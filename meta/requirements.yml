@@ -1,0 +1,12 @@
+---
+# Ansible galaxy packages
+
+collections:
+  # https://docs.ansible.com/ansible/latest/collections/community/general/
+  # ini_file, make
+  - community.general
+  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/patch_module.html
+  # patch, mount
+  - ansible.posix
+
+roles: []

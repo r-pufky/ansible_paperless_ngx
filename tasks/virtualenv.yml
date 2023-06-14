@@ -1,0 +1,52 @@
+---
+###############################################################################
+# Paperless NGX Python Virtual Environment
+###############################################################################
+# Configure Python Virtual Environment. This is created in the versioned
+# install location so state is kept between versions. Assumes archive is
+# already unpacked and cleaned.
+#
+# Args:
+#   _pngx_venv: str versioned python virtual environment location.
+#   _pngx_install_dir: str versioned install location.
+
+- name: 'virtualenv | virtual environment configuration (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Virtual environment is being configured. This will take a few minutes.
+
+- name: 'virtualenv | setup virtual environment'
+  ansible.builtin.pip:
+    virtualenv:         '{{ _pngx_venv }}'
+    virtualenv_command: 'virtualenv'
+    virtualenv_python:  'python3'
+    requirements:       '{{ _pngx_install_dir }}/requirements.txt'
+    extra_args:         '--upgrade'
+  become: true
+  become_user: '{{ pngx_user }}'
+  # Reference: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: 'virtualenv | add additional nltk packages'
+  ansible.builtin.pip:
+    virtualenv:         '{{ _pngx_venv }}'
+    virtualenv_command: 'virtualenv'
+    virtualenv_python:  'python3'
+    name:               '{{ pngx_default_nltk }}'
+    extra_args:         '--upgrade'
+  become: true
+  become_user: '{{ pngx_user }}'
+  # Reference: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+  when: pngx_enable_nltk
+
+- name: 'virtualenv | secure virtual environment'
+  ansible.builtin.file:
+    path:    '{{ _pngx_venv }}'
+    owner:   '{{ pngx_user }}'
+    group:   '{{ pngx_group }}'
+    mode:    'a-st,g-w,o-rwx'
+    state:   'directory'
+    recurse: true

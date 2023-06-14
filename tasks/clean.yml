@@ -1,0 +1,33 @@
+---
+###############################################################################
+# Remove Old Paperless NGX Versions
+###############################################################################
+# Remove versioned Paperless NGX directories, excluding the currently set
+# paperless NGX version and any version where user data is defined to reside.
+#
+# Args:
+#   _pngx_target: str full version (ng-x.x.x) to install.
+
+- name: 'clean | find existing installations'
+  ansible.builtin.find:
+    paths:     '{{ pngx_default_install_dir }}'
+    file_type: 'directory'
+    use_regex: true
+    patterns:
+      - '.*paperless-ngx-.*'
+    recurse:   false
+  register: _pngx_existing_installs
+
+# Never delete old version if user data resides in it.
+- name: 'clean | remove old versions'
+  ansible.builtin.file:
+    path:  '{{ item.path }}'
+    state: 'absent'
+  loop: '{{ _pngx_existing_installs.files }}'
+  when: |
+    item.path not in pngx_consumption_dir and
+    item.path not in pngx_data_dir and
+    item.path not in pngx_trash_dir and
+    item.path not in pngx_media_root and
+    _pngx_target != item.path.split("-", 2)[-1] and
+    pngx_delete_old_versions

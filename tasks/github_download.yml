@@ -1,0 +1,38 @@
+---
+###############################################################################
+# Paperless NGX Github Download
+###############################################################################
+# Download and validate the paperless-ngx package from github, using the
+# specified version.
+#
+# Currently 'latest' versioned releases can be full releases or branches. So
+# 'latest' should not be used; though it is still enabled in case the release
+# strucutrue ever changes.
+#
+# Args:
+#   _pngx_target: str full version (ng-x.x.x) to install.
+#   _pngx_url: str download url for current release.
+#   _pngx_install_dir: str versioned install location.
+#   _pngx_archive: str local versioned archive location.
+#
+# Generates:
+#   _pngx_install_stat: stat object for the versioned install location.
+#
+
+- name: 'download | check local versioned install directory'
+  ansible.builtin.stat:
+    path: '{{ _pngx_install_dir }}'
+  register: _pngx_install_stat
+
+- name: 'download | download paperless-ngx {{ _pngx_target }}'
+  ansible.builtin.get_url:
+    url:    '{{ _pngx_url }}'
+    dest:   '{{ _pngx_archive }}'
+    mode:   0644
+    owner:  '{{ pngx_user }}'
+    group:  '{{ pngx_group }}'
+  register: _paperless_download
+  until: _paperless_download is succeeded
+  retries: 5
+  delay: 2
+  when: not _pngx_install_stat.stat.exists
