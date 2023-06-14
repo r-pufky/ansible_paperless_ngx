@@ -1,0 +1,84 @@
+---
+###############################################################################
+# Paperless NGX Service Configuration
+###############################################################################
+# Each release contains templated systemd services that need to be customized
+# to the installation. Write settings to service and ensure it is actively
+# reloaded to pickup the latest settings.
+#
+# Args:
+#   _pngx_venv: str versioned python virtual environment location.
+#   _pngx_install_dir: str versioned install location.
+#   _pngx_service_consumer: str path to consumer service definition.
+#   _pngx_service_scheduler: str path to scheduler service definition.
+#   _pngx_service_webserver: str path to webserver service definition.
+#   _pngx_service_task_queue: str path to task queue service definition.
+
+- name: 'config | set common service options'
+  ansible.builtin.include_tasks: service_options.yml
+  loop:
+    - '{{ _pngx_service_consumer }}'
+    - '{{ _pngx_service_scheduler }}'
+    - '{{ _pngx_service_webserver }}'
+    - '{{ _pngx_service_task_queue }}'
+  loop_control:
+    loop_var: service
+
+- name: 'config | set paperless-consumer service'
+  community.general.ini_file:
+    path:    '{{ _pngx_service_consumer }}'
+    section: 'Service'
+    option:  'ExecStart'
+    value:   '{{ _pngx_venv }}/bin/python3 manage.py document_consumer'
+    owner:   '{{ pngx_user }}'
+    group:   '{{ pngx_group }}'
+    mode:    0640
+  notify: 'reload paperless_ngx'
+
+- name: config | set paperless-scheduler service'
+  community.general.ini_file:
+    path:    '{{ _pngx_service_scheduler }}'
+    section: 'Service'
+    option:  'ExecStart'
+    value:   '{{ _pngx_venv }}/bin/celery --app paperless beat --loglevel INFO'
+    owner:   '{{ pngx_user }}'
+    group:   '{{ pngx_group }}'
+    mode:    0640
+  notify: 'reload paperless_ngx'
+
+- name: config | set paperless-webserver service'
+  community.general.ini_file:
+    path:    '{{ _pngx_service_webserver }}'
+    section: 'Service'
+    option:  'ExecStart'
+    value:   '{{ _pngx_venv }}/bin/gunicorn -c {{ _pngx_install_dir }}/gunicorn.conf.py paperless.asgi:application'
+    owner:   '{{ pngx_user }}'
+    group:   '{{ pngx_group }}'
+    mode:    0640
+  notify: 'reload paperless_ngx'
+
+- name: config | set paperless-task-queue service'
+  community.general.ini_file:
+    path:    '{{ _pngx_service_task_queue }}'
+    section: 'Service'
+    option:  'ExecStart'
+    value:   '{{ _pngx_venv }}/bin/celery --app paperless worker --loglevel INFO'
+    owner:   '{{ pngx_user }}'
+    group:   '{{ pngx_group }}'
+    mode:    0640
+  notify: 'reload paperless_ngx'
+
+- name: 'config | stage paperless services'
+  ansible.builtin.copy:
+    remote_src: true
+    src:        '{{ item }}'
+    dest:       '/etc/systemd/system/'
+    owner:      'root'
+    group:      'root'
+    mode:       0755
+  loop:
+    - '{{ _pngx_service_consumer }}'
+    - '{{ _pngx_service_scheduler }}'
+    - '{{ _pngx_service_webserver }}'
+    - '{{ _pngx_service_task_queue }}'
+  notify: 'reload paperless_ngx'

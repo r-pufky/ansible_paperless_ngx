@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  role_name:   'paperless_ngx'
+  author:      'r_pufky'
+  description: 'Paperless NGX'
+  company:     'N/A'
+  license:     'AGPL-3.0 License'
+  min_ansible_version: 2.11
+
+  platforms:
+    - name: 'Debian'
+      versions:
+        - 'bullseye'
+
+  galaxy_tags:
+    - 'paperless'
+    - 'ngx'
+    - 'pdf'
+    - 'document'
+    - 'scanning'
+    - 'archive'
+    - 'edms'
+    - 'media'
+
+dependencies: []

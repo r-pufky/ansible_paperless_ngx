@@ -1,0 +1,136 @@
+---
+###############################################################################
+# Paperless NGX Python Virtual Environment
+###############################################################################
+# Configure Python Virtual Environment. This is created in the versioned
+# install location so state is keep between versions. Assumes archive is
+# already unpacked and cleaned; and a database is ready to be configured.
+#
+# Args:
+#   _pngx_venv: str versioned python virtual environment location.
+#   _pngx_install_dir: str versioned install location.
+#   _pngx_staticdir: str calculated static serving location.
+#   _pngx_convert_tmpdir: str path temp directory for processing.
+
+- name: 'config | create in-memory /tmp for processing'
+  ansible.posix.mount:
+    path:   '{{ _pngx_convert_tmpdir }}'
+    src:    'tmpfs'
+    fstype: 'tmpfs'
+    opts:   'defaults,size={{ pngx_tmp_memory }}'
+    state:  'mounted'
+  when: pngx_tmp_memory|length > 0
+
+- name: 'config | set paperless config'
+  ansible.builtin.template:
+    src:   'paperless.conf.j2'
+    dest:  '/etc/paperless.conf'
+    owner: 'root'
+    group: '{{ pngx_group }}' # root originally.
+    mode:  0640 # 0644 originally.
+  notify: 'reload paperless_ngx'
+
+- name: 'config | set consume permissions'
+  ansible.builtin.file:
+    path:  '{{ pngx_consumption_dir }}'
+    owner: '{{ pngx_consumption_perms.user }}'
+    group: '{{ pngx_consumption_perms.group }}'
+    mode:  '{{ pngx_consumption_perms.mode }}'
+    state: 'directory'
+  when: pngx_consumption_perms|length > 0
+
+- name: 'config | set data permissions'
+  ansible.builtin.file:
+    path:  '{{ pngx_data_dir }}'
+    owner: '{{ pngx_data_perms.user }}'
+    group: '{{ pngx_data_perms.group }}'
+    mode:  '{{ pngx_data_perms.mode }}'
+    state: 'directory'
+  when: pngx_data_perms|length > 0
+
+- name: 'config | set trash permissions'
+  ansible.builtin.file:
+    path:  '{{ pngx_trash_dir }}'
+    owner: '{{ pngx_trash_perms.user }}'
+    group: '{{ pngx_trash_perms.group }}'
+    mode:  '{{ pngx_trash_perms.mode }}'
+    state: 'directory'
+  when: pngx_trash_perms|length > 0
+
+- name: 'config | set media permissions'
+  ansible.builtin.file:
+    path:  '{{ pngx_media_root }}'
+    owner: '{{ pngx_media_perms.user }}'
+    group: '{{ pngx_media_perms.group }}'
+    mode:  '{{ pngx_media_perms.mode }}'
+    state: 'directory'
+  when: pngx_media_perms|length > 0
+
+- name: 'config | set static dir permissions'
+  ansible.builtin.file:
+    path:  '{{ _pngx_staticdir }}'
+    owner: '{{ pngx_staticdir_perms.user }}'
+    group: '{{ pngx_staticdir_perms.group }}'
+    mode:  '{{ pngx_staticdir_perms.mode }}'
+    state: 'directory'
+  when: pngx_staticdir_perms|length > 0
+
+- name: 'config | set nltk dir permissions'
+  ansible.builtin.file:
+    path:  '{{ pngx_nltk_dir }}'
+    owner: '{{ pngx_user }}'
+    group: '{{ pngx_group }}'
+    mode:  '0755'
+    state: 'directory'
+  when: pngx_nltk_dir|length > 0
+
+- name: 'config | migrate database schema (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Database schema migration in progress. This may take a few minutes.
+
+# Migrations need to be applied before root user configuration.
+- name: 'config | migrate database schema'
+  ansible.builtin.command: '{{ _pngx_venv }}/bin/python3 {{ _pngx_install_dir }}/src/manage.py migrate'
+  changed_when: false
+  become: true
+  become_user: '{{ pngx_user }}'
+  # Reference: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+# Documentation states the need to run 'manage.py createsuperuser', running
+# 'manage_superuser' will create the root user if it does not exist.
+- name: 'config | set root user'
+  become: true
+  become_user: "{{ pngx_user }}"
+  ansible.builtin.command: "{{ _pngx_venv }}/bin/python3 {{ _pngx_install_dir }}/src/manage.py manage_superuser"
+  environment:
+    PAPERLESS_ADMIN_USER: "{{ pngx_admin_user }}"
+    PAPERLESS_ADMIN_MAIL: "{{ pngx_admin_mail }}"
+    PAPERLESS_ADMIN_PASSWORD: "{{ pngx_admin_password }}"
+  register: superuser
+  changed_when: '"Created superuser" in superuser.stdout'
+  no_log: true
+  # Reference: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+# Ghostscript RCE for versions < 9.25. Enable. Debian Bullseye is 9.53.
+#
+# Reference:
+# * https://www.kb.cert.org/vuls/id/332928/
+# * https://packages.debian.org/bullseye/ghostscript
+- name: 'config | enable imagemagick pdf processing'
+  ansible.builtin.lineinfile:
+    path:     '/etc/ImageMagick-6/policy.xml'
+    regexp:   '(\s+)<policy domain="coder" rights=".*" pattern="PDF" />'
+    line:     '\1<policy domain="coder" rights="read|write" pattern="PDF" />'
+    backrefs: true
+
+- name: 'config | set web server listen on {{ pngx_address }}:{{ pngx_port }}'
+  ansible.builtin.lineinfile:
+    path:   '{{ _pngx_install_dir }}/gunicorn.conf.py'
+    regexp: '^bind = '
+    line:   "bind = '{{ pngx_address }}:{{ pngx_port }}'"
+  notify: 'reload paperless_ngx'

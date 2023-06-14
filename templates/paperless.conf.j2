@@ -1,0 +1,145 @@
+# Have a look at the docs for documentation.
+# https://docs.paperless-ngx.com/configuration/
+#
+# Ordered according to configuration page, not template file. PAPERLESS_DEBUG
+# is Only listed on the setup page.
+
+# Debug. Only enable this for development.
+PAPERLESS_DEBUG={{ pngx_debug|string|lower }}
+
+# Required Services
+
+PAPERLESS_REDIS={{ pngx_redis }}
+PAPERLESS_DBENGINE={{ pngx_dbengine|lower }}
+{% if pngx_dbengine != 'sqlite' %}
+PAPERLESS_DBHOST={{ pngx_dbhost }}
+PAPERLESS_DBPORT={{ pngx_dbport }}
+PAPERLESS_DBNAME={{ pngx_dbname }}
+PAPERLESS_DBUSER={{ pngx_dbuser }}
+PAPERLESS_DBPASS={{ pngx_dbpass }}
+PAPERLESS_DBSSLMODE={{ pngx_dbsslmode }}
+PAPERLESS_DBSSLROOTCERT={{ pngx_dbsslrootcert }}
+PAPERLESS_DBSSLCERT={{ pngx_dbsslcert }}
+PAPERLESS_DBSSLKEY={{ pngx_dbsslkey }}
+{% endif %}
+{#
+# TODO(bug): Fixed in next release.
+# Reference: https://github.com/paperless-ngx/paperless-ngx/issues/3569
+#}
+{% if pngx_dbengine == 'sqlite' %}PAPERLESS_DB_TIMEOUT={{ pngx_db_timeout if pngx_db_timeout > 0 else '' }}
+{% endif %}
+
+# Optional Services (Tika settings)
+
+PAPERLESS_TIKA_ENABLED={{ pngx_tika_enabled|string|lower }}
+PAPERLESS_TIKA_ENDPOINT={{ pngx_tika_endpoint }}
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT={{ pngx_tika_gotenberg_endpoint }}
+
+# Paths and folders
+
+PAPERLESS_CONSUMPTION_DIR={{ pngx_consumption_dir }}
+PAPERLESS_DATA_DIR={{ pngx_data_dir }}
+PAPERLESS_TRASH_DIR={{ pngx_trash_dir }}
+PAPERLESS_MEDIA_ROOT={{ pngx_media_root }}
+PAPERLESS_STATICDIR={{ _pngx_staticdir }}
+PAPERLESS_FILENAME_FORMAT={{ pngx_filename_format }}
+PAPERLESS_FILENAME_FORMAT_REMOVE_NONE={{ pngx_filename_format_remove_none|string|lower }}
+PAPERLESS_NLTK_DIR:{{ pngx_nltk_dir }}
+
+# Logging
+
+PAPERLESS_LOGGING_DIR={{ pngx_logging_dir }}
+PAPERLESS_LOGROTATE_MAX_SIZE={{ pngx_logrotate_max_size }}
+PAPERLESS_LOGROTATE_MAX_BACKUPS={{ pngx_logrotate_max_backups }}
+
+# Hosting and security
+
+PAPERLESS_SECRET_KEY={{ pngx_secret_key }}
+PAPERLESS_URL={{ pngx_url }}
+PAPERLESS_CSRF_TRUSTED_ORIGINS={{ pngx_csrf_trusted_origins|join(',') }}
+PAPERLESS_ALLOWED_HOSTS={{ pngx_allowed_hosts|join(',') }}
+PAPERLESS_CORS_ALLOWED_HOSTS={{ pngx_cors_allowed_hosts|join(',') }}
+PAPERLESS_TRUSTED_PROXIES={{ pngx_trusted_proxies|join(',') }}
+PAPERLESS_FORCE_SCRIPT_NAME={{ pngx_force_script_name }}
+PAPERLESS_STATIC_URL={{ pngx_static_url }}
+PAPERLESS_AUTO_LOGIN_USERNAME={{ pngx_auto_login_username }}
+{% if pngx_admin_user|length > 0 %}
+PAPERLESS_ADMIN_USER={{ pngx_admin_user }}
+PAPERLESS_ADMIN_MAIL={{ pngx_admin_mail }}
+PAPERLESS_ADMIN_PASSWORD={{ pngx_admin_password }}
+{% endif %}
+PAPERLESS_COOKIE_PREFIX={{ pngx_cookie_prefix }}
+PAPERLESS_ENABLE_HTTP_REMOTE_USER={{ pngx_enable_http_remote_user|string|lower }}
+PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME={{ pngx_http_remote_user_header_name }}
+PAPERLESS_LOGOUT_REDIRECT_URL={{ pngx_logout_redirect_url }}
+PAPERLESS_USE_X_FORWARD_HOST={{ pngx_use_x_forward_host|string|lower }}
+PAPERLESS_USE_X_FORWARD_PORT={{ pngx_use_x_forward_port|string|lower }}
+PAPERLESS_PROXY_SSL_HEADER={{ pngx_proxy_ssl_header|to_json }}
+
+# OCR settings
+
+PAPERLESS_OCR_LANGUAGE={{ pngx_ocr_language|join('+') }}
+PAPERLESS_OCR_MODE={{ pngx_ocr_mode }}
+PAPERLESS_OCR_SKIP_ARCHIVE_FILE={{ pngx_ocr_skip_archive_file }}
+PAPERLESS_OCR_CLEAN={{ pngx_ocr_clean }}
+PAPERLESS_OCR_DESKEW={{ pngx_ocr_deskew|string|lower }}
+PAPERLESS_OCR_ROTATE_PAGES={{ pngx_ocr_rotate_pages|string|lower }}
+PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD={{ pngx_ocr_rotate_pages_threshold }}
+PAPERLESS_OCR_OUTPUT_TYPE={{ pngx_ocr_output_type }}
+PAPERLESS_OCR_PAGES={{ pngx_ocr_pages }}
+PAPERLESS_OCR_IMAGE_DPI={{ pngx_ocr_image_dpi }}
+PAPERLESS_OCR_IMAGE_PIXELS={{ pngx_ocr_image_pixels }}
+{# Always use lossless compression if pdf/a high compression is used. #}
+PAPERLESS_OCR_USER_ARGS={{ pngx_ocr_user_args|combine({'jbig2_lossy': false} if pngx_pfda_compression else {})|to_json }}
+
+# Software tweaks
+
+PAPERLESS_TASK_WORKERS={{ pngx_task_workers }}
+PAPERLESS_THREADS_PER_WORKER={{ pngx_threads_per_worker }}
+PAPERLESS_WORKER_TIMEOUT={{ pngx_worker_timeout }}
+PAPERLESS_TIME_ZONE={{ pngx_time_zone }}
+{# Per documentation nltk bool is interpreted using integer. #}
+PAPERLESS_ENABLE_NLTK={{ pngx_enable_nltk|int }}
+PAPERLESS_EMAIL_TASK_CRON={{ pngx_email_task_cron }}
+PAPERLESS_TRAIN_TASK_CRON={{ pngx_train_task_cron }}
+PAPERLESS_INDEX_TASK_CRON={{ pngx_index_task_cron }}
+PAPERLESS_SANITY_TASK_CRON={{ pngx_sanity_task_cron }}
+{# Per documentation compression bool is interpreted using integer. #}
+PAPERLESS_ENABLE_COMPRESSION={{ pngx_enable_compression|bool }}
+PAPERLESS_CONVERT_MEMORY_LIMIT={{ pngx_convert_memory_limit }}
+PAPERLESS_CONVERT_TMPDIR={{ _pngx_convert_tmpdir }}
+
+# Document consumption
+
+PAPERLESS_CONSUMER_DELETE_DUPLICATES={{ pngx_consumer_delete_duplicates|string|lower }}
+PAPERLESS_CONSUMER_RECURSIVE={{ pngx_consumer_recursive|string|lower }}
+PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS={{ pngx_consumer_subdirs_as_tags|string|lower }}
+PAPERLESS_CONSUMER_IGNORE_PATTERNS={{ pngx_consumer_ignore_patterns|to_json }}
+PAPERLESS_CONSUMER_BARCODE_SCANNER={{ pngx_consumer_barcode_scanner|upper }}
+PAPERLESS_PRE_CONSUME_SCRIPT={{ pngx_pre_consume_script }}
+PAPERLESS_POST_CONSUME_SCRIPT={{ pngx_post_consume_script }}
+PAPERLESS_FILENAME_DATE_ORDER={{ pngx_filename_date_order }}
+PAPERLESS_NUMBER_OF_SUGGESTED_DATES={{ pngx_number_of_suggested_dates }}
+PAPERLESS_THUMBNAIL_FONT_NAME='{{ pngx_thumbnail_font_name }}'
+PAPERLESS_IGNORE_DATES={{ pngx_ignore_dates|join(',') }}
+PAPERLESS_DATE_ORDER={{ pngx_date_order }}
+
+# Polling
+
+PAPERLESS_CONSUMER_POLLING={{ pngx_consumer_polling }}
+PAPERLESS_CONSUMER_POLLING_RETRY_COUNT={{ pngx_consumer_polling_retry_count }}
+PAPERLESS_CONSUMER_POLLING_DELAY={{ pngx_consumer_polling_delay }}
+PAPERLESS_CONSUMER_INOTIFY_DELAY={{ pngx_consumer_inotify_delay }}
+
+# Barcodes
+
+PAPERLESS_CONSUMER_ENABLE_BARCODES={{ pngx_consumer_enable_barcodes|string|lower }}
+PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT={{ pngx_consumer_barcode_tiff_support|string|lower }}
+PAPERLESS_CONSUMER_BARCODE_STRING={{ pngx_consumer_barcode_string }}
+PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE={{ pngx_consumer_enable_asn_barcode }}
+PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX={{ pngx_consumer_asn_barcode_prefix }}
+
+# Binaries
+
+PAPERLESS_CONVERT_BINARY={{ pngx_convert_binary }}
+PAPERLESS_GS_BINARY={{ pngx_gs_binary }}

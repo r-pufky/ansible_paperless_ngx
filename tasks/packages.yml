@@ -1,0 +1,71 @@
+---
+###############################################################################
+# Paperless NGX Packages
+###############################################################################
+# Install packages.
+#
+# Args:
+#   _pngx_ocr_packages: list of str containing OCR packages to install.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/
+# * https://github.com/paperless-ngx/paperless-ngx
+#    # * https://github.com/agl/jbig2enc
+
+- name: 'packages | add packages (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Packages are being installed. This will take a few minutes.
+
+- name: 'packages | modify postgresql support'
+  ansible.builtin.apt:
+    name:  '{{ pngx_default_postgresql }}'
+    state: '{% if pngx_dbengine == "postgresql" %}latest{% else %}absent{% endif %}'
+    update_cache: true
+    purge: '{% if pngx_dbengine == "postgresql" %}false{% else %}true{% endif %}'
+
+# mariadb-common depends on default-libmysqlclient-dev; required for installing
+# the virtual environment pip files. Removing MariaDB after the base
+# dependencies are installed will cause virtual environment creation to fail.
+# Setup DB packages first, then layer in the core dependencies which should
+# reinstall default-libmysqlclient-dev correctly if MariaDB is removed.
+- name: 'packages | modify mariadb support'
+  ansible.builtin.apt:
+    name:  '{{ pngx_default_mariadb }}'
+    state: '{% if pngx_dbengine == "mariadb" %}latest{% else %}absent{% endif %}'
+    update_cache: true
+    purge: '{% if pngx_dbengine == "mariadb" %}false{% else %}true{% endif %}'
+
+- name: 'packages | modify sqlite support'
+  ansible.builtin.apt:
+    name:  '{{ pngx_default_sqlite }}'
+    state: '{% if pngx_dbengine == "sqlite" %}latest{% else %}absent{% endif %}'
+    update_cache: true
+    purge: '{% if pngx_dbengine == "sqlite" %}false{% else %}true{% endif %}'
+
+- name: 'packages | install dependencies'
+  ansible.builtin.apt:
+    name:  '{{ item }}'
+    state: 'latest'
+    update_cache: true
+    install_recommends: true
+  loop:
+    - '{{ pngx_default_packages }}'
+    - '{{ pngx_default_ocr_my_pdf }}'
+    - '{{ _pngx_ocr_packages }}'
+    - '{{ pngx_default_additional }}'
+
+- name: 'packages | add jbig2enc (pdf/a compression) dependencies'
+  ansible.builtin.apt:
+    name:         '{{ pngx_default_jbig2enc }}'
+    state:        'latest'
+    update_cache: true
+    install_recommends: true
+  when: pngx_pfda_compression
+
+- name: 'packages | install redis'
+  ansible.builtin.apt:
+    name:  '{{ pngx_default_redis }}'
+    state: 'latest'
+    update_cache: true
+  when: pngx_enable_redis

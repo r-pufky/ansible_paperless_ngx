@@ -1,0 +1,642 @@
+---
+###############################################################################
+# Paperless NGX Role Configuration
+###############################################################################
+# Electronic Document Management System.
+#
+# Suggested Use (based on archivst recommendations):
+#
+# 1. **Document Types** refer to the broad type of document in question. Is it
+#    a letter? Receipt? Bill? Every instance will be different, but this should
+#    be your broadest field. You just want to more of less get it in the
+#    ballpark. For example, my Receipts doctype holds receipts that I scan in,
+#    but it will also hold confirmations from my debtors that I paid a bill, or
+#    an email from Cash app that I sold Bitcoin.
+#
+# 2. **Correspondent** refers to the person/organization you are communicating
+#    with in the document. A bill from your credit card would have Capital One
+#    as correspondent for example, while a copy of your W2 might go under IRS.
+#    Again, you can be broad here, as trying to narrow it down is going to
+#    drive you crazy.
+#
+# 3. **Tags** are used to answer the below basic concepts:
+#
+#   * **Who** is it referring to? In my case, I have tags for myself, my wife,
+#     the kids, and the dogs. They are all the same color to easily denote
+#     that. Note that this is NOT the same as correspondent.
+#
+#   * **What** is it referring to? Is it related to your car loan? Is it
+#     related to your homes maintenance? Mark these tags in a different color
+#     to easily notice them.
+#
+#   * **When** is the information in this document relevant? Was it a bill from
+#     2 years ago? Does it relate to your taxes for 2022? Personally, I make
+#     tags for the year it was received, as it makes it easier to sort. You can
+#     further break this down by month if needed.
+#
+# 4. I also make tags for special categories that I need to track. For example,
+#    I have a tag for any documents that we'll need for our taxes in the coming
+#    year, or critical documents (birth certs, etc). This helps to further
+#    break it down.
+#
+# See README.md to migrate from NG to NGX.
+#
+# References:
+# * https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/
+# * https://docs.paperless-ngx.com/configuration/
+
+# User that paperless will run under. Assumes externally managed.
+pngx_user:  'paperless'
+pngx_group: 'paperless'
+
+# Create 'paperless' user if not detected? See: vars/main.yml.
+pngx_create_user: false
+
+# Version. Use specific tagged release or 'latest'. Default: 'v1.15.1'.
+# Reference: https://github.com/paperless-ngx/paperless-ngx/releases
+pngx_version: 'latest'
+
+# Should old paperless installs be removed automatically on upgrade success?
+pngx_delete_old_versions: true
+
+# Use RAM (mounted as /tmp via tmpfs) for document processing. Uses fstab
+# sizes. Enabling this will OVERRIDE 'pngx_convert_tmpdir'. Empty Disables.
+# Default: '1G'.
+pngx_tmp_memory: '1G'
+
+# Supported OCR languages. Use language only (remove tesseract-ocr-). Empty
+# will install all languages (Multi-GB).
+#
+# Reference:
+# * https://packages.debian.org/bullseye/tesseract-ocr-all
+pngx_ocr_languages:
+  - 'eng'
+
+# Install jbig2enc library for improved lossless high compression of pdf/a.
+# Lossless compression is automatically used if enabled.
+pngx_pfda_compression: true
+
+# jbig2enc install location. Default: '/opt'.
+pngx_jbig2enc_dir: '/opt'
+
+# jbig2enc version. Default: '0.29'.
+pngx_jbig2enc_version: '0.29'
+
+# Webserver listen interface. Default: '0.0.0.0' (all interfaces).
+pngx_address: '0.0.0.0'
+
+# Webserver listen port. Default: 8000.
+pngx_port: 8000
+
+# Install a local redis memcache server? Redis is required, disable if hosted
+# externally. Default: true.
+pngx_enable_redis: true
+
+# Set user document submissions directory permissions.
+# {user: '', group: '', mode: ''}. Empty disables.
+pngx_consumption_perms:
+  user:  '{{ pngx_user }}'
+  group: '{{ pngx_group }}'
+  mode:  '0750'
+
+# Set configuration directory permissions.
+# {user: '', group: '', mode: ''}. Empty disables.
+pngx_data_perms:
+  user:  '{{ pngx_user }}'
+  group: '{{ pngx_group }}'
+  mode:  '0750'
+
+# Set stored user data directory permissions.
+# {user: '', group: '', mode: ''}. Empty disables.
+pngx_media_perms:
+  user:  '{{ pngx_user }}'
+  group: '{{ pngx_group }}'
+  mode:  '0750'
+
+# Set stored trash directory permissions.
+# {user: '', group: '', mode: ''}. Empty disables.
+pngx_trash_perms:
+  user:  '{{ pngx_user }}'
+  group: '{{ pngx_group }}'
+  mode:  '0750'
+
+# Set static serving directory permissions.
+# {user: '', group: '', mode: ''}. Empty disables.
+pngx_staticdir_perms:
+  user:  '{{ pngx_user }}'
+  group: '{{ pngx_group }}'
+  mode:  '0750'
+
+###############################################################################
+# Paperless NGX paperless.conf Configuration
+###############################################################################
+# Migrations between databases backends must be done manually. Highly prefer
+# postgresql. Docker options have been excluded.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/
+# * https://docs.paperless-ngx.com/setup/#sqlite_to_psql
+
+# Enable debugging. Default: false.
+pngx_debug: false
+
+###############################################################################
+# Required Services
+###############################################################################
+# Redis server location. Default: 'redis://localhost:6379' (local redis).
+pngx_redis: 'redis://localhost:6379'
+
+# Enable support for database type. 'sqlite', 'postgresql', 'mariadb'. MariaDB
+# has specific caveats; use postgresql. Default: 'postgresql'.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/advanced_usage/#mysql-caveats
+pngx_dbengine:  'postgresql'
+pngx_dbhost:    'localhost' # Ignored for sqlite.
+pngx_dbport:    5432        # Ignored for sqlite.
+pngx_dbname:    'paperless' # Ignored for sqlite.
+pngx_dbuser:    'paperless' # Ignored for sqlite.
+pngx_dbpass:    'paperless' # Ignored for sqlite.
+pngx_dbsslmode: 'prefer'    # Ignored for sqlite.
+
+# Database SSL root certificate path. '' uses defaults. Default: ''.
+pngx_dbsslrootcert: ''
+
+# Database SSL client certificate path. '' uses defaults. Default: ''.
+pngx_dbsslcert: ''
+
+# Database SSL client key path. '' uses defaults. Default: ''.
+pngx_dbsslkey: ''
+
+# Database timeout in seconds. 0 uses defaults. Default: 0.
+pngx_db_timeout: 0
+
+###############################################################################
+# Optional Services (Tika Settings)
+###############################################################################
+# Enable the tika/gotenburg parsing. Requires a tika/gotenburg server.
+pngx_tika_enabled: false
+
+# Tika server to connect to.
+pngx_tika_endpoint: 'http://localhost:9998'
+
+# Gotenburg server to connect to.
+pngx_tika_gotenberg_endpoint: 'http://localhost:3000'
+
+###############################################################################
+# Paths and Folders
+###############################################################################
+# Location of user document submissions.
+pngx_consumption_dir: '/data/consume'
+
+# Location of configuration data.
+pngx_data_dir: '/data/data'
+
+# Location of trashed items. Deleted permanently if empty. Default: ''.
+pngx_trash_dir: ''
+
+# Location of stored user data. May be the same as pngx_data_dir.
+pngx_media_root: '/data/media'
+
+# Location of static serving directory. If you don't know why you should
+# change this, don't. Default: '' (autoconfigure to installed location/static).
+pngx_staticdir: ''
+
+# Ingested media file naming conventions. If this is changed after documents
+# are loaded run 'document_renamer' to mass update files. You many need to
+# temporarily enable the pngx_user user shell to login and run the
+# command.
+#
+#   su - { pngx_user }
+#   cd /var/lib/paperless-ngx-X.X.X/scripts
+#   . ../.venv/bin/activate
+#   python3 manage.py document_renamer
+#
+# Reference:
+# * https://docs.paperless-ngx.com/advanced_usage/#file-name-handling
+# * https://docs.paperless-ngx.com/advanced_usage/#advanced-file-name-handling
+# * https://docs.paperless-ngx.com/administration/#management-utilities
+# * https://docs.paperless-ngx.com/administration/#renamer
+pngx_filename_format: ''
+
+# Omit filename/directory placholders that resolve to 'none'. See File name
+# handling for details. Default: false (disabled).
+pngx_filename_format_remove_none: false
+
+# Location for NLTK data processing if used. Default: '/usr/share/nltk_data'.
+pngx_nltk_dir: '/usr/share/nltk_data'
+
+###############################################################################
+# Logging
+###############################################################################
+# Location of logs. If you don't know why you should change this, don't.
+# default: '{{ pngx_data_dir }}/log'.
+pngx_logging_dir: '{{ pngx_data_dir }}/log'
+
+# Max log size before rotation in MiB. Default: 1.
+pngx_logrotate_max_size: 1
+
+# Max number of rotated logs to keep. Default: 20.
+pngx_logrotate_max_backups: 20
+
+###############################################################################
+# Hosting and Security
+###############################################################################
+# Used for session token generation. Specify custom token.
+# Default: Randomly generated 50 characters.
+pngx_secret_key: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=50') }}"
+
+# Set all CSRF, CORS, allowed hosts options at once. Appended to
+# pngx_allowed_hosts, pngx_cors_allowed_hosts, pngx_csrf_trusted_origins if
+# set. Do not include trailing slash. Default: ''.
+#
+# If you get a 'Forbidden (403) CSRF verification failed. Request aborted.'
+# Error, then start by setting this and enabling pngx_use_x_forward_host,
+# pngx_use_x_forward_port.
+#
+# Reference:
+# * https://github.com/paperless-ngx/paperless-ngx/pull/674
+# * https://github.com/paperless-ngx/paperless-ngx/issues/712
+# * https://github.com/paperless-ngx/paperless-ngx/issues/817
+pngx_url: ''
+
+# Cross Site Request Forgery (CSRF) trusted origins. A list of trusted origins
+# for unsafe requests. Required for Django web admin access. Default: [''].
+#
+# Reference:
+# * https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins
+pngx_csrf_trusted_origins:
+  - ''
+
+# Hosts allowed to connect. Default: ['*']. Restrict to known hosts only.
+pngx_allowed_hosts:
+  - '*'
+
+# Cross origin resource sharing (CORS) allowed hosts. Servers should be added
+# here (like NGINX). Default: ['http://localhost:8000'].
+#
+# Reference:
+# * https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+pngx_cors_allowed_hosts:
+  - 'http://localhost:8000'
+
+# Trursted proxies. May be needed to prevent IP address spoofing if you are
+# using fail2ban with log entries for failed authorization attempts. List of IP
+# addresses. Default: [].
+pngx_trusted_proxies: []
+
+# Hosting path, if not using a subdomain. Include /.
+# e.g. '/paperless' would result in http://www.example.com/paperless
+pngx_force_script_name: ''
+
+# Static path. Update if pngx_force_script_name is used.
+pngx_static_url: '/static/'
+
+# User to automatically login as. Do **NOT** use if exposed externally.
+pngx_auto_login_username: ''
+
+# Paperless root user. This user will automatically be created and have root.
+# Root user is only created/enabled if pngx_admin_user is specified. All
+# options are required if used.
+pngx_admin_user:     'paperless'
+pngx_admin_mail:     'paperless@example.com'
+pngx_admin_password: 'paperless'
+
+# Cookie prefix. Use if running multiple instances on the same system.
+pngx_cookie_prefix: ''
+
+# Enables authentication via 'Remote-User'. Requests should come from trusted
+# sources. Use for SSO, do **not** use with proxy.
+#
+# Reference:
+# * https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration
+pngx_enable_http_remote_user: false
+
+# Specify custom header for obtaining username if pngx_enable_http_remote_user
+# is enabled. Default: 'HTTP_REMOTE_USER'.
+pngx_http_remote_user_header_name: 'HTTP_REMOTE_USER'
+
+# Logout redirection to remote user SSO authentication page. Empty disables.
+# Default: ''.
+pngx_logout_redirect_url: ''
+
+# Enable Django use of USE_X_FORWARDED_HOST which may be needed for hosting
+# behind a proxy. Default: false.
+#
+# Reference:
+# * https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-host
+pngx_use_x_forward_host: false
+
+# Enable Django use of USE_X_FORWARD_PORT which may be needed for hosting
+# behind a proxy. Default: false.
+#
+# Reference:
+# * https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-port
+pngx_use_x_forward_port: false
+
+# Enable Django use of SECURE_PROXY_SSL_HEADER which may be needed for hosting
+# behind a proxy. List containing [HTTP Header, value]. Default: [].
+#
+# pngx_proxy_ssl_header:
+#   - 'HTTP_X_FORWARDED_PROTO'
+#   - 'https'
+#
+# Danger! Setting this value has security implications.  Read the Django
+# documentation and be sure you understand its usage before setting it.
+#
+# Reference:
+# * https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header
+pngx_proxy_ssl_header: []
+
+###############################################################################
+# OCR Settings
+###############################################################################
+# List of languages that OCR will process with. Multiple languages will be
+# attempted in defined order. Defualt: ['eng'].
+pngx_ocr_language:
+  - 'eng'
+
+# How to performce OCR document scanning. Default 'skip'.
+# * skip:
+#     Skip all pages and perform OCR only on pages where no text present. This
+#     is the safest option.
+# * skip_noarchive:
+#     In addition to 'skip', paperless won’t create an archived version of your
+#     documents when it finds any text in them. This is useful if you don’t
+#     want to have two almost-identical versions of your digital documents in
+#     the media folder. This is the fastest option.
+# * redo:
+#     Paperless will OCR all pages of your documents and attempt to replace any
+#     existing text layers with new text. This will be useful for documents
+#     from scanners that already performed OCR with insufficient results. It
+#     will also perform OCR on purely digital documents. This option may fail
+#     on some documents that have features that cannot be removed, such as
+#     forms. In this case, the text from the document is used instead.
+# * force:
+#     Paperless rasterizes your documents, converting any text into images and
+#     puts the OCRed text on top. This works for all documents, however, the
+#     resulting document may be significantly larger and text won’t appear as
+#     sharp when zoomed in.
+pngx_ocr_mode: 'skip'
+
+# Skip creating an archive version of scanned documents. Default: 'never'.
+# * never: Never skip creating an archived version.
+# * with_text: Skip creating an archived version for documents that already
+#     have embedded text.
+# * always: Always skip creating an archived version.
+pngx_ocr_skip_archive_file: 'never'
+
+# Use unpaper to clean document before sending to tesseract. Generally produces
+# better OCR results.
+# * clean:
+#     Apply unpaper.
+# * clean-final:
+#     Apply unpaper, and use the cleaned images to build the output file
+#     instead of the original images.
+# * none:
+#     Do not apply unpaper.
+pngx_ocr_clean: 'clean'
+
+# Deskew images. Deskewing is incompatible with pngx_ocr_mode: 'redo'; will be
+# disabled automatically if set.
+pngx_ocr_deskew: true
+
+# Rotate pages to correct orientation based tesseract analysis.
+pngx_ocr_rotate_pages: true
+
+# Threshold for automatic page rotation. 15 is conservative, 2 is agressive.
+# Default: 12.
+pngx_ocr_rotate_pages_threshold: 12
+
+# Type of documents that OCR should produce. The original is always kept.
+# Default: 'pdfa'
+# * pdf:
+#     Modify the PDF document as little as possible.
+# * pdfa:
+#     Convert PDF documents into PDF/A-2b documents, which is a subset of the
+#     entire PDF specification and meant for storing documents long term.
+# * pdfa-1, pdfa-2, pdfa-3:
+#     specify the exact version of PDF/A you wish to use.
+pngx_ocr_output_type: 'pdfa'
+
+# Number of pages to process with OCR. With 'pngx_ocr_mode: redo' or
+# pngx_ocr_mode: 'force'; paperless will not modify any text it finds on
+# excluded pages and copy it verbatim. Default: 0 (all).
+pngx_ocr_pages: 0
+
+# DPI of scanned images. Set to printer image scan DPI.
+pngx_ocr_image_dpi: 600
+
+# Raise warning when images are past specified limit, and disable processing
+# for an image 2x this size (may result in dropping images). Default: 89478485
+# (Pillow default ~250MB for 24bit image).
+#
+# Reference:
+# * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS
+pngx_ocr_image_pixels: 89478485
+
+# Additional ocrmypdf options as a list of dicts. Automatically converted to
+# JSON. Default: [{'optimize': 1}] (Enable lossless optimizations).
+#
+# Reference:
+# * https://ocrmypdf.readthedocs.io/en/latest/api.html#reference
+pngx_ocr_user_args:
+  - {'optimize': 1}
+
+###############################################################################
+# Software Tweaks
+###############################################################################
+# How many tasks to run in parallel. Do not exceed worker*thread=core count.
+#
+# Cores Workers Threads
+# 1     1       1
+# 2     2       1
+# 4     2       2
+# 6     2       3
+# 8     2       4
+# 12    3       4
+# 16    4       4
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#software_tweaks
+pngx_task_workers:       1
+pngx_threads_per_worker: 1
+
+# Timeout in seconds before force failing processing a single docment.
+# Default: 1800
+pngx_worker_timeout: 1800
+
+# Timezone for document processing.
+pngx_time_zone: 'UTC'
+
+# Enable natural language processing during automatic classification.
+# Automatically downloads an additional 20.6MB for machine learning data when
+# enabled.
+# Default: true.
+pngx_enable_nltk: true
+
+# Scheduled email fetch frequency. Crontab expression. 'disable' disables
+# cronjob. Default: '*/10 * * * *' (every 10 minutes).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+pngx_email_task_cron: '*/10 * * * *'
+
+# Scheduled automatic classifier training frequency. Crontab expression.
+# 'disable' disables cronjob. Default: '5 */1 * * *' (every hour at 5 minutes
+# past the hour).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+pngx_train_task_cron: '5 */1 * * *'
+
+# Scheduled search index update frequency. Crontab expression. 'disable'
+# disables cronjob. Default: '0 0 * * *' (daily at midnight).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+pngx_index_task_cron: '0 0 * * *'
+
+# Scheduled sanity checker frequency. Crontab expression. 'disable' disables
+# cronjob. Default: '30 0 * * sun' (Sunday at 30 minutes past midnight).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+pngx_sanity_task_cron: '30 0 * * sun'
+
+# Enable compression of webserver responses. It is more efficient to enable
+# compression in the proxy than here. Default: true.
+pngx_enable_compression: true
+
+# Document conversion memory limit in MB. 0 disables. Default: 0.
+# Errors with 'unable to extend pixel cache' are from this limit.
+pngx_convert_memory_limit: 0
+
+# Document conversion temp directory. Automatically OVERRIDEN by setting
+# 'pngx_tmp_memory'. Use this when you expect to process documents larger than
+# those that will fit in the 'pngx_tmp_memory' space. Empty Disables.
+# Default: ''.
+pngx_convert_tmpdir: ''
+
+###############################################################################
+# Document Consumption
+###############################################################################
+# If a duplicate document is detected, should it be deleted?
+pngx_consumer_delete_duplicates: false
+
+# Recursively watch pngx_consumption_dir for changes?
+pngx_consumer_recursive: false
+
+# Autotag documents based on pngx_consumption_dir. Tags will be created
+# if needed, folders will not be deleted. Requires
+# pngx_consumer_recursive.
+pngx_consumer_subdirs_as_tags: false
+
+# Files to ignore in pngx_consumption_dir.
+pngx_consumer_ignore_patterns:
+  - '.DS_STORE/*'
+  - '._*'
+  - '.stfolder/*'
+  - '.stversions/*'
+  - '.localized/*'
+  - 'desktop.ini'
+  - '@eaDir/*'
+
+# Set the barcode scanner used for barcode functionality. If issues are
+# encountered with barcords not being detected, try switching libraries.
+# Values 'PYZBAR' or 'ZXING'. Default: 'ZXING'.
+pngx_consumer_barcode_scanner: 'PYZBAR'
+
+# Pre process document with user defined script. Empty disables. Default: ''.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/advanced_usage/#pre-consume-script
+pngx_pre_consume_script: ''
+
+# Post process document with user defined script. Empty disables. Default: ''.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/advanced_usage/#post-consume-script
+pngx_post_consume_script: ''
+
+# Use specified format for automatic document date detection; filename is
+# checked first, then document. Empty disables. Default: 'YMD'.
+# Reference:
+# * https://dateparser.readthedocs.io/en/latest/settings.html#date-order
+pngx_filename_date_order: 'YMD'
+
+# Search document for alternative created date suggestions. 0 disbles.
+# Default: 3.
+pngx_number_of_suggested_dates: 3
+
+# Font to use for plain text file thumbnail generation; does not apply to
+# already generated images.
+# Default: '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'.
+pngx_thumbnail_font_name: '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'
+
+# List of dates that should be ignored during creation date detection. This is
+# useful for special dates (like date of birth) that appear in documents
+# regularly but are very unlikely to be the documents creation date. Empty list
+# disables. Default: [].
+#
+# Reference:
+# * https://dateparser.readthedocs.io/en/latest/#popular-formats
+pngx_ignore_dates: []
+
+# Date formate expected in documents. Shuffle order to expected order in docs.
+# * D: Day
+# * M: Month
+# * Y: Year
+# Default: 'DMY'.
+pngx_date_order: 'DMY'
+
+###############################################################################
+# Polling
+###############################################################################
+# Filesystem polling interval in seconds. Inotify used if disabled, however
+# this may lead to processing of partial file uploads. Default: 0 (disabled).
+pngx_consumer_polling: 0
+
+# Number of times to check a file has remained unmodified. Default: 5.
+pngx_consumer_polling_retry_count: 5
+
+# Delay in seconds between polls. Default: 5.
+pngx_consumer_polling_delay: 5
+
+# Time in seconds to wait for additional inotify events before considering a
+# file ready to process (certain events may notify multiple times, this will
+# consider all those events as a single event). Default: 0.5.
+pngx_consumer_inotify_delay: 0.5
+
+###############################################################################
+# Barcodes
+###############################################################################
+# Separate single file PDF based on barcode separation pages.
+# Reference:
+# * https://www.alliancegroup.co.uk/patch-codes.htm
+pngx_consumer_enable_barcodes: false
+
+# Scan TIFF images for barcodes. Automatically converts TIFF images to PDF for
+# processing. Only active if pngx_consumer_enable_barcodes enabled.
+# Default: false.
+pngx_consumer_barcode_tiff_support: false
+
+# Defines string to be detected as a separator barcode. Default: 'PATCHT'.
+pngx_consumer_barcode_string: 'PATCHT'
+
+# Enable detection of barcodes and setting of ASN (archive serial number) if a
+# properly formatted barcode is detected. Default: false.
+pngx_consumer_enable_asn_barcode: false
+
+# Define prefix used to identify barcode as ASN (archive serial number).
+# Default: 'ASN'.
+pngx_consumer_asn_barcode_prefix: 'ASN'
+
+###############################################################################
+# Binaries
+###############################################################################
+# convert binary location.
+pngx_convert_binary: '/usr/bin/convert'
+
+# gs binary location.
+pngx_gs_binary: '/usr/bin/gs'
