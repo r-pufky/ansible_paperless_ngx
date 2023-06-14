@@ -2,7 +2,7 @@
 Paperless NGX install from source.
 
 ## Requirements
-No additional requirements. [Migration from NG requires specific steps](#migration-from-r_pufkypaperlessng-paperless-ng-to-paperless-ngx).
+No additional requirements. [Migration from NG requires specific steps](https://github.com/r-pufky/ansible_paperless_ngx#migration-from-r_pufkypaperlessng-paperless-ng-to-paperless-ngx).
 
 ## Role Variables
 Settings have been throughly documented for usage.
