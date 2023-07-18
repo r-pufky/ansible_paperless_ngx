@@ -21,6 +21,15 @@
     state:  'mounted'
   when: pngx_tmp_memory|length > 0
 
+- name: 'config | set temp processing directory'
+  ansible.builtin.file:
+    path:  '{{ _pngx_convert_tmpdir }}'
+    owner: '{{ pngx_data_perms.user }}'
+    group: '{{ pngx_data_perms.group }}'
+    mode:  '{{ pngx_data_perms.mode }}'
+    state: 'directory'
+  when: not pngx_tmp_memory
+
 - name: 'config | set paperless config'
   ansible.builtin.template:
     src:   'paperless.conf.j2'
