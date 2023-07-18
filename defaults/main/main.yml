@@ -41,7 +41,7 @@
 #
 # See README.md to migrate from NG to NGX.
 #
-# References:
+# Reference:
 # * https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/
 # * https://docs.paperless-ngx.com/configuration/
 
@@ -512,9 +512,10 @@ pngx_enable_compression: true
 # Errors with 'unable to extend pixel cache' are from this limit.
 pngx_convert_memory_limit: 0
 
-# Document conversion temp directory. Automatically OVERRIDEN by setting
+# Document conversion temp directory. Automatically OVERRIDDEN by setting
 # 'pngx_tmp_memory'. Use this when you expect to process documents larger than
-# those that will fit in the 'pngx_tmp_memory' space. Empty Disables.
+# those that will fit in the 'pngx_tmp_memory' space. Uses 'pngx_data_perms' to
+# set directory permissions. Empty Disables.
 # Default: ''.
 pngx_convert_tmpdir: ''
 
