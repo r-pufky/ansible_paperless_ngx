@@ -1,0 +1,8 @@
+---
+- name: 'Live API test | converge'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Live API test | converge | apply r_pufky.srv.paperless_ngx'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.paperless_ngx'

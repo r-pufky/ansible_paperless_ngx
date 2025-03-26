@@ -1,0 +1,11 @@
+---
+###############################################################################
+# Audit Trail
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#audit-trail
+
+# Enable audit trail for documents, document types, correspondents, and tags?
+#
+# Default: True.
+paperless_ngx_config_audit_log_enabled: true

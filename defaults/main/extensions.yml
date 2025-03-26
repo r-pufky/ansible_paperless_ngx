@@ -1,0 +1,25 @@
+---
+###############################################################################
+# Extensions Section (paperless.conf)
+###############################################################################
+# Manually specify additional settings that are not explicitly defined in this
+# config. Use to add additional options from future paperless-ngx updates that
+# are not currently in the role. If you are using this section, please submit a
+# bug with the specific key that needs to be added to the config.
+#
+# Deprecated options may be specified here.
+#
+# https://github.com/r-pufky/ansible_paperless_ngx/issues
+#
+
+# Extensions for paperless.conf.
+#
+# paperless_ngx_config_extensions:
+#     dict - additional settings.
+#   {KEY}: str - value.
+#
+# paperless_ngx_config_extensions:
+#   PAPERLESS_NEW_SETTING: 300
+#
+# Default: {}.
+paperless_ngx_config_extensions: {}

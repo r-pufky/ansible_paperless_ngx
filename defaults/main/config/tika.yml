@@ -1,0 +1,19 @@
+---
+###############################################################################
+# Tika (Optional)
+###############################################################################
+# Used to parse and convert office documents (such as ".doc", ".xlsx" and
+# ".odt") and E-Mails (.eml). Optional additional service.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#tika
+# * https://github.com/tteck/Proxmox/discussions/2286
+
+# Enable Tika/Gotenberg Parsing. Default: False.
+paperless_ngx_config_tika_enabled: false
+
+# Tika server location. Default: 'http://localhost:9998'.
+paperless_ngx_config_tika_endpoint: 'http://localhost:9998'
+
+# Gotenburg server location. Default: 'http://localhost:3000'.
+paperless_ngx_config_tika_gotenberg_endpoint: 'http://localhost:3000'

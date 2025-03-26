@@ -1,0 +1,26 @@
+---
+###############################################################################
+# Trash
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#trash
+
+# How long documents remain in trash before permanent deletion (days).
+#
+# Values:
+#   1: Minimum.
+#
+# Default: 30.
+paperless_ngx_config_empty_trash_delay: 30
+
+# Schedule to empty trash of expired deleted documents.
+#
+# Values:
+#    {CRON}: Crontab expression.
+#   disable: disable email fetching.
+#
+# Default: '0 1 * * *' (once per day).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+paperless_ngx_config_empty_trash_task_cron: '0 1 * * *'

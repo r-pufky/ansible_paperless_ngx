@@ -1,14 +1,10 @@
 ---
-- ansible.builtin.include_tasks: core.yml
-- ansible.builtin.include_tasks: manage_users.yml
-- ansible.builtin.include_tasks: packages.yml
-- ansible.builtin.include_tasks: jbig2enc.yml
-  when: _pngx_jbig2enc_install
-- ansible.builtin.include_tasks: github_download.yml
-- ansible.builtin.include_tasks: unpack.yml
-- ansible.builtin.include_tasks: virtualenv.yml
-- ansible.builtin.include_tasks: config.yml
-- ansible.builtin.include_tasks: nltk.yml
-  when: pngx_enable_nltk
-- ansible.builtin.include_tasks: services.yml
-- ansible.builtin.include_tasks: clean.yml
+- name: 'Prep'
+  ansible.builtin.import_tasks: 'prep.yml'
+
+- name: 'Install'
+  when: not paperless_ngx_service_force_config_only_enable
+  ansible.builtin.import_tasks: 'install.yml'
+
+- name: 'Config'
+  ansible.builtin.import_tasks: 'config.yml'

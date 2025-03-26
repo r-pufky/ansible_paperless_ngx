@@ -1,0 +1,40 @@
+---
+###############################################################################
+# Collate Double-Sided Documents
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#collate
+
+# Enable collation of two single-sided scans into a double-sided document?
+#
+# Requires paperless_ngx_config_consumer_recursive=true.
+#
+# This is useful if you have an automatic document feeder that only supports
+# single-sided scans, but you need to scan a double-sided document. If your ADF
+# supports double-sided scans natively, you do not need this feature.
+#
+# Default: False.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/advanced_usage/#collate
+paperless_ngx_config_consumer_enable_collate_double_sided: false
+
+# Subdirectory that collate expects documents to arrive in.
+#
+# Requires paperless_ngx_config_consumer_enable_collate_double_sided=true.
+#
+# Automatically creates directory in paperless_ngx_config_consumption_dir
+# using paperless_ngx_media_perms_folder permissions.
+#
+# Default: 'double-sided'.
+paperless_ngx_config_consumer_collate_double_sided_subdir_name: 'double-sided'
+
+# Enable support for TIFF image files when collating documents?
+#
+# Requires paperless_consumer_enable_collate_double_sided=true.
+#
+# This will automatically convert any TIFF image(s) to pdfs for later
+# processing.
+#
+# Default: False.
+paperless_ngx_config_consumer_collate_double_sided_tiff_support: false

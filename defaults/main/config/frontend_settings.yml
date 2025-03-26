@@ -1,0 +1,17 @@
+---
+###############################################################################
+# Frontend Settings
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#frontend-settings
+
+# Set default application name. Default: 'Paperless-ngx'.
+paperless_ngx_config_app_title: 'Paperless-ngx'
+
+# Path to a custom logo image file in the /media/logo directory.
+#
+# Special Case:
+#   *: Must include 'logo' (e.g. /logo/Atari_logo.svg).
+#
+# Default: '' (disabled).
+paperless_ngx_config_app_logo: ''
