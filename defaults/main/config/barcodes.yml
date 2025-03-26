@@ -1,0 +1,136 @@
+---
+###############################################################################
+# Barcodes
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#barcodes
+
+# Enable scanning and page separation based on detected barcodes?
+#
+# Allows for scanning and adding multiple documents per uploaded file, which
+# are separated by one or multiple barcode pages. The original document will be
+# removed and the separated pages will be saved as pdf. If no barcodes are
+# detected in the uploaded file, no page separation will happen.
+#
+# Suggest using standardized separation page.
+#
+# Default: False.
+#
+# Reference:
+# * https://www.alliancegroup.co.uk/patch-codes.htm
+# * https://docs.paperless-ngx.com/advanced_usage/#barcodes
+paperless_ngx_config_consumer_enable_barcodes: false
+
+# Scan TIFF images for barcodes?
+#
+# Requires paperless_ngx_config_consumer_enable_barcodes=true.
+#
+# Automatically converts TIFF images to PDF for processing.
+#
+# Default: False.
+paperless_ngx_config_consumer_barcode_tiff_support: false
+
+# Defines string to be detected as a separator barcode.
+#
+# If paperless is used with the PATCH-T separator pages, users shouldn't change
+# this.
+#
+# Default: 'PATCHT'.
+paperless_ngx_config_consumer_barcode_string: 'PATCHT'
+
+# Keep all pages that are split by a barcode (such as PATCHT)? Default: False.
+paperless_ngx_config_consumer_barcode_retain_split_pages: false
+
+# Enable detection of barcodes and setting of ASN (archive serial number)?
+#
+# The barcode must consist of a (configurable) prefix and the ASN to be set,
+# for instance ASN00123. The content after the prefix is cleaned of non-numeric
+# characters.
+#
+# This option is compatible with barcode page separation, since pages will be
+# split up before reading the ASN.
+#
+# If no ASN barcodes are detected in the uploaded file, no ASN will be set. If
+# a barcode with an existing ASN is detected, the document will not be consumed
+# and an error logged.
+#
+# Default: False.
+paperless_ngx_config_consumer_enable_asn_barcode: false
+
+# Define prefix used to identify barcode as ASN (archive serial number).
+#
+# Default: 'ASN'.
+paperless_ngx_config_consumer_asn_barcode_prefix: 'ASN'
+
+# Defines the upscale factor used in barcode detection.
+#
+# Upscale document before barcode detection process to improve detection of
+# small barcodes. Use with paperless_ngx_config_consumer_barcode_dpi to set
+# higher values.
+#
+# Values:
+#   1.0+: Upscale factor (not processed below 1.0).
+#    0.0: Disabled (default).
+#
+# Default: 0.0.
+paperless_ngx_config_consumer_barcode_upscale: 0.0
+
+# Barcode image DPI for barcode detection.
+#
+# During barcode detection every page from a PDF document needs to be converted
+# to an image. A DPI value can be specified in the conversion process. Default
+# is 300. If the detection of small barcodes fails a bigger dpi value i.e. 600
+# can fix the issue. Use with paperless_ngx_config_consumer_barcode_upscale.
+#
+# Default: 300.
+paperless_ngx_config_consumer_barcode_dpi: 300
+
+# Limit barcode detection to the first X pages.
+#
+# Because barcode detection is a computationally-intensive operation, this
+# setting limits the detection of barcodes to a number of first pages. If your
+# scanner has a limit for the number of pages that can be scanned it would be
+# sensible to set this as the limit here.
+#
+# Default: 0 (check all pages).
+paperless_ngx_config_consumer_barcode_max_pages: 0
+
+# Enable barcode detection in scanned document and tag?
+#
+# Assigns or creates tags if a properly formatted barcode is detected. The
+# barcode must match one of the (configurable) regular expressions.
+#
+# Special Case:
+#   ,: If barcode text contains ',' (comma), it is split into multiple barcodes
+#      which are individually processed for tagging.
+#   *: Matching is case insensitive.
+#
+# Default: False.
+paperless_ngx_config_consumer_enable_tag_barcode: false
+
+# Dict of filter regex and substitute expressions.
+#
+# Automatically converted to JSON.
+#
+# A barcode is considered for tagging if the barcode text matches at least one
+# of the provided pattern. If a match is found, the rule is applied. Allows
+# very versatile reformatting and mapping of barcode pattern to tag values. If
+# a tag is not found it will be created.
+#
+# Special Case:
+#    *: YAML will automatically be converted to JSON object.
+#   "": Use double quotes for correct escape character interpretation for JSON.
+#
+# paperless_ngx_config_consumer_tag_barcode_mapping:
+#       list of dict - Barcode regex test matching to tag mapping rules.
+#   - {REGEX}: {RULE} str - Python regex to match against barcode text.
+#
+# paperless_ngx_config_consumer_tag_barcode_mapping
+#   "ASN12.*": "JOHN"  # maps ASN12nnnn barcode to john.
+#   "ASN13.*": "SMITH"  # maps ASN13nnnn barcode to smith.
+#   "TAG:(.*)": "\\g<1>"  # maps TAG:{TAG} barcode to {TAG}.
+#
+# Default:
+#  "TAG:(.*)": "\\g<1>"
+paperless_ngx_config_consumer_tag_barcode_mapping:
+  "TAG:(.*)": "\\g<1>"

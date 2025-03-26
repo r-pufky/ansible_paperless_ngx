@@ -1,13 +1,13 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
 # Ports Configuration
 ###############################################################################
-# Ports should be managed externally via an OS role.
+# Manage firewall with r_pufky.srv.ufw.
 #
 # Reference:
-# * https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
-# * https://paperless-ng.readthedocs.io/en/latest/setup.html?highlight=proxy#using-nginx-as-a-reverse-proxy
+# * https://github.com/r-pufky/ansible_ufw
 
-ports:
-  - {proto: 'tcp', from_ip: 'any',       to_port: 8000, direction: 'in', comment: 'paperless WebUI'}
+paperless_ngx_ports:
+  - {proto: 'tcp', from_ip: 'any', to_port: 8000, direction: 'in', comment: 'paperless webui'}
   - {proto: 'tcp', from_ip: '127.0.0.1', to_port: 6379, direction: 'in', comment: 'local redis memcache'}

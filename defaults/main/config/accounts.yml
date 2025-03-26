@@ -1,0 +1,149 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Hosting and Security > Accounts
+###############################################################################
+
+# Paperless root user.
+#
+# This user will automatically be created and have root. It will not update the
+# user after the initial creation.
+#
+# Values:
+#   '': Disable account creation.
+#
+# Default: 'paperless'.
+paperless_ngx_config_admin_user: 'paperless'
+
+# Paperless root password. Default: 'paperless'
+paperless_ngx_config_admin_password: 'paperless'
+
+# Paperless root email. Default: 'root@localhost'.
+paperless_ngx_config_admin_mail: 'root@localhost'
+
+# Additional SSL certificate to validate mail provider SSL connections.
+#
+# Configures an additional SSL certificate file containing a certificate or
+# certificate chain which should be trusted for validating SSL connections
+# against mail providers. This is for use with self-signed certificates against
+# local IMAP servers.
+#
+# Settings this value has security implications for the security of your email.
+# Understand what it does and be sure you need to before setting.
+#
+# Default: '' (disabled).
+paperless_ngx_config_email_certificate_location: ''
+
+###############################################################################
+# Social Media Accounts
+###############################################################################
+
+# Configure social media account logins.
+#
+# Automatically converted to JSON.
+#
+# Used to setup login and sign-up via social account providers which are
+# compatible with django-allauth. See the corresponding django-allauth
+# documentation for a list of provider configurations. You will also need to
+# include the relevant Django 'application' inside the
+# paperless_ngx_config_paperless_apps setting to activate that specific
+# authentication provider (e.g. allauth.socialaccount.providers.openid_connect
+# for the OIDC Connect provider).
+#
+# Special Case:
+#    *: YAML will automatically be converted to JSON object.
+#   "": Use double quotes for correct escape character interpretation for JSON.
+#
+# Default: '' (disabled).
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/socialaccount/providers/index.html
+# * https://docs.paperless-ngx.com/configuration/#PAPERLESS_APPS
+# * https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
+paperless_ngx_config_socialaccount_providers: ''
+
+# Enable automatic account sign-up from social media providers?
+#
+# Attempt to sign-up user using retrieved email, username, etc. from third
+# party authentication system.
+#
+# Default: False.
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/account/configuration.html
+paperless_ngx_config_social_auto_signup: false
+
+# Enable account sign-up from social media providers?
+#
+# Allow users to manually sign-up for a new Paperless-ngx account using any
+# setup third party authentication systems.
+#
+# Default: True.
+paperless_ngx_config_socialaccount_allow_signups: true
+
+# Enable users to sign-up for a new Paperless-ngx account? Default: False.
+paperless_ngx_config_account_allow_signup: false
+
+# Default login callback URL protocol.
+#
+# Default: 'https'.
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/account/configuration.html
+paperless_ngx_config_account_default_http_protocol: 'https'
+
+# Email verification method during user account sign-up.
+#
+# Requires a working email server.
+#
+# Values:
+#   mandatory: Verification required before signing in.
+#    optional: Verification is sent, but not required for sign-in.
+#        none: No verification (default).
+#
+# Default: 'none'.
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/account/configuration.html
+# * https://docs.paperless-ngx.com/configuration/#PAPERLESS_EMAIL_HOST
+paperless_ngx_config_account_email_verification: 'none'
+
+# Disable standard username/password login?
+#
+# Use this to enforce SSO-only logins after it is working. This setting does
+# not disable the Django admin login nor logging in with local credentials via
+# the API. To prevent access to the Django admin, consider blocking /admin/ in
+# your web server or reverse proxy configuration.
+#
+# You can optionally also automatically redirect users to the SSO login with
+# paperless_ngx_config_redirect_login_to_sso=true.
+#
+# Default: False.
+paperless_ngx_config_disable_regular_login: false
+
+# Automatically redirect to first SSO provider login?
+#
+# You may still want to disable the frontend login form for clarity.
+#
+# Default: False.
+paperless_ngx_config_paperless_redirect_login_to_sso: false
+
+# Use paperless_ngx_config_session_cookie_age for session expiration?
+#
+# sessions expire at browser close if disabled.
+#
+# Default: True.
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/account/configuration.html
+paperless_ngx_config_paperless_account_session_remember: true
+
+# Login session cookie expiration (seconds).
+#
+# Requires paperless_ngx_config_paperless_account_session_remember=true.
+#
+# Default: 1209600 (2 weeks).
+#
+# Reference:
+# * https://docs.allauth.org/en/latest/account/configuration.html
+paperless_ngx_config_paperless_session_cookie_age: 1209600

@@ -1,43 +1,77 @@
 # Paperless-NGX
-Paperless NGX install from source.
+Paperless-NGX installation from public release tarball.
 
 ## Requirements
-No additional requirements. [Migration from NG requires specific steps](https://github.com/r-pufky/ansible_paperless_ngx#migration-from-r_pufkypaperlessng-paperless-ng-to-paperless-ngx).
+[supported platforms](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/meta/main.yml)
+
+[collections/roles](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/meta/requirements.yml)
 
 ## Role Variables
-Settings have been throughly documented for usage.
-[defaults/main/main.yml](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/defaults/main/main.yml).
+[defaults](https://github.com/r-pufky/ansible_paperless_ngx/tree/main/defaults/main)
+
+### Ports
+All ports and protocols have been defined for the role.
+
+[defaults/ports.yml](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/defaults/main/ports.yml)
 
 ## Dependencies
-[community.general.ini_file](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html)
-
-[community.general.make](https://docs.ansible.com/ansible/latest/collections/community/general/make_module.html)
-
-[ansible.posix.patch](https://docs.ansible.com/ansible/latest/collections/ansible/posix/patch_module.html)
-
-[ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html)
+Part of the [r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv)
+collection.
 
 ## Example Playbook
+Read defaults documentation.
+
 The following example will get an instance quickly up and running. Paperless
 is highly customizable and you should fully read through defaults before using.
+``` yaml
+- name: 'Paperless-NGX server'
+  hosts: 'ngx.example.com'
+  become: true
+  roles:
+     - 'r_pufky.srv.paperless_ngx'
+  vars:
+    paperless_ngx_config_dbengine: 'sqlite'
+    paperless_ngx_config_admin_user: 'example_user'
+    paperless_ngx_config_admin_mail: 'user@example.com'
+    paperless_ngx_config_admin_password: '{{ vault_paperless_ngx_admin_password }}'
+    paperless_ngx_config_filename_format: '{document_type}/{correspondent}/{created}-{title}-[{tag_list}]'
+```
+
+Changes updating the configuration only can be done to speed role application:
+``` bash
+ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_service_force_config_only_enable=true'
+```
+
+### Reverse Proxy
+Reverse proxy configuration has drastically **changed**. Be sure to set the
+following configuration variables:
 
 host_vars/paperless.example.com/vars/paperless.yml
 ``` yaml
-# Paperless root user. This user will automatically be created and have root.
-pngx_admin_user:      'example_user'
-pngx_admin_mail:      'user@example.com'
-pngx_admin_password:  '{{ vault_pngx_admin_password }}'
-pngx_filename_format: '{document_type}/{correspondent}/{created}-{title}-[{tag_list}]'
+paperless_ngx_use_x_forward_host: true
+paperless_ngx_use_x_forward_port: true
+paperless_ngx_url: 'https://paperless.example.com'
+paperless_ngx_csrf_trusted_origins: 'https://paperless.example.com'
+paperless_ngx_allowed_hosts: 'paperless.example.com'
+paperless_ngx_cors_allowed_hosts: 'https://paperless.example.com'
+```
+See linked bugs detailing reasons for change:
+* https://github.com/paperless-ngx/paperless-ngx/pull/674
+* https://github.com/paperless-ngx/paperless-ngx/issues/817
+* https://github.com/paperless-ngx/paperless-ngx/issues/712
+
+Receiving a 403 after logging in explicitly after upgrading with:
+```
+Forbidden (403) CSRF verification failed. Request aborted.
+```
+See the [Proxy Rule Changes](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx)
+and be sure to add referrer-policy to allow requests through:
+
+```
+add_header Referrer-Policy 'strict-origin-when-cross-origin';
 ```
 
-site.yml
-``` yaml
-- name:   'paperless server'
-  hosts:  'paperless.example.com'
-  become: true
-  roles:
-    - 'r_pufky.paperless_ngx'
-```
+Restart both NGINX and Paperless and try again.
 
 ## Suggested Archival Use
 Suggested Use (based on archivst recommendations):
@@ -71,18 +105,20 @@ Suggested Use (based on archivst recommendations):
 [Reference](https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/)
 
 ## Using Management Utilities
-You many need to temporarily enable the `pngx_user` user shell to login
-and run managment utilties. It is **highly** recommended that the user shell be
-disabled after use.
+You many need to temporarily enable the `paperless_ngx_user` user shell to
+login and run management utilities. It is **highly** recommended that the user
+shell be disabled after use.
 
 ```bash
-su - {{ pngx_user }}
-cd /var/lib/paperless-ngx-X.X.X/scripts
-. ../.venv/bin/activate
+su - {{ paperless_ngx_user }}
+. /var/venv/paperless/bin/activate
+cd /opt/paperless/paperless/src
 python3 manage.py document_renamer
 ```
+
 [Reference](https://docs.paperless-ngx.com/administration/)
 
+### img2pdf
 `img2pdf` has been included to provide increased functionality for import
 scripts. This will enable lossless conversion of images to pdf's, enabling
 import into paperless. The following example will strip alpha channel data from
@@ -94,6 +130,7 @@ img2pdf out.png -o import.pdf
 ```
 [Reference](https://github.com/josch/img2pdf)
 
+### ghostscript
 `ghostscript` is included with paperless. This will enable you to reduce pdf
 size if needed. Use the following settings for specific resolutions: `/screen`
 72dpi, `/ebook` 150dpi, `/prepress` 300dpi, `/printer` 300dpi, `/default` no
@@ -113,73 +150,54 @@ gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE={OUTPUT}.pdf
 ```
 [Reference](https://www.fosslinux.com/49661/merge-pdf-files-on-linux.htm)
 
-## Migration From r_pufky.paperlessng (Paperless-NG to Paperless-NGX)
+## Migration
 In place migrations from NG to NGX can be done using this role if the
 following conditions are met:
 1. Ensure the last release of paperless-ng is already deployed (1.5.0) and
-   sucessfully launched. Shutdown.
+   successfully launched. Shutdown.
 2. Backup your data, and your databases. Recommend cloning your paperless
    instance as well.
-3. Role variables are migrated and updated from `paperlessng_` to `pngx_`.
-   Many variables have been added, removed, or changed. The easiest way is to
-   start fresh with a new copy of `defaults/main.yml` and add your existing
-   values into it for your host. Specifically watch out for:
-
-   Variables Dropped:
-   * `paperlessng_worker_retry` (removed).
-   * `paperlessng_filename_parse_transforms` (removed).
-   * `paperlessng_enable_update_check` (moved to UI toggle).
-
-   Variables Explicitly Changed:
-   * `paperlessng_root_name` --> `pngx_admin_name`
-   * `paperlessng_root_email` --> `pngx_admin_email`
-   * `paperlessng_root_password` --> `pngx_admin_password`
-   * `paperlessng_ocr_rotate_pages_threshold` (float) --> `pngx_ocr_rotate_pages_threshold` (int)
-
-   See [proxy instuctions below](#reverse-proxy-migration-changes) for reverse
+3. Role variables are migrated and updated from `paperlessng_` or `pngx_` to
+   `paperless_ngx_`. Many variables have been added, removed, or changed. The
+   easiest way is to start fresh using values from `defaults` and add your
+   existing values into it for your host. Specifically watch out for:
+4. See [proxy instructions below](#reverse-proxy-migration-changes) for reverse
    proxy changes.
-4. Database backend changes are **not** supported. Database migrations to NGX
-   are done automatically during role application.
+4. Database backend changes are **not** supported. Database upgrades to NGX are
+   done automatically during role application.
 
 [Reference](https://docs.paperless-ngx.com/setup/#migrating-from-paperless-ng)
 
-### Reverse Proxy Migration Changes
-Reverse proxy configuration has drastically **changed**. Be sure to set the
-following configuration variables:
+## Troubleshooting
+https://docs.paperless-ngx.com/troubleshooting/
 
-host_vars/paperless.example.com/vars/paperless.yml
-``` yaml
-pngx_use_x_forward_host: true
-pngx_use_x_forward_port: true
-pngx_url: 'https://paperless.example.com'
-pngx_csrf_trusted_origins: 'https://paperless.example.com'
-pngx_allowed_hosts: 'paperless.example.com'
-pngx_cors_allowed_hosts: 'https://paperless.example.com'
-```
-See linked bugs detailing reasons for change:
-* https://github.com/paperless-ngx/paperless-ngx/pull/674
-* https://github.com/paperless-ngx/paperless-ngx/issues/817
-* https://github.com/paperless-ngx/paperless-ngx/issues/712
+### PDF's fail to ingest with older ICC profiles.
+Some PDF's with older ICC profiles may fail to be injested. Though rare, these
+can be manually pre-processed to fix the ICC profiles:
 
-Recieving a 403 after logging in explicitly after upgrading with:
-```
-Forbidden (403) CSRF verification failed. Request aborted.
-```
-See the [Proxy Rule Changes](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx)
-and be sure to add referrer-policy to allow requests through:
-
-```
-add_header Referrer-Policy 'strict-origin-when-cross-origin';
+``` bash
+gs -o output.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress input.pdf
 ```
 
-Restart both NGINX and Paperless and try again.
+[Reference](https://kcore.org/2021/05/08/paperless-ng/)
+
+## Development
+Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)
+
+Run all unit tests:
+``` bash
+molecule test --all
+```
 
 ## Issues
 Create a bug and provide as much information as possible.
+
 Associate pull requests with a submitted bug.
 
 ## License
-[AGPL-3.0 License](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/LICENSE)
+[AGPL-3.0 License](https://www.tldrlegal.com/license/gnu-affero-general-public-license-v3-agpl-3-0)
+ [(direct link)](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/LICENSE)
 
 ## Author Information
-https://keybase.io/rpufky
+PGP Fingerprint: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9](https://keys.openpgp.org/vks/v1/by-fingerprint/466EEC2B67516C7117C85CE3A0BC35D16698BAB9)
+| [github gist](https://gist.github.com/r-pufky/a8df36977c55b5bb20829267c4c49d22)

@@ -1,0 +1,62 @@
+---
+# yamllint disable rule:line-length
+# Integration test against a live github repository for download and
+# extraction. This confirms the API endpoints are processed correctly, NLTK
+# data is downloaded correctly and should only be run as one-off test before
+# releasing.
+#
+# Set paperless_ngx_live_api_enable=true to test live API commands.
+#
+#   molecule test -s live_api_test -- -v -e 'paperless_ngx_live_api_enable=true'
+#
+# Additionally, a github token may be provided to test authenticated API use:
+#
+#   molecule test -s live_api_test -- -v -e 'paperless_ngx_live_api_enable=true,github_personal_access_token={TOKEN}'
+#
+# Test success against molecule default tests.
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        paperless_ngx_live_api_enable: false
+        paperless_ngx_config_dbengine: 'sqlite'
+        paperless_ngx_config_secret_key: 'test'
+platforms:
+  - name: 'paperless_ngx-debian-12-live_api_test'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # Files created, extracted, created, deleted.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

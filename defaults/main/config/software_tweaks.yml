@@ -1,0 +1,185 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Software Tweaks
+###############################################################################
+
+# Number of tasks to run in parallel. Default: 1.
+paperless_ngx_config_task_workers: 1
+
+# Number of pages paperless will process in parallel on a single document.
+#
+# Ensure CORE COUNT < WORKERS * THREADS_PER_WORKER. Otherwise paperless will be
+# extremely slow.
+#
+# If you want paperless to process many documents in parallel, choose a high
+# worker count. If you want paperless to process very large documents faster,
+# use a higher thread per worker count. The default is a balance between the
+# two, according to your CPU core count with a slight favor towards threads per
+# worker.
+#
+# Cores Workers Threads
+#     1       1       1
+#     2       2       1
+#     4       2       2
+#     6       2       3
+#     8       2       4
+#    12       3       4
+#    16       4       4
+#
+# Values:
+#   0: Adjust threads per worker automatically. Requires
+#      paperless_ngx_config_task_workers set.
+#   #: Number of threads per worker.
+#
+# Default: 0.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#software_tweaks
+paperless_ngx_config_threads_per_worker: 0
+
+# Document processing timeout before force failing (seconds).
+#
+# Underpowered machines might not be able to finish OCR on large documents in
+# reasonable amounts of time.
+#
+# Default: 1800
+paperless_ngx_config_worker_timeout: 1800
+
+# Timezone for document processing.
+#
+# Default: 'UTC'.
+#
+# Reference:
+# * https://docs.djangoproject.com/en/4.1/ref/settings/#std:setting-TIME_ZONE
+paperless_ngx_config_time_zone: 'UTC'
+
+# Enable natural language processing during automatic classification?
+#
+# Decision: use bool - Documentation uses bool though example config uses int.
+#
+# If disabled paperless will still perform some basic text pre-processing
+# before matching.
+#
+# Default: True.
+paperless_ngx_config_enable_nltk: true
+
+# Scheduled email fetch frequency.
+#
+# Values:
+#    {CRON}: Crontab expression.
+#   disable: disable email fetching.
+#
+# Default: '*/10 * * * *' (every 10 minutes).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+paperless_ngx_config_email_task_cron: '*/10 * * * *'
+
+# Scheduled automatic classifier training frequency.
+#
+# Values:
+#    {CRON}: Crontab expression.
+#   disable: disable automatic classifier.
+#
+# Default: 5 */1 * * *' (every hour at 5 minutes past the hour).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+paperless_ngx_config_train_task_cron: '5 */1 * * *'
+
+# Scheduled search index update frequency.
+#
+# Values:
+#    {CRON}: Crontab expression.
+#   disable: disable search index update.
+#
+# Default: '0 0 * * *' (daily at midnight).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+paperless_ngx_config_index_task_cron: '0 0 * * *'
+
+# Scheduled sanity checker frequency.
+#
+# Values:
+#    {CRON}: Crontab expression.
+#   disable: disable sanity check.
+#
+# Default: '30 0 * * sun' (Sunday at 30 minutes past midnight).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+paperless_ngx_config_sanity_task_cron: '30 0 * * sun'
+
+# Enable compression of webserver responses.
+#
+# Decision: use bool - Documentation uses bool though example config uses int.
+#
+# It is more efficient to enable compression in the proxy than here.
+#
+# Default: True.
+paperless_ngx_config_enable_compression: true
+
+# Document conversion memory limit (MB).
+#
+# On smaller systems or very large documents, errors may occur specifying
+# 'unable to extend pixel cache'.
+#
+# In such cases, try setting this to a reasonably low value, like 32. The
+# default is to use whatever is necessary to do everything without writing to
+# disk.
+#
+# Default: 0 (disabled).
+#
+# Reference:
+# * https://imagemagick.org/script/resources.php
+paperless_ngx_config_convert_memory_limit: 0
+
+# Document conversion temp directory.
+#
+# ImageMagick scratch space location for processing documents.
+#
+# Values:
+#   {PATH}: HIGHLY recommended to use tmpfs (RAM) backed location over
+#           disk-backed location. Use disk if memory constrained. Both are
+#           preferable to disabling.
+#       '': Disabled.
+# location.
+#
+# Default: '/tmp'.
+paperless_ngx_config_convert_tmpdir: '/tmp'
+
+# List of Django apps to be included in Django's INSTALLED_APPS.
+#
+# Used to setup login and sign-up via social account providers which are
+# compatible with django-allauth. You will also need to include the relevant
+# Django 'providers' inside the paperless_ngx_config_socialaccount_providers
+# setting to activate that specific authentication provider.
+#
+# Default: [] (disabled).
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#PAPERLESS_APPS
+paperless_ngx_config_paperless_apps: []
+
+# Max PIL image pixel limit.
+#
+# Maximum size of an image PIL will allow to load without warning or error.
+#
+# Limit is intended to prevent malicious files from consuming system resources
+# and causing crashes and other errors. It should only be raised or disabled in
+# certain circumstances and with great care. A DecompressionBombError will be
+# raised when limit is exceeded.
+#
+# Special Case:
+#     #: Raise warning with images which are over this limit.
+#   2*#: Refuse images which are more than twice this limit (may result in
+#        dropping images).
+#     0: Disables limit.
+#
+# Default: 0 (disabled).
+#
+# Reference:
+# * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS
+paperless_ngx_config_max_image_pixels: 0

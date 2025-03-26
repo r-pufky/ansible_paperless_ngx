@@ -1,12 +1,10 @@
 ---
-# Ansible galaxy packages
+# yamllint disable rule:line-length
+collections: []
 
-collections:
-  # https://docs.ansible.com/ansible/latest/collections/community/general/
-  # ini_file, make
-  - community.general
-  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/patch_module.html
-  # patch, mount
-  - ansible.posix
-
-roles: []
+roles:
+  - name: 'r_pufky.srv.apt'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.avenv'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.github'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.systemd'  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.users'  # https://github.com/r-pufky/ansible_collection_srv

@@ -1,0 +1,118 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Install Paperless-NGX Packages
+###############################################################################
+# Install packages, compile JBIG2enc, and download extra NLTK data if needed.
+# Create virtual environment with required PIP packages.
+#
+# Redis is installed with default configuration if enabled.
+#
+# OCR packages are installed if OCR is enabled, include tesseract OCR data.
+#
+# JBIG2enc is used for loseless PDF/A compression (not listed in bare-metal
+# instructions) but used in Docker configuration which is based on Bookworm.
+#
+# NLTK is installed and extra data is downloaded if specified.
+#
+# All database libraries are installed (except sqlite) as they are required
+# for the project to run.
+#
+# Args:
+#   _paperless_ngx_tesseract_packages: list of str - additional OCR packages.
+#   _paperless_ngx_dir: str - Path shortcut for github install location.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/setup/#bare_metal
+
+- name: 'Install'
+  block:
+    - name: 'Install | packages'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.apt'
+      vars:
+        apt_packages:
+          - '{{ paperless_ngx_role_python_deps }}'
+          - '{{ paperless_ngx_role_packages }}'
+          - '{{ paperless_ngx_role_ocr_my_pdf if paperless_ngx_config_ocr_language | length > 0 else [] }}'
+          - '{{ _paperless_ngx_tesseract_packages if _paperless_ngx_tesseract_packages | length > 0 else [] }}'
+          - '{{ paperless_ngx_role_jbig2enc }}'
+          - '{{ paperless_ngx_role_redis if paperless_ngx_service_redis_enable else [] }}'
+          - '{{ paperless_ngx_role_sqlite if paperless_ngx_config_dbengine | lower == "sqlite" else [] }}'
+          - '{{ paperless_ngx_role_custom_packages }}'
+        apt_package_update_cache: true
+
+# Don't migrate data as we force users to use external locations.
+- name: 'Install | Paperless-NGX {{ paperless_ngx_service_version }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.github'
+  vars:
+    github_repo_owner: '{{ paperless_ngx_role_github_owner }}'
+    github_repo_repo: '{{ paperless_ngx_role_github_repo }}'
+    github_repo_release: '{{ paperless_ngx_service_version }}'
+    github_repo_archive_type: '{{ paperless_ngx_role_github_repo_archive_type }}'
+    github_binary_enable: true
+    github_binary_specifier: '{{ paperless_ngx_role_github_binary_specifier }}'
+    github_binary_url: '{{ paperless_ngx_role_github_binary_url }}'
+    github_file_owner: '{{ paperless_ngx_user }}'
+    github_file_group: '{{ paperless_ngx_group }}'
+    github_force_overwrite: '{{ paperless_ngx_service_force_overwrite }}'
+    github_extract_dest: '{{ paperless_ngx_role_github_extract_dest }}'
+    github_extract_symlink_target: '{{ _paperless_ngx_dir }}'
+    github_extract_delete_old_versions: '{{ paperless_ngx_service_delete_old_versions_enable }}'
+    github_extract_mode: 'a-st,o-rwx'
+    github_extract_extra_opts: '--strip-components=1'
+    github_extract_remove_files:
+      - '.dockerignore'
+      - '.env'
+      - 'docker'
+      - 'docs'
+      - 'Dockerfile'
+      - 'LICENSE'
+      - 'README.md'
+      - 'data'  # Never store user data in install. Asserted in prep.
+      - 'trash'
+      - 'consume'
+      - 'media'
+      - 'nltk'
+
+- name: 'Install | JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.github'
+  vars:
+    github_repo_owner: '{{ paperless_ngx_role_jbig2enc_owner }}'
+    github_repo_repo: '{{ paperless_ngx_role_jbig2enc_repo }}'
+    github_repo_release: '{{ paperless_ngx_role_jbig2enc_version }}'
+    github_repo_archive_type: '{{ paperless_ngx_role_jbig2enc_repo_archive_type }}'
+    github_extract_dest: '{{ paperless_ngx_role_jbig2enc_extract_dest }}'
+    github_extract_symlink_target: '{{ paperless_ngx_role_jbig2enc_extract_symlink_target }}'
+    github_extract_mode: 'a-st,o-rwx'
+    github_extract_extra_opts: '--strip-components=1'
+
+- name: 'Install | Build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
+  when: _github_changed
+  ansible.builtin.shell: 'set -o pipefail && ./autogen.sh && ./configure && make install'
+  args:
+    executable: '/bin/bash'
+    chdir: '{{ paperless_ngx_role_jbig2enc_extract_symlink_target }}'
+  changed_when: _paperless_ngx_jbig2enc_build.rc == 0
+  register: _paperless_ngx_jbig2enc_build
+
+- name: 'Install | create virtual environment'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.avenv'
+  vars:
+    avenv_name: 'paperless'
+    avenv_user: '{{ paperless_ngx_user }}'
+    avenv_group: '{{ paperless_ngx_group }}'
+    avenv_pip_extra_args: '--upgrade'
+    avenv_pips: '{{ paperless_ngx_role_nltk_pip }}'
+    avenv_pip_requirements_install: '{{ _paperless_ngx_dir }}'
+
+- name: 'Install | additional NLTK data'
+  when: paperless_ngx_service_nltk_data | length > 0
+  ansible.builtin.command: '{{ _avenv_venv }}/bin/python3 -W ignore::RuntimeWarning -m nltk.downloader -d {{ paperless_ngx_config_nltk_dir }} {{ paperless_ngx_service_nltk_data | join(" ") }}'
+  args:
+    chdir: '{{ _paperless_ngx_dir }}/src'
+  register: _paperless_ngx_nltk
+  changed_when: '"already up-to-date" not in _paperless_ngx_nltk.stderr'

@@ -3,47 +3,38 @@
 # Paperless NGX Handlers
 ###############################################################################
 
-- name: 'reload redis memcache'
+- name: 'Handlers | reload redis memcache'
+  listen: 'Handlers | reload paperless_ngx'
+  when: paperless_ngx_service_redis_enable
   ansible.builtin.systemd:
-    name:    'redis-server'
+    name: 'redis-server'
     enabled: true
-    masked:  false
-    state:   'restarted'
-  listen: 'reload paperless_ngx'
-  when: pngx_default_redis
+    state: 'restarted'
 
-- name: 'reload paperless-consumer'
+- name: 'Handlers | reload paperless-consumer'
+  listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
-    name:    'paperless-consumer'
-    state:   'restarted'
+    name: 'paperless-consumer'
     enabled: true
-    masked:  false
-    daemon_reload: true
-  listen: 'reload paperless_ngx'
+    state: 'restarted'
 
-- name: 'reload paperless-scheduler'
+- name: 'Handlers | reload paperless-scheduler'
+  listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
-    name:    'paperless-scheduler'
-    state:   'restarted'
+    name: 'paperless-scheduler'
     enabled: true
-    masked:  false
-    daemon_reload: true
-  listen: 'reload paperless_ngx'
+    state: 'restarted'
 
-- name: 'reload paperless-task-queue'
+- name: 'Handlers | reload paperless-task-queue'
+  listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
-    name:    'paperless-task-queue'
-    state:   'restarted'
+    name: 'paperless-task-queue'
     enabled: true
-    masked:  false
-    daemon_reload: true
-  listen: 'reload paperless_ngx'
+    state: 'restarted'
 
-- name: 'reload paperless-webserver'
+- name: 'Handlers | reload paperless-webserver'
+  listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
-    name:    'paperless-webserver'
-    state:   'restarted'
+    name: 'paperless-webserver'
     enabled: true
-    masked:  false
-    daemon_reload: true
-  listen: 'reload paperless_ngx'
+    state: 'restarted'

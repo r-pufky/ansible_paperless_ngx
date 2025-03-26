@@ -6,24 +6,34 @@
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
+# * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
-pngx_default_packages:
+# Last time Paperless-NGS options were validated against default configuration.
+paperless_ngx_role_validate_date: '2025-03-20'
+paperless_ngx_role_validate_release: 'bookworm'
+paperless_ngx_role_validate_version: 'v2.14.7'
+
+###############################################################################
+# APT Packages
+###############################################################################
+
+paperless_ngx_role_packages:
   - 'python3'
   - 'python3-pip'
   - 'python3-dev'
-  - 'imagemagick'
+  - 'default-libmysqlclient-dev'
+  - 'pkg-config'
   - 'fonts-liberation'
-  - 'gnupg2'             # gnupg specificed, install full suite.
+  - 'imagemagick'
+  - 'gnupg2'  # Use full GPG suite instead of bare bones gnupg.
+  - 'libpq-dev'
   - 'libmagic-dev'
-  - 'mime-support'
+  - 'mariadb-client'
   - 'libzbar0'
   - 'poppler-utils'
-  - 'build-essential'    # Build dependency for above packages.
-  - 'python3-setuptools' # Build dependency for above packages.
-  - 'python3-wheel'      # Build dependency for above packages.
-  - 'default-libmysqlclient-dev' # requirements.txt depends on mysql client.
+  - 'python3-zxing-cpp'  # ZXING paperless_ngx_config_consumer_barcode_scanner.
 
-pngx_default_ocr_my_pdf:
+paperless_ngx_role_ocr_my_pdf:
   - 'unpaper'
   - 'ghostscript'
   - 'icc-profiles-free'
@@ -32,89 +42,95 @@ pngx_default_ocr_my_pdf:
   - 'libxml2'
   - 'pngquant'
   - 'zlib1g'
-  - 'tesseract-ocr'
+  - 'tesseract-ocr'  # tesseract-ocr-{LANG} packages automatically installed.
 
-pngx_default_jbig2enc:
+paperless_ngx_role_python_deps:  # Explicit. Auto-included with other packages.
+  - 'build-essential'
+  - 'python3-setuptools'
+  - 'python3-wheel'
+
+paperless_ngx_role_redis:  # includes redis-server, redis-tools
+  - 'redis'
+
+paperless_ngx_role_sqlite:
+  - 'sqlite3'
+
+paperless_ngx_role_jbig2enc:  # JBIG2enc build support.
   - 'autotools-dev'
   - 'automake'
   - 'libtool'
   - 'libleptonica-dev'
   - 'zlib1g-dev'
 
-pngx_default_redis:
-  - 'redis-server'
-
-pngx_default_postgresql:
-  - 'libpq-dev'
-
-pngx_default_mariadb:
-  - 'mariadb-common'
-
-pngx_default_sqlite:
-  - 'sqlite3'
-
-pngx_default_additional:
-  - 'sudo'               # Run paperless CLI commands.
-  - 'git'                # Manage git upstream repositories and builds.
-  - 'img2pdf'            # Provide loseless image import to PDF via CLI.
-  - 'python3-venv'       # Manage paperless virtual environment.
-  - 'python3-virtualenv' # Added for virtualenv/ansible pip.
-  - 'python3-jmespath'   # JSON dotted accessor notation (var.subvar).
-  - 'optipng'            # Lossless PNG compression.
-  - 'libzxingcore1'      # pngx_consumer_barcode_scanner 'ZXING' support.
-
-pngx_default_nltk:       # https://www.nltk.org/install.html
-  - 'nltk'
-  - 'numpy'
-
-pngx_default_nltk_data:  # https://www.nltk.org/nltk_data/
-  - 'snowball_data'      # Snowball, 6.7MB
-  - 'rslp'               # Stemmer, 3805B
-  - 'stopwords'          # Stopwords, 34276B
-  - 'punkt'              # Punkt, 13.9MB
+paperless_ngx_role_custom_packages:
+  - 'img2pdf'  # Provide loseless image import to PDF via CLI.
+  - 'optipng'  # Lossless PNG compression.
 
 ###############################################################################
-# Default Paperless-NGX Configuration Root
+# NLTK Support
 ###############################################################################
-# Default install location for Paperless-NGX versioned installs.
-
-pngx_default_install_dir: '/var/lib'
-
-###############################################################################
-# Default jbig2enc Build Settings
-###############################################################################
-# Default build/install options for jbig2enc.
-
-pngx_default_jbig2enc_dir:     '/opt'
-pngx_default_jbig2enc_version: '0.29'
-pngx_default_jbig2enc_repo:    'https://github.com/agl/jbig2enc.git'
-
-###############################################################################
-# Default Paperless-NGX User Group
-###############################################################################
-# Default group settings if an paperless user is force created.
-
-pngx_default_group:
-  name: 'paperless'
-  gid:  950
-
-###############################################################################
-# Default Paperless-NGX User Account
-###############################################################################
-# Default user settings if an paperless user is force created.
+# Machine learning language processor.
 #
-# Logins are disabled.
+# Reference:
+# * https://www.nltk.org/nltk_data/
+# * https://www.nltk.org/data.html
+# * https://www.nltk.org/install.html
 
-pngx_default_user:
-  name:            'paperless'
-  group:           'paperless'
-  uid:             950
-  shell:           '/usr/sbin/nologin'
-  home:            '/etc/paperless'
-  comment:         'paperless system account,,,'
-  create_home:     true
-  password:        '!'
-  password_lock:   true
+paperless_ngx_role_nltk_pip:
+  - name:
+      - 'nltk'
+      - 'numpy'
+
+###############################################################################
+# JBIG2 Encoder Support
+###############################################################################
+# Lossless high-compression used in pdf/a formats. Debian provided package is
+# 0.19; Paperless requires 0.29+.
+#
+# Reference:
+# * https://github.com/agl/jbig2enc/releases
+
+paperless_ngx_role_jbig2enc_version: '0.30'
+paperless_ngx_role_jbig2enc_owner: 'agl'
+paperless_ngx_role_jbig2enc_repo: 'jbig2enc'
+paperless_ngx_role_jbig2enc_repo_archive_type: 'tar.gz'
+paperless_ngx_role_jbig2enc_extract_dest: '/opt/jbig2enc'
+paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
+
+###############################################################################
+# Paperless-NGX GitHub Options
+###############################################################################
+# Paperless releases source and separate binary downloads.
+#
+# Reference:
+# * https://github.com/paperless-ngx/paperless-ngx/releases
+
+paperless_ngx_role_github_owner: 'paperless-ngx'
+paperless_ngx_role_github_repo: 'paperless-ngx'
+paperless_ngx_role_github_repo_archive_type: 'tar.xz'
+paperless_ngx_role_github_extract_dest: '/opt/paperless'
+paperless_ngx_role_github_extract_symlink_target: '/opt/paperless/paperless'
+paperless_ngx_role_github_binary_specifier: 'v'
+paperless_ngx_role_github_binary_url: '{VERSION}/paperless-ngx-{VERSION}.tar.xz'
+
+###############################################################################
+# Default Paperless-NGX  User/Group
+###############################################################################
+
+paperless_ngx_role_group:
+  name: 'paperless'
+  gid: 950
+
+paperless_ngx_role_user:
+  name: 'paperless'
+  group: 'paperless'
+  uid: 950
+  shell: '/usr/sbin/nologin'
+  home: '/opt/paperless'
+  comment: 'paperless system account,,,'
+  create_home: true
+  password: '!'
+  password_lock: true
   update_password: 'always'
-  expires:         -1
-  system:          true
+  expires: -1
+  system: true

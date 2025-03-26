@@ -1,0 +1,36 @@
+---
+###############################################################################
+# Polling
+###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#polling
+
+# Filesystem polling interval (seconds).
+#
+# If documents added to your consume folder are not found, Paperless might not
+# be able to automatically detect filesystem changes. In that case, specify a
+# polling interval in seconds here, which will then cause paperless to
+# periodically check your consumption directory for changes.
+#
+# Default: 0 (disabled, use inotify).
+paperless_ngx_config_consumer_polling: 0
+
+# Number of times to check a file has remained unmodified.
+#
+# Requires paperless_ngx_config_consumer_polling > 0.
+#
+# If a file's modification time and size are identical for two consecutive
+# checks, it will be consumed.
+#
+# Default: 5.
+paperless_ngx_config_consumer_polling_retry_count: 5
+
+# Delay between polls (seconds).
+#
+# Requires paperless_ngx_config_consumer_polling > 0.
+#
+# Sets delay in seconds between each check paperless will do while waiting for
+# a file to remain unmodified.
+#
+# Default: 5.
+paperless_ngx_config_consumer_polling_delay: 5
