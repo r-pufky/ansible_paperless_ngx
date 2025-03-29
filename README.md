@@ -34,7 +34,7 @@ is highly customizable and you should fully read through defaults before using.
     paperless_ngx_config_admin_user: 'example_user'
     paperless_ngx_config_admin_mail: 'user@example.com'
     paperless_ngx_config_admin_password: '{{ vault_paperless_ngx_admin_password }}'
-    paperless_ngx_config_filename_format: '{document_type}/{correspondent}/{created}-{title}-[{tag_list}]'
+    paperless_ngx_config_filename_format: !unsafe '{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]'
 ```
 
 Changes updating the configuration only can be done to speed role application:

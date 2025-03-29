@@ -62,15 +62,20 @@ paperless_ngx_config_staticdir: '../static'
 #   cd /var/lib/paperless-ngx-X.X.X/src
 #   python3 manage.py document_renamer
 #
+# Special Case:
+#   *: Use '!unsafe' for double curly bracket replacements.
+#
 # Values:
 #   '': Disabled renaming (default).
+#
+# Default: !unsafe '' (disabled).
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#file-name-handling
 # * https://docs.paperless-ngx.com/advanced_usage/#advanced-file-name-handling
 # * https://docs.paperless-ngx.com/administration/#management-utilities
 # * https://docs.paperless-ngx.com/administration/#renamer
-paperless_ngx_config_filename_format: ''
+paperless_ngx_config_filename_format: !unsafe ''
 
 # Omit filename/directory placeholders that resolve to 'none'.
 #

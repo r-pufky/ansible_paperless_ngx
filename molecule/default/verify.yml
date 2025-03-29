@@ -119,3 +119,14 @@
         that:
           - _test_paperless_jbig2.stat.exists
         fail_msg: '/usr/local/bin/jbig2 should have been built.'
+
+    - name: 'Default | verify | query ghostscript'
+      ansible.builtin.stat:
+        path: '/usr/local/bin/gs'
+      register: _test_paperless_ghostscript
+
+    - name: 'Default | verify | assert ghostscript'
+      ansible.builtin.assert:
+        that:
+          - _test_paperless_ghostscript.stat.exists
+        fail_msg: '/usr/local/bin/gs should have been built.'

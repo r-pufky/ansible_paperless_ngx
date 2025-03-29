@@ -76,6 +76,11 @@
       - 'media'
       - 'nltk'
 
+- name: 'Install | JBIG2enc configuration (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      JBIG2enc is being downloaded and built. This will take a few minutes.
+
 - name: 'Install | JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
   ansible.builtin.include_role:
     name: 'r_pufky.srv.github'
@@ -97,6 +102,64 @@
     chdir: '{{ paperless_ngx_role_jbig2enc_extract_symlink_target }}'
   changed_when: _paperless_ngx_jbig2enc_build.rc == 0
   register: _paperless_ngx_jbig2enc_build
+
+# Security: CVE-2023-43115
+#   CVE:
+#   * https://nvd.nist.gov/vuln/detail/cve-2023-43115
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27835
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27832
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27831
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27836
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27830
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27833
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27837
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27834
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46951
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46952
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46953
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46954
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46955
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46956
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33869
+#   * https://nvd.nist.gov/vuln/detail/cve-2023-52722
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33870
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33871
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
+#  Decision: do not use package - multiple vulnerabilities with PDF corruption
+#      for existing files, bookworm package (and backport) affected.
+#  Mitigation: use source release. Default gs binary to custom binary location
+#      instead of /usr/bin/gs.
+#  Reference:
+#  * https://github.com/tteck/Proxmox/discussions/3265
+#  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
+- name: 'Install | Ghostscript configuration (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Ghostscript is being downloaded and built. This will take a few minutes.
+
+- name: 'Install | Ghostscript {{ paperless_ngx_role_ghostscript_version }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.github'
+  vars:
+    github_repo_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
+    github_repo_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
+    github_repo_release: '{{ paperless_ngx_role_ghostscript_version }}'
+    github_repo_archive_type: '{{ paperless_ngx_role_ghostscript_repo_archive_type }}'
+    github_extract_dest: '{{ paperless_ngx_role_ghostscript_extract_dest }}'
+    github_extract_symlink_target: '{{ paperless_ngx_role_ghostscript_extract_symlink_target }}'
+    github_binary_enable: '{{ paperless_ngx_role_ghostscript_github_binary_enable }}'
+    github_binary_url: '{{ paperless_ngx_role_ghostscript_github_binary_url }}'
+    github_extract_mode: 'a-st,o-rwx'
+    github_extract_extra_opts: '--strip-components=1'
+
+- name: 'Install | Build Ghostscript {{ paperless_ngx_role_ghostscript_version }}'
+  when: _github_changed
+  ansible.builtin.shell: 'set -o pipefail && ./configure && make && make install'
+  args:
+    executable: '/bin/bash'
+    chdir: '{{ paperless_ngx_role_ghostscript_extract_symlink_target }}'
+  changed_when: _paperless_ngx_ghostscript_build.rc == 0
+  register: _paperless_ngx_ghostscript_build
 
 - name: 'Install | create virtual environment'
   ansible.builtin.include_role:
