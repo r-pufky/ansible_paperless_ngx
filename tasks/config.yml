@@ -24,7 +24,6 @@
 #   _paperless_ngx_gid: int - Paperless-NGX user GID.
 #   _paperless_ngx_dir: str - Path shortcut for github install location.
 #   _paperless_ngx_config: dict - Sanitized Paperless-NGX config.
-#   _paperless_ngx_certs_path: str - Sanitized
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -37,8 +36,8 @@
   ansible.builtin.copy:
     src: '{{ paperless_ngx_service_certs_path if paperless_ngx_service_certs_path.endswith("/") else paperless_ngx_service_certs_path ~ "/" }}'
     dest: '{{ paperless_ngx_role_github_extract_dest }}/certs'
-    owner: '{{ paperless_ngx_user }}'
-    group: '{{ paperless_ngx_group }}'
+    owner: '{{ _paperless_ngx_uid }}'
+    group: '{{ _paperless_ngx_gid }}'
     mode: '0600'
     directory_mode: '0750'
     force: true
@@ -48,8 +47,8 @@
   ansible.builtin.template:
     src: 'paperless.conf.j2'
     dest: '{{ _paperless_ngx_dir }}/paperless.conf'
-    owner: '{{ paperless_ngx_user }}'
-    group: '{{ paperless_ngx_group }}'
+    owner: '{{ _paperless_ngx_uid }}'
+    group: '{{ _paperless_ngx_gid }}'
     mode: '0640'  # passwords.
 
 - name: 'Config | migrate database schema'

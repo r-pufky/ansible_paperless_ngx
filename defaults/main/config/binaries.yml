@@ -34,8 +34,8 @@ paperless_ngx_config_convert_binary: '/usr/bin/convert'
 #   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
 #  Decision: do not use package - multiple vulnerabilities with PDF corruption
 #      for existing files, bookworm package (and backport) affected.
-#  Mitigation: use source release. Default gs binary to custom binary location
-#      instead of /usr/bin/gs.
+#  Mitigation: use source release. Default gs binary to custom binary
+#      /usr/local/bin/gs instead of /usr/bin/gs.
 #  Reference:
 #  * https://github.com/tteck/Proxmox/discussions/3265
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases

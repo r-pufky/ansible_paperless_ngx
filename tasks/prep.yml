@@ -13,6 +13,8 @@
 #   _paperless_ngx_dir: str - Path shortcut for github install location.
 #   _paperless_ngx_config: dict - Sanitized Paperless-NGX config.
 #   _paperless_ngx_tesseract_packages: list of str - additional OCR packages.
+#   _paperless_ngx_ghostscript_binary_url: str - parsed ghostscript binary url.
+#   _paperless_ngx_ghostscript_release_version: str - release version.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -35,11 +37,18 @@
       paperless_ngx_config_empty_trash_dir: '{{ paperless_ngx_config_empty_trash_dir }}'
       paperless_ngx_config_media_root: '{{ paperless_ngx_config_media_root }}'
 
+- name: 'Prep | parse source versions'
+  ansible.builtin.set_fact:
+    _paperless_ngx_jbig2_version: '{{ paperless_ngx_service_jbig2enc_version | default(paperless_ngx_role_jbig2enc_version) }}'
+    _paperless_ngx_ghostscript_version: '{{ paperless_ngx_service_ghostscript_version | default(paperless_ngx_role_ghostscript_version) }}'
+    _paperless_ngx_ghostscript_release_version: 'gs{{ paperless_ngx_service_ghostscript_version | default(paperless_ngx_role_ghostscript_version) | replace(".", "") | replace("-", "") }}'
+
 - name: 'Prep | generate directories and tesseract dependencies'
   ansible.builtin.set_fact:
     _paperless_ngx_tesseract_packages: '{{ paperless_ngx_config_ocr_language | default([]) | map("regex_replace", "^(.*)$", "tesseract-ocr-\1") | list }}'
     _paperless_ngx_dir: '{{ paperless_ngx_role_github_extract_symlink_target }}'
     _paperless_ngx_double_side_dir: '{{ paperless_ngx_config_consumption_dir if paperless_ngx_config_consumption_dir.endswith("/") else paperless_ngx_config_consumption_dir ~ "/" }}{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name }}'
+    _paperless_ngx_ghostscript_binary_url: '{{ _paperless_ngx_ghostscript_release_version }}/ghostscript-{{ _paperless_ngx_ghostscript_version }}.tar.xz'
 
 - name: 'Prep | manage users'
   when: paperless_ngx_create_user

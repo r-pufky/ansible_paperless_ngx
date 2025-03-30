@@ -49,6 +49,59 @@ paperless_ngx_service_nltk_data:
   - 'stopwords'
   - 'punkt'
 
+# JBIG2 version.
+#
+# JBIG2 is automatically built from source and installed. It provides Lossless
+# high-compression used in pdf/a formats. Debian provided package is 0.19;
+# Paperless requires 0.29+.
+#
+# Reference:
+# * https://github.com/agl/jbig2enc/releases
+paperless_ngx_service_jbig2enc_version: '0.30'
+
+# Ghostscript version.
+#
+# Ghostscript is automatically built from source and installed. It is used to
+# manipulate and transform documents. Debian provided package is 10.0.0 which
+# has multiple vulnerabilities as well as PDF corruption issues.
+#
+# Special Case:
+#   *: Use the version listed for the 'ghostscript-{VERSION}.tar.xz', not the
+#      release tag.
+#
+# Security: CVE-2023-43115
+#   CVE:
+#   * https://nvd.nist.gov/vuln/detail/cve-2023-43115
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27835
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27832
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27831
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27836
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27830
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27833
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27837
+#   * https://nvd.nist.gov/vuln/detail/cve-2025-27834
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46951
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46952
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46953
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46954
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46955
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-46956
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33869
+#   * https://nvd.nist.gov/vuln/detail/cve-2023-52722
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33870
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-33871
+#   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
+#  Decision: do not use package - multiple vulnerabilities with PDF corruption
+#      for existing files, bookworm package (and backport) affected.
+#  Mitigation: use source release. Default gs binary to custom binary
+#      /usr/local/bin/gs instead of /usr/bin/gs.
+#  Reference:
+#  * https://github.com/tteck/Proxmox/discussions/3265
+#  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
+#
+# Default: '10.05.0'.
+paperless_ngx_service_ghostscript_version: '10.05.0'
+
 # Path to custom certificates.
 #
 # Sourced from ansible controller; automatically placed in

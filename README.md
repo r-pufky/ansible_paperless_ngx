@@ -105,12 +105,10 @@ Suggested Use (based on archivst recommendations):
 [Reference](https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/)
 
 ## Using Management Utilities
-You many need to temporarily enable the `paperless_ngx_user` user shell to
-login and run management utilities. It is **highly** recommended that the user
-shell be disabled after use.
+Login and switch to `paperless_ngx_user` to run management utilities.
 
 ```bash
-su - {{ paperless_ngx_user }}
+su - -s /bin/bash {{ paperless_ngx_user }}
 . /var/venv/paperless/bin/activate
 cd /opt/paperless/paperless/src
 python3 manage.py document_renamer
@@ -131,10 +129,16 @@ img2pdf out.png -o import.pdf
 [Reference](https://github.com/josch/img2pdf)
 
 ### ghostscript
-`ghostscript` is included with paperless. This will enable you to reduce pdf
-size if needed. Use the following settings for specific resolutions: `/screen`
-72dpi, `/ebook` 150dpi, `/prepress` 300dpi, `/printer` 300dpi, `/default` no
-change.
+`ghostscript` is included with paperless.
+
+#### Reduce PDF size
+This will enable you to reduce pdf size if needed. Use the following settings
+for specific resolutions:
+* `/screen` 72dpi
+* `/ebook` 150dpi
+* `/prepress` 300dpi
+* `/printer` 300dpi
+* `/default` no change
 
 ```bash
 gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS={SETTING} -dNOPAUSE
@@ -142,13 +146,32 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS={SETTING} -dNOPAUSE
 ```
 [Reference](https://askubuntu.com/questions/113544/how-can-i-reduce-the-file-size-of-a-scanned-pdf-file)
 
-`ghostscript` can also be used to merge pdf's.
+#### Merge PDF's
+This is now supported directly in the UI: select both documents and
+ `actions > merge`.
 
 ```bash
-gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE={OUTPUT}.pdf
--dBATCH {INPUT}1.pdf {INPUT}2.pdf
+gs -dNOPAUSE -sDEVICE=pdfwrite -dBATCH -sOutputFile={OUTPUT}.pdf {INPUT}1.pdf
+{INPUT}2.pdf
 ```
+
 [Reference](https://www.fosslinux.com/49661/merge-pdf-files-on-linux.htm)
+
+#### Split PDF's
+This is now supported directly in the UI: select both documents and
+ `actions > split`.
+
+For documents that failed consumption, manually split before re-adding to the
+consumption directory.
+
+```bash
+gs -dBATCH -dPDFINFO {INPUT}.pdf
+gs -dNOPAUSE -sDEVICE=pdfwrite -dBATCH -sOutputFile={OUTPUT}.pdf -dFirstPage=1
+-dLastPage=3 {INPUT}.pdf
+```
+* Repeat for each chunk of the PDF document.
+
+[Reference](https://stackoverflow.com/questions/10228592/splitting-a-pdf-with-ghostscript)
 
 ## Migration
 In place migrations from NG to NGX can be done using this role if the
@@ -180,6 +203,14 @@ gs -o output.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress input.pdf
 ```
 
 [Reference](https://kcore.org/2021/05/08/paperless-ng/)
+
+### PDF failed import from consumption directory.
+Check logs for specific errors. Increase `paperless_ngx_config_convert_tmpdir`
+if necessary and restart the machine or the consumption service:
+
+``` bash
+systemctl restart paperless-consumer.service
+```
 
 ## Development
 Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)

@@ -19,8 +19,11 @@
 # for the project to run.
 #
 # Args:
+#   _paperless_ngx_uid: int - Paperless-NGX user UID.
+#   _paperless_ngx_gid: int - Paperless-NGX user GID.
 #   _paperless_ngx_tesseract_packages: list of str - additional OCR packages.
-#   _paperless_ngx_dir: str - Path shortcut for github install location.
+#   _paperless_ngx_ghostscript_binary_url: str - parsed ghostscript binary url.
+#   _paperless_ngx_ghostscript_release_version: str - release version.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -127,8 +130,8 @@
 #   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
 #  Decision: do not use package - multiple vulnerabilities with PDF corruption
 #      for existing files, bookworm package (and backport) affected.
-#  Mitigation: use source release. Default gs binary to custom binary location
-#      instead of /usr/bin/gs.
+#  Mitigation: use source release. Default gs binary to custom binary
+#      /usr/local/bin/gs instead of /usr/bin/gs.
 #  Reference:
 #  * https://github.com/tteck/Proxmox/discussions/3265
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
@@ -143,12 +146,12 @@
   vars:
     github_repo_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
     github_repo_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
-    github_repo_release: '{{ paperless_ngx_role_ghostscript_version }}'
+    github_repo_release: '{{ _paperless_ngx_ghostscript_release_version }}'
     github_repo_archive_type: '{{ paperless_ngx_role_ghostscript_repo_archive_type }}'
     github_extract_dest: '{{ paperless_ngx_role_ghostscript_extract_dest }}'
     github_extract_symlink_target: '{{ paperless_ngx_role_ghostscript_extract_symlink_target }}'
     github_binary_enable: '{{ paperless_ngx_role_ghostscript_github_binary_enable }}'
-    github_binary_url: '{{ paperless_ngx_role_ghostscript_github_binary_url }}'
+    github_binary_url: '{{ _paperless_ngx_ghostscript_binary_url }}'
     github_extract_mode: 'a-st,o-rwx'
     github_extract_extra_opts: '--strip-components=1'
 
