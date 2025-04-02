@@ -205,11 +205,26 @@ gs -o output.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress input.pdf
 [Reference](https://kcore.org/2021/05/08/paperless-ng/)
 
 ### PDF failed import from consumption directory.
+Paperless does not clean cache aggressively and TMPFS is typically cleared only
+on boot. In cases where there are mass processing of documents it is better to
+use disk. Some paperless subprocesses will always use `/tmp`.
+
 Check logs for specific errors. Increase `paperless_ngx_config_convert_tmpdir`
-if necessary and restart the machine or the consumption service:
+backing space if necessary and restart the machine or the consumption service:
 
 ``` bash
 systemctl restart paperless-consumer.service
+```
+* Tasks may also be restarted in the django admin interface
+  `settings > Open Django Admin > Paperless tasks`.
+
+The service may also be stopped and `paperless_ngx_config_convert_tmpdir` and
+`/tmp` cleared:
+``` bash
+systemctl stop paperless-*
+rm -rf /tmp/paperless*
+rm -rf {{ paperless_ngx_config_convert_tmpdir }}
+systemctl start paperless-*
 ```
 
 ## Development

@@ -140,10 +140,18 @@ paperless_ngx_config_convert_memory_limit: 0
 #
 # ImageMagick scratch space location for processing documents.
 #
+# Special Case:
+#   *: Paperless does not clean cache aggressively and TMPFS is typically
+#      cleared only on boot. In cases where there are mass processing of
+#      documents it is better to use disk and then switch to TMPFS afterwards
+#      to prevent confusing error messages that do not reflect the actual
+#      cause. See paperless_ngx_service_clear_cache.
+#
 # Values:
-#   {PATH}: HIGHLY recommended to use tmpfs (RAM) backed location over
-#           disk-backed location. Use disk if memory constrained. Both are
-#           preferable to disabling.
+#   {PATH}: HIGHLY recommended to use disk-backed location over TMPFS (RAM)
+#           backed location (some paperless sub-processes will still use /tmp
+#           regardless). Use disk if memory constrained. Both are preferable to
+#           disabling.
 #       '': Disabled.
 # location.
 #

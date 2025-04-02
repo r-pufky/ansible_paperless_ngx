@@ -38,3 +38,10 @@
     name: 'paperless-webserver'
     enabled: true
     state: 'restarted'
+
+- name: 'Handlers | reload paperless-cache'
+  listen: 'Handlers | reload paperless_ngx'
+  ansible.builtin.systemd:
+    name: 'paperless-cache'
+    enabled: true
+    state: 'restarted'

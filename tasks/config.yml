@@ -174,3 +174,32 @@
           private_devices: true
         install:
           wanted_by: ['multi-user.target']
+      - name: 'paperless-cache'
+        state: 'present'
+        drop_in: false
+        unit:
+          description: 'Paperless cache management'
+          requires: ['paperless-cache.timer']
+          after: ['network.target']
+          wants: ['network.target']
+        service:
+          type: 'oneshot'
+          exec_start: ['/usr/bin/find "{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}" -cmin +{{ paperless_ngx_service_cache_lifetime }} -type f -delete']
+        exec:
+          user: 'root'
+          group: 'root'
+          working_directory: '{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}'
+        install:
+          wanted_by: ['multi-user.target']
+    systemd_timers:
+      - name: 'paperless-cache'
+        state: 'present'
+        drop_in: false
+        unit:
+          description: 'paperless-cache.service timer'
+          requires: ['paperless-cache.service']
+        timer:
+          unit: 'paperless-cache.service'
+          on_unit_active_sec: '{{ paperless_ngx_service_cache_lifetime | default(30) }}m'
+        install:
+          wanted_by: ['timers.target']

@@ -132,6 +132,21 @@ paperless_ngx_service_force_overwrite: false
 # Default: True.
 paperless_ngx_service_restart_daily_enable: true
 
+# Max lifetime of Paperless cache files (minutes).
+#
+# Requires paperless_ngx_config_convert_tmpdir.
+#
+# Paperless does not clean cache aggressively and TMPFS is typically cleared
+# only on boot. Setting this to a lower value will aggressively clear the cache
+# and remove files have have not been modified for this period of time,
+# preventing 'out of space' errors during mass processing.
+#
+# Cache lifetime should be longer than the expected processing time for
+# documents.
+#
+# Default: 30 (minutes).
+paperless_ngx_service_cache_lifetime: 30
+
 # Only apply configuration?
 #
 # Reduces role application time by ONLY applying configuration changes. Does
