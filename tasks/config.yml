@@ -35,7 +35,7 @@
   when: paperless_ngx_service_certs_path | length > 0
   ansible.builtin.copy:
     src: '{{ paperless_ngx_service_certs_path if paperless_ngx_service_certs_path.endswith("/") else paperless_ngx_service_certs_path ~ "/" }}'
-    dest: '{{ paperless_ngx_role_github_extract_dest }}/certs'
+    dest: '{{ paperless_ngx_role_repo_extract_dir }}/certs'
     owner: '{{ _paperless_ngx_uid }}'
     group: '{{ _paperless_ngx_gid }}'
     mode: '0600'

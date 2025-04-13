@@ -1,10 +1,10 @@
 ---
-# yamllint disable rule:line-length
 collections: []
 
 roles:
-  - name: 'r_pufky.srv.apt'  # https://github.com/r-pufky/ansible_collection_srv
-  - name: 'r_pufky.srv.avenv'  # https://github.com/r-pufky/ansible_collection_srv
-  - name: 'r_pufky.srv.github'  # https://github.com/r-pufky/ansible_collection_srv
-  - name: 'r_pufky.srv.systemd'  # https://github.com/r-pufky/ansible_collection_srv
-  - name: 'r_pufky.srv.users'  # https://github.com/r-pufky/ansible_collection_srv
+  # https://github.com/r-pufky/ansible_collection_srv
+  - name: 'r_pufky.srv.apt'
+  - name: 'r_pufky.srv.avenv'
+  - name: 'r_pufky.srv.repo'
+  - name: 'r_pufky.srv.systemd'
+  - name: 'r_pufky.srv.users'

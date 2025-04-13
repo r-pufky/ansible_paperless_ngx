@@ -48,24 +48,22 @@
 # Don't migrate data as we force users to use external locations.
 - name: 'Install | Paperless-NGX {{ paperless_ngx_service_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.github'
+    name: 'r_pufky.srv.repo'
   vars:
-    github_repo_owner: '{{ paperless_ngx_role_github_owner }}'
-    github_repo_repo: '{{ paperless_ngx_role_github_repo }}'
-    github_repo_release: '{{ paperless_ngx_service_version }}'
-    github_repo_archive_type: '{{ paperless_ngx_role_github_repo_archive_type }}'
-    github_binary_enable: true
-    github_binary_specifier: '{{ paperless_ngx_role_github_binary_specifier }}'
-    github_binary_url: '{{ paperless_ngx_role_github_binary_url }}'
-    github_file_owner: '{{ paperless_ngx_user }}'
-    github_file_group: '{{ paperless_ngx_group }}'
-    github_force_overwrite: '{{ paperless_ngx_service_force_overwrite }}'
-    github_extract_dest: '{{ paperless_ngx_role_github_extract_dest }}'
-    github_extract_symlink_target: '{{ _paperless_ngx_dir }}'
-    github_extract_delete_old_versions: '{{ paperless_ngx_service_delete_old_versions_enable }}'
-    github_extract_mode: 'a-st,o-rwx'
-    github_extract_extra_opts: '--strip-components=1'
-    github_extract_remove_files:
+    repo_release_owner: '{{ paperless_ngx_role_repo_release_owner }}'
+    repo_release_repo: '{{ paperless_ngx_role_repo_release_repo }}'
+    repo_release_tag: '{{ paperless_ngx_service_version }}'
+    repo_release_specifier: '{{ paperless_ngx_role_repo_release_specifier }}'
+    repo_release_asset: '{{ paperless_ngx_role_repo_release_asset }}'
+    repo_file_owner: '{{ paperless_ngx_user }}'
+    repo_file_group: '{{ paperless_ngx_group }}'
+    repo_force_overwrite: '{{ paperless_ngx_service_force_overwrite }}'
+    repo_extract_dir: '{{ paperless_ngx_role_repo_extract_dir }}'
+    repo_extract_symlink_target: '{{ _paperless_ngx_dir }}'
+    repo_extract_delete_old_versions: '{{ paperless_ngx_service_delete_old_versions_enable }}'
+    repo_extract_mode: 'a-st,o-rwx'
+    repo_extract_extra_opts: '--strip-components=1'
+    repo_extract_remove_files:
       - '.dockerignore'
       - '.env'
       - 'docker'
@@ -86,19 +84,19 @@
 
 - name: 'Install | JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.github'
+    name: 'r_pufky.srv.repo'
   vars:
-    github_repo_owner: '{{ paperless_ngx_role_jbig2enc_owner }}'
-    github_repo_repo: '{{ paperless_ngx_role_jbig2enc_repo }}'
-    github_repo_release: '{{ paperless_ngx_role_jbig2enc_version }}'
-    github_repo_archive_type: '{{ paperless_ngx_role_jbig2enc_repo_archive_type }}'
-    github_extract_dest: '{{ paperless_ngx_role_jbig2enc_extract_dest }}'
-    github_extract_symlink_target: '{{ paperless_ngx_role_jbig2enc_extract_symlink_target }}'
-    github_extract_mode: 'a-st,o-rwx'
-    github_extract_extra_opts: '--strip-components=1'
+    repo_release_owner: '{{ paperless_ngx_role_jbig2enc_owner }}'
+    repo_release_repo: '{{ paperless_ngx_role_jbig2enc_repo }}'
+    repo_release_tag: '{{ paperless_ngx_role_jbig2enc_version }}'
+    repo_release_asset: '{{ paperless_ngx_role_jbig2enc_asset }}'
+    repo_extract_dir: '{{ paperless_ngx_role_jbig2enc_extract_dir }}'
+    repo_extract_symlink_target: '{{ paperless_ngx_role_jbig2enc_extract_symlink_target }}'
+    repo_extract_mode: 'a-st,o-rwx'
+    repo_extract_extra_opts: '--strip-components=1'
 
 - name: 'Install | Build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
-  when: _github_changed
+  when: _repo_changed
   ansible.builtin.shell: 'set -o pipefail && ./autogen.sh && ./configure && make install'
   args:
     executable: '/bin/bash'
@@ -142,21 +140,19 @@
 
 - name: 'Install | Ghostscript {{ paperless_ngx_role_ghostscript_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.github'
+    name: 'r_pufky.srv.repo'
   vars:
-    github_repo_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
-    github_repo_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
-    github_repo_release: '{{ _paperless_ngx_ghostscript_release_version }}'
-    github_repo_archive_type: '{{ paperless_ngx_role_ghostscript_repo_archive_type }}'
-    github_extract_dest: '{{ paperless_ngx_role_ghostscript_extract_dest }}'
-    github_extract_symlink_target: '{{ paperless_ngx_role_ghostscript_extract_symlink_target }}'
-    github_binary_enable: '{{ paperless_ngx_role_ghostscript_github_binary_enable }}'
-    github_binary_url: '{{ _paperless_ngx_ghostscript_binary_url }}'
-    github_extract_mode: 'a-st,o-rwx'
-    github_extract_extra_opts: '--strip-components=1'
+    repo_release_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
+    repo_release_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
+    repo_release_tag: '{{ _paperless_ngx_ghostscript_release_version }}'
+    repo_release_asset: 'ghostpdl-{{ paperless_ngx_service_ghostscript_version }}.tar.xz'
+    repo_extract_dir: '{{ paperless_ngx_role_ghostscript_extract_dir }}'
+    repo_extract_symlink_target: '{{ paperless_ngx_role_ghostscript_extract_symlink_target }}'
+    repo_extract_mode: 'a-st,o-rwx'
+    repo_extract_extra_opts: '--strip-components=1'
 
 - name: 'Install | Build Ghostscript {{ paperless_ngx_role_ghostscript_version }}'
-  when: _github_changed
+  when: _repo_changed
   ansible.builtin.shell: 'set -o pipefail && ./configure && make && make install'
   args:
     executable: '/bin/bash'

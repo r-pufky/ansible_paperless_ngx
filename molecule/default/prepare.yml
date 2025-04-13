@@ -31,28 +31,28 @@
 
     - name: 'Default | prepare | check JBIG2enc 0.30'
       ansible.builtin.stat:
-        path: '{{ _test_cache }}/jbig2enc-0.30.tar.gz'
+        path: '{{ _test_cache }}/0.30.tar.gz'
       register: _test_prepare
 
     - name: 'Default | prepare | cache JBIG2enc 0.30'
       when: not _test_prepare.stat.exists
       ansible.builtin.get_url:
         url: 'https://github.com/agl/jbig2enc/archive/refs/tags/0.30.tar.gz'
-        dest: '{{ _test_cache }}/jbig2enc-0.30.tar.gz'
+        dest: '{{ _test_cache }}/0.30.tar.gz'
         mode: '0640'
       retries: 5
       delay: 5
 
     - name: 'Default | prepare | check Ghostscript 10.05.0'
       ansible.builtin.stat:
-        path: '{{ _test_cache }}/ghostscript-10.05.0.tar.xz'
+        path: '{{ _test_cache }}/ghostpdl-10.05.0.tar.xz'
       register: _test_prepare
 
     - name: 'Default | prepare | cache Ghostscript 10.05.0'
       when: not _test_prepare.stat.exists
       ansible.builtin.get_url:
-        url: 'https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10050/ghostscript-10.05.0.tar.xz'
-        dest: '{{ _test_cache }}/ghostscript-10.05.0.tar.xz'
+        url: 'https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10050/ghostpdl-10.05.0.tar.xz'
+        dest: '{{ _test_cache }}/ghostpdl-10.05.0.tar.xz'
         mode: '0640'
       retries: 5
       delay: 5

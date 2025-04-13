@@ -94,8 +94,8 @@ paperless_ngx_role_nltk_pip:
 paperless_ngx_role_jbig2enc_version: '0.30'
 paperless_ngx_role_jbig2enc_owner: 'agl'
 paperless_ngx_role_jbig2enc_repo: 'jbig2enc'
-paperless_ngx_role_jbig2enc_repo_archive_type: 'tar.gz'
-paperless_ngx_role_jbig2enc_extract_dest: '/opt/jbig2enc'
+paperless_ngx_role_jbig2enc_asset: '{VERSION}.tar.gz'
+paperless_ngx_role_jbig2enc_extract_dir: '/opt/jbig2enc'
 paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
 
 ###############################################################################
@@ -138,10 +138,10 @@ paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
 paperless_ngx_role_ghostscript_version: '10.05.0'
 paperless_ngx_role_ghostscript_owner: 'ArtifexSoftware'
 paperless_ngx_role_ghostscript_repo: 'ghostpdl-downloads'
-paperless_ngx_role_ghostscript_repo_archive_type: 'tar.xz'
-paperless_ngx_role_ghostscript_extract_dest: '/opt/ghostscript'
+# Asset is dynamically generated as the tag is different from version string.
+# paperless_ngx_role_ghostscript_asset: 'ghostpdl-{VERSION}.tar.xz'
+paperless_ngx_role_ghostscript_extract_dir: '/opt/ghostscript'
 paperless_ngx_role_ghostscript_extract_symlink_target: '/opt/ghostscript/ghostscript'
-paperless_ngx_role_ghostscript_github_binary_enable: true
 
 ###############################################################################
 # Paperless-NGX GitHub Options
@@ -151,13 +151,12 @@ paperless_ngx_role_ghostscript_github_binary_enable: true
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
 
-paperless_ngx_role_github_owner: 'paperless-ngx'
-paperless_ngx_role_github_repo: 'paperless-ngx'
-paperless_ngx_role_github_repo_archive_type: 'tar.xz'
-paperless_ngx_role_github_extract_dest: '/opt/paperless'
-paperless_ngx_role_github_extract_symlink_target: '/opt/paperless/paperless'
-paperless_ngx_role_github_binary_specifier: 'v'
-paperless_ngx_role_github_binary_url: '{VERSION}/paperless-ngx-{VERSION}.tar.xz'
+paperless_ngx_role_repo_release_owner: 'paperless-ngx'
+paperless_ngx_role_repo_release_repo: 'paperless-ngx'
+paperless_ngx_role_repo_extract_dir: '/opt/paperless'
+paperless_ngx_role_repo_extract_symlink_target: '/opt/paperless/paperless'
+paperless_ngx_role_repo_release_specifier: 'v'
+paperless_ngx_role_repo_release_asset: 'paperless-ngx-{VERSION}.tar.xz'
 
 ###############################################################################
 # Default Paperless-NGX  User/Group

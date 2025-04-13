@@ -20,6 +20,7 @@
 
     - name: 'Default | verify | assert paperless.conf'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_paperless_config.changed
         fail_msg: >
@@ -29,6 +30,7 @@
     # Paperless will fail if configuration is bad (r_pufky.srv.systemd)
     - name: 'Default | verify | assert Paperless-NGX services active'
       ansible.builtin.assert:
+        quiet: true
         that:
           - '"paperless-consumer.service" in ansible_facts.services'
           - 'ansible_facts["services"]["paperless-consumer.service"]["state"] == "running"'
@@ -56,6 +58,7 @@
 
     - name: 'Default | verify | assert paperless.conf'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_paperless_data.stat.exists
         fail_msg: '/opt/paperless/paperless/data should be deleted.'
@@ -67,6 +70,7 @@
 
     - name: 'Default | verify | assert /data/data/db.sqlite3'
       ansible.builtin.assert:
+        quiet: true
         that:
           - _test_paperless_sqlite.stat.exists
         fail_msg: '/data/data/db.sqlite3 should be exist.'
@@ -84,6 +88,7 @@
 
     - name: 'Default | verify | assert policy.xml'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_paperless_magick.changed
         fail_msg: >
@@ -103,6 +108,7 @@
 
     - name: 'Default | verify | assert gunicorn.conf.py'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_paperless_gunicorn.changed
         fail_msg: >
@@ -116,6 +122,7 @@
 
     - name: 'Default | verify | assert big2'
       ansible.builtin.assert:
+        quiet: true
         that:
           - _test_paperless_jbig2.stat.exists
         fail_msg: '/usr/local/bin/jbig2 should have been built.'
@@ -127,6 +134,7 @@
 
     - name: 'Default | verify | assert ghostscript'
       ansible.builtin.assert:
+        quiet: true
         that:
           - _test_paperless_ghostscript.stat.exists
         fail_msg: '/usr/local/bin/gs should have been built.'

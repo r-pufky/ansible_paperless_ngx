@@ -22,15 +22,17 @@ provisioner:
   inventory:
     group_vars:
       all:
-        github_testing_enable: true
-        github_testing_versions:
-          - 'v2.14.7'
-          - '0.30'
-          - 'gs10050'
-        github_testing_archives:
-          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/paperless-ngx-v2.14.7.tar.xz'
-          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/jbig2enc-0.30.tar.gz'
-          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ghostscript-10.05.0.tar.xz'
+        repo_testing_enable: true
+        repo_testing_versions:
+          - comment: 'paperless'
+            version: 'v2.14.7'
+            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/paperless-ngx-v2.14.7.tar.xz'
+          - comment: 'JBIG2enc'
+            version: '0.30'
+            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/0.30.tar.gz'
+          - comment: 'Ghostscript'
+            version: 'gs10050'
+            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ghostpdl-10.05.0.tar.xz'
         paperless_ngx_service_nltk_data: []
         paperless_ngx_config_dbengine: 'sqlite'
         paperless_ngx_config_secret_key: 'test'

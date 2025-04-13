@@ -22,15 +22,15 @@
 - name: 'Prep | assert data locations are not in install paths'
   ansible.builtin.assert:
     that:
-      - not paperless_ngx_config_consumption_dir.startswith(paperless_ngx_role_github_extract_dest)
-      - not paperless_ngx_config_data_dir.startswith(paperless_ngx_role_github_extract_dest)
-      - not paperless_ngx_config_empty_trash_dir.startswith(paperless_ngx_role_github_extract_dest)
-      - not paperless_ngx_config_media_root.startswith(paperless_ngx_role_github_extract_dest)
-      - not paperless_ngx_config_logging_dir.startswith(paperless_ngx_role_github_extract_dest)
+      - not paperless_ngx_config_consumption_dir.startswith(paperless_ngx_role_repo_extract_dir)
+      - not paperless_ngx_config_data_dir.startswith(paperless_ngx_role_repo_extract_dir)
+      - not paperless_ngx_config_empty_trash_dir.startswith(paperless_ngx_role_repo_extract_dir)
+      - not paperless_ngx_config_media_root.startswith(paperless_ngx_role_repo_extract_dir)
+      - not paperless_ngx_config_logging_dir.startswith(paperless_ngx_role_repo_extract_dir)
     fail_msg: |
       Data storage should not be in the same location as install.
 
-      Installs: '{{ paperless_ngx_role_github_extract_dest }}'
+      Installs: '{{ paperless_ngx_role_repo_extract_dir }}'
 
       paperless_ngx_config_consumption_dir: '{{ paperless_ngx_config_consumption_dir }}'
       paperless_ngx_config_data_dir: '{{ paperless_ngx_config_data_dir }}'
@@ -46,7 +46,7 @@
 - name: 'Prep | generate directories and tesseract dependencies'
   ansible.builtin.set_fact:
     _paperless_ngx_tesseract_packages: '{{ paperless_ngx_config_ocr_language | default([]) | map("regex_replace", "^(.*)$", "tesseract-ocr-\1") | list }}'
-    _paperless_ngx_dir: '{{ paperless_ngx_role_github_extract_symlink_target }}'
+    _paperless_ngx_dir: '{{ paperless_ngx_role_repo_extract_symlink_target }}'
     _paperless_ngx_double_side_dir: '{{ paperless_ngx_config_consumption_dir if paperless_ngx_config_consumption_dir.endswith("/") else paperless_ngx_config_consumption_dir ~ "/" }}{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name }}'
     _paperless_ngx_ghostscript_binary_url: '{{ _paperless_ngx_ghostscript_release_version }}/ghostscript-{{ _paperless_ngx_ghostscript_version }}.tar.xz'
 
