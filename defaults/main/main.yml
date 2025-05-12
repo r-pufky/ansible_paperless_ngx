@@ -9,7 +9,8 @@
 
 # Version.
 #
-# Older versions (<2) are not supported.
+# Older versions (<2) are not supported. Set repo_host_access_token if github
+# API is rate limited. See r_pufky.srv.repo.
 #
 # Values:
 #   {VERSION}: Tagged release to use ('v2.14.7').

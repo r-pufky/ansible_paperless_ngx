@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Configure Paperless-NGX
 ###############################################################################
@@ -34,7 +33,11 @@
 - name: 'Prep | set certs'
   when: paperless_ngx_service_certs_path | length > 0
   ansible.builtin.copy:
-    src: '{{ paperless_ngx_service_certs_path if paperless_ngx_service_certs_path.endswith("/") else paperless_ngx_service_certs_path ~ "/" }}'
+    src: '{{
+        paperless_ngx_service_certs_path
+        if paperless_ngx_service_certs_path.endswith("/") else
+        paperless_ngx_service_certs_path ~ "/"
+      }}'
     dest: '{{ paperless_ngx_role_repo_extract_dir }}/certs'
     owner: '{{ _paperless_ngx_uid }}'
     group: '{{ _paperless_ngx_gid }}'
@@ -52,8 +55,11 @@
     mode: '0640'  # passwords.
 
 - name: 'Config | migrate database schema'
-  ansible.builtin.command: '{{ _avenv_venv }}/bin/python3 {{ _paperless_ngx_dir }}/src/manage.py migrate'
-  args:
+  ansible.builtin.command:
+    argv:
+      - '{{ _avenv_venv }}/bin/python3'
+      - '{{ _paperless_ngx_dir }}/src/manage.py'
+      - 'migrate'
     chdir: '{{ _paperless_ngx_dir }}/src'
   become: true
   become_user: '{{ paperless_ngx_user }}'
@@ -63,8 +69,11 @@
 # manage_superuser will create the root user if it does not exist; no need to
 # run 'manage.py createsuperuser'.
 - name: 'Config | set root user'
-  ansible.builtin.command: "{{ _avenv_venv }}/bin/python3 {{ _paperless_ngx_dir }}/src/manage.py manage_superuser"
-  args:
+  ansible.builtin.command:
+    argv:
+      - '{{ _avenv_venv }}/bin/python3'
+      - '{{ _paperless_ngx_dir }}/src/manage.py'
+      - 'manage_superuser'
     chdir: '{{ _paperless_ngx_dir }}/src'
   environment:
     PAPERLESS_ADMIN_USER: "{{ paperless_ngx_config_admin_user }}"
@@ -83,12 +92,16 @@
     line: '\1<policy domain="coder" rights="read|write" pattern="PDF" />'
     backrefs: true
 
-- name: 'Config | set listen {{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}'  # noqa name[template] ip:port.
-  notify: 'Handlers | reload paperless_ngx'
+- name: >
+    Config | set listen
+    {{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}
+  notify: 'Handlers | reload paperless_ngx'  # noqa name[template] ip:port.
   ansible.builtin.lineinfile:
     path: '{{ _paperless_ngx_dir }}/gunicorn.conf.py'
     regexp: '^bind = '
-    line: "bind = '{{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}'"
+    line: >-
+      bind =
+      '{{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}'
 
 - name: 'Config | set service definitions'
   ansible.builtin.include_role:
@@ -103,8 +116,13 @@
           description: 'Paperless consumer'
           requires: ['redis.service']
         service:
-          exec_start: ['{{ _avenv_venv }}/bin/python3 manage.py document_consumer']
-          runtime_max_sec: '{{ "1d" if paperless_ngx_service_restart_daily_enable else "infinity" }}'
+          exec_start:
+            - '{{ _avenv_venv }}/bin/python3 manage.py document_consumer'
+          runtime_max_sec: '{{
+              "1d"
+              if paperless_ngx_service_restart_daily_enable else
+              "infinity"
+            }}'
         exec:
           user: '{{ paperless_ngx_user }}'
           group: '{{ paperless_ngx_group }}'
@@ -122,8 +140,17 @@
           description: 'Paperless Celery Beat'
           requires: ['redis.service']
         service:
-          exec_start: ['{{ _avenv_venv }}/bin/celery --app paperless beat --loglevel {{ paperless_ngx_service_log_level | default("info") | upper }}']
-          runtime_max_sec: '{{ "1d" if paperless_ngx_service_restart_daily_enable else "infinity" }}'
+          exec_start:
+            - >-
+              {{ _avenv_venv }}/bin/celery
+              --app paperless beat
+              --loglevel
+              {{ paperless_ngx_service_log_level | default("info") | upper }}
+          runtime_max_sec: '{{
+              "1d"
+              if paperless_ngx_service_restart_daily_enable else
+              "infinity"
+            }}'
         exec:
           user: '{{ paperless_ngx_user }}'
           group: '{{ paperless_ngx_group }}'
@@ -141,8 +168,17 @@
           description: 'Paperless Celery Workers'
           requires: ['redis.service']
         service:
-          exec_start: ['{{ _avenv_venv }}/bin/celery --app paperless worker --loglevel {{ paperless_ngx_service_log_level | default("info") | upper }}']
-          runtime_max_sec: '{{ "1d" if paperless_ngx_service_restart_daily_enable else "infinity" }}'
+          exec_start:
+            - >-
+              {{ _avenv_venv }}/bin/celery
+              --app paperless worker
+              --loglevel
+              {{ paperless_ngx_service_log_level | default("info") | upper }}
+          runtime_max_sec: '{{
+              "1d"
+              if paperless_ngx_service_restart_daily_enable else
+              "infinity"
+            }}'
         exec:
           user: '{{ paperless_ngx_user }}'
           group: '{{ paperless_ngx_group }}'
@@ -162,8 +198,16 @@
           after: ['network.target']
           wants: ['network.target']
         service:
-          exec_start: ['{{ _avenv_venv }}/bin/gunicorn -c {{ _paperless_ngx_dir }}/gunicorn.conf.py paperless.asgi:application']
-          runtime_max_sec: '{{ "1d" if paperless_ngx_service_restart_daily_enable else "infinity" }}'
+          exec_start:
+            - >-
+              {{ _avenv_venv }}/bin/gunicorn
+              -c {{ _paperless_ngx_dir }}/gunicorn.conf.py
+              paperless.asgi:application
+          runtime_max_sec: '{{
+              "1d"
+              if paperless_ngx_service_restart_daily_enable else
+              "infinity"
+            }}'
         exec:
           user: '{{ paperless_ngx_user }}'
           group: '{{ paperless_ngx_group }}'
@@ -184,11 +228,18 @@
           wants: ['network.target']
         service:
           type: 'oneshot'
-          exec_start: ['/usr/bin/find "{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}" -cmin +{{ paperless_ngx_service_cache_lifetime }} -type f -delete']
+          exec_start:
+            - >-
+              /usr/bin/find
+              "{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}"
+              -cmin +{{ paperless_ngx_service_cache_lifetime }}
+              -type f
+              -delete
         exec:
           user: 'root'
           group: 'root'
-          working_directory: '{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}'
+          working_directory:
+            '{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}'
         install:
           wanted_by: ['multi-user.target']
     systemd_timers:
@@ -200,6 +251,7 @@
           requires: ['paperless-cache.service']
         timer:
           unit: 'paperless-cache.service'
-          on_unit_active_sec: '{{ paperless_ngx_service_cache_lifetime | default(30) }}m'
+          on_unit_active_sec:
+            '{{ paperless_ngx_service_cache_lifetime | default(30) }}m'
         install:
           wanted_by: ['timers.target']

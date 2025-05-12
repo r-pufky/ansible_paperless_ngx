@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Default Paperless-NGX Package Dependencies
 ###############################################################################
@@ -50,7 +49,7 @@ paperless_ngx_role_python_deps:  # Explicit. Auto-included with other packages.
   - 'python3-setuptools'
   - 'python3-wheel'
 
-paperless_ngx_role_redis:  # includes redis-server, redis-tools
+paperless_ngx_role_redis:  # includes redis-server, redis-tools.
   - 'redis'
 
 paperless_ngx_role_sqlite:
@@ -141,7 +140,8 @@ paperless_ngx_role_ghostscript_repo: 'ghostpdl-downloads'
 # Asset is dynamically generated as the tag is different from version string.
 # paperless_ngx_role_ghostscript_asset: 'ghostpdl-{VERSION}.tar.xz'
 paperless_ngx_role_ghostscript_extract_dir: '/opt/ghostscript'
-paperless_ngx_role_ghostscript_extract_symlink_target: '/opt/ghostscript/ghostscript'
+paperless_ngx_role_ghostscript_extract_symlink_target:
+  '/opt/ghostscript/ghostscript'
 
 ###############################################################################
 # Paperless-NGX GitHub Options
@@ -154,7 +154,7 @@ paperless_ngx_role_ghostscript_extract_symlink_target: '/opt/ghostscript/ghostsc
 paperless_ngx_role_repo_release_owner: 'paperless-ngx'
 paperless_ngx_role_repo_release_repo: 'paperless-ngx'
 paperless_ngx_role_repo_extract_dir: '/opt/paperless'
-paperless_ngx_role_repo_extract_symlink_target: '/opt/paperless/paperless'
+paperless_ngx_role_repo_extract_symlink: '/opt/paperless/paperless'
 paperless_ngx_role_repo_release_specifier: 'v'
 paperless_ngx_role_repo_release_asset: 'paperless-ngx-{VERSION}.tar.xz'
 

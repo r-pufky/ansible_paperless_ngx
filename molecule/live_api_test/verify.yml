@@ -7,24 +7,17 @@
     - name: 'Live API test | verify | gather service status'
       ansible.builtin.service_facts:
 
-    - name: 'Live API test | verify | query paperless.conf'
-      ansible.builtin.copy:
-        src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/paperless.conf'
-        dest: '/opt/paperless/paperless/paperless.conf'
-        owner: 'paperless'
-        group: 'paperless'
-        mode: '0640'
-      check_mode: true
-      diff: true
-      register: _test_paperless_config
-
-    - name: 'Live API test | verify | assert paperless.conf'
-      ansible.builtin.assert:
-        that:
-          - not _test_paperless_config.changed
-        fail_msg: >
-          /opt/paperless/paperless/paperless.conf is not in expected format:
-          {{ _test_paperless_config.diff }}.
+    - name: 'Default | verify | paperless.conf'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Default | verify | paperless.conf'
+        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/paperless.conf'
+        test_file: '/opt/paperless/paperless/paperless.conf'
+        test_owner: 'paperless'
+        test_group: 'paperless'
+        test_mode: '0640'
 
     # Paperless will fail if configuration is bad (r_pufky.srv.systemd)
     - name: 'Live API test | verify | assert Paperless-NGX services active'
@@ -49,73 +42,75 @@
            paperless-webserver.service: {{ ansible_facts["services"]["paperless-webserver.service"]["state"] }}
                   redis-server.service: {{ ansible_facts["services"]["redis-server.service"]["state"] }}
 
-    - name: 'Live API test | verify | query /opt/paperless/paperless/data'
-      ansible.builtin.stat:
-        path: '/opt/paperless/paperless/data'
-      register: _test_paperless_data
 
-    - name: 'Live API test | verify | assert paperless.conf'
-      ansible.builtin.assert:
-        that:
-          - not _test_paperless_data.stat.exists
-        fail_msg: '/opt/paperless/paperless/data should be deleted.'
+    - name: 'Default | verify | /opt/paperless/paperless/data'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Default | verify | /opt/paperless/paperless/data'
+        test_file: '/opt/paperless/paperless/data'
+        test_owner: '{{ omit }}'
+        test_group: '{{ omit }}'
+        test_mode: '{{ omit }}'
+        test_state: 'absent'
 
-    - name: 'Live API test | verify | query /data/data/db.sqlite3'
-      ansible.builtin.stat:
-        path: '/data/data/db.sqlite3'
-      register: _test_paperless_sqlite
+    - name: 'Default | verify | /data/data/db.sqlite3'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Default | verify | /data/data/db.sqlite3'
+        test_file: '/data/data/db.sqlite3'
+        test_owner: 'paperless'
+        test_group: 'paperless'
+        test_mode: '0644'
+        test_state: 'file'
 
-    - name: 'Live API test | verify | assert /data/data/db.sqlite3'
-      ansible.builtin.assert:
-        that:
-          - _test_paperless_sqlite.stat.exists
-        fail_msg: '/data/data/db.sqlite3 should be exist.'
+    - name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
+        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/policy.xml'
+        test_file: '/etc/ImageMagick-6/policy.xml'
+        test_owner: 'root'
+        test_group: 'root'
+        test_mode: '0644'
 
-    - name: 'Live API test | verify | query policy.xml'
-      ansible.builtin.copy:
-        src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/policy.xml'
-        dest: '/etc/ImageMagick-6/policy.xml'
-        owner: 'root'
-        group: 'root'
-        mode: '0644'
-      check_mode: true
-      diff: true
-      register: _test_paperless_magick
+    - name: 'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
+        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/gunicorn.conf.py'
+        test_file: '/opt/paperless/paperless/gunicorn.conf.py'
+        test_owner: 'paperless'
+        test_group: 'paperless'
+        test_mode: '0640'
 
-    - name: 'Live API test | verify | assert policy.xml'
-      ansible.builtin.assert:
-        that:
-          - not _test_paperless_magick.changed
-        fail_msg: >
-          /etc/ImageMagick-6/policy.xml is not in expected format:
-          {{ _test_paperless_magick.diff }}.
+    - name: 'Default | verify | /usr/local/bin/jbig2'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Default | verify | /usr/local/bin/jbig2'
+        test_file: '/usr/local/bin/jbig2'
+        test_owner: 'root'
+        test_group: 'root'
+        test_mode: '0755'
+        test_state: 'file'
 
-    - name: 'Live API test | verify | query gunicorn.conf.py'
-      ansible.builtin.copy:
-        src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/gunicorn.conf.py'
-        dest: '/opt/paperless/paperless/gunicorn.conf.py'
-        owner: 'paperless'
-        group: 'paperless'
-        mode: '0640'
-      check_mode: true
-      diff: true
-      register: _test_paperless_gunicorn
-
-    - name: 'Live API test | verify | assert gunicorn.conf.py'
-      ansible.builtin.assert:
-        that:
-          - not _test_paperless_gunicorn.changed
-        fail_msg: >
-          /opt/paperless/paperless/gunicorn.conf.py is not in expected format:
-          {{ _test_paperless_gunicorn.diff }}.
-
-    - name: 'Live API test | verify | query jbig2'
-      ansible.builtin.stat:
-        path: '/usr/local/bin/jbig2'
-      register: _test_paperless_jbig2
-
-    - name: 'Live API test | verify | assert big2'
-      ansible.builtin.assert:
-        that:
-          - _test_paperless_jbig2.stat.exists
-        fail_msg: '/usr/local/bin/jbig2 should have been built.'
+    - name: 'Default | verify | /usr/local/bin/gs'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Default | verify | /usr/local/bin/gs'
+        test_file: '/usr/local/bin/gs'
+        test_owner: 'root'
+        test_group: 'root'
+        test_mode: '0755'
+        test_state: 'file'

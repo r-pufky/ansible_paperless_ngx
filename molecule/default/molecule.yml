@@ -1,12 +1,18 @@
 ---
 # yamllint disable rule:line-length
-# Confirm:
+###############################################################################
+# Default
+###############################################################################
+# Default configuration is deployed successfully.
+#
+# Tests:
 # * paperless.conf set.
 # * paperless ngx services are active and running.
 # * gunicorn overrides are set correctly.
 # * ImageMaick has PDF processing enabled.
 # * install directory locations are removed.
 # * sqlite database exists in data directory.
+
 dependency:
   name: 'galaxy'
 driver:

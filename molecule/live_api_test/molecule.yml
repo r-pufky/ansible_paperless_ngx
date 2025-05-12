@@ -1,9 +1,11 @@
 ---
 # yamllint disable rule:line-length
+###############################################################################
+# Live API Test
+###############################################################################
 # Integration test against a live github repository for download and
-# extraction. This confirms the API endpoints are processed correctly, NLTK
-# data is downloaded correctly and should only be run as one-off test before
-# releasing.
+# extraction. This confirms the API endpoints are processed correctly and
+# should only be run as one-off test before releasing.
 #
 # TEST WILL NOT EXECUTE UNLESS IT IS EXPLICITLY ENABLED.
 #
@@ -15,7 +17,10 @@
 #
 #   molecule test -s live_api_test -- -v -e 'repo_live_api_github_enable=true repo_host_access_token={TOKEN}'
 #
-# Test success against molecule default tests.
+# Tests:
+# * Test success against molecule default tests.
+# yamllint enable rule:line-length
+
 dependency:
   name: 'galaxy'
 driver:

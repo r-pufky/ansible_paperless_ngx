@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Document Consumption
 ###############################################################################
@@ -135,7 +134,8 @@ paperless_ngx_config_number_of_suggested_dates: 3
 # changed here.
 #
 # Default: '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'.
-paperless_ngx_config_thumbnail_font_name: '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'
+paperless_ngx_config_thumbnail_font_name:
+  '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'
 
 # List of dates that should be ignored during creation date detection.
 #

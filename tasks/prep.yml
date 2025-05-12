@@ -39,15 +39,32 @@
 
 - name: 'Prep | parse source versions'
   ansible.builtin.set_fact:
-    _paperless_ngx_jbig2_version: '{{ paperless_ngx_service_jbig2enc_version | default(paperless_ngx_role_jbig2enc_version) }}'
-    _paperless_ngx_ghostscript_version: '{{ paperless_ngx_service_ghostscript_version | default(paperless_ngx_role_ghostscript_version) }}'
-    _paperless_ngx_ghostscript_release_version: 'gs{{ paperless_ngx_service_ghostscript_version | default(paperless_ngx_role_ghostscript_version) | replace(".", "") | replace("-", "") }}'
+    _paperless_ngx_jbig2_version: '{{
+        paperless_ngx_service_jbig2enc_version |
+        default(paperless_ngx_role_jbig2enc_version)
+      }}'
+    _paperless_ngx_ghostscript_version: '{{
+        paperless_ngx_service_ghostscript_version |
+        default(paperless_ngx_role_ghostscript_version)
+      }}'
+    _paperless_ngx_ghostscript_release_version: 'gs{{
+        paperless_ngx_service_ghostscript_version |
+        default(paperless_ngx_role_ghostscript_version) |
+        replace(".", "") | replace("-", "")
+      }}'
 
 - name: 'Prep | generate directories and tesseract dependencies'
   ansible.builtin.set_fact:
-    _paperless_ngx_tesseract_packages: '{{ paperless_ngx_config_ocr_language | default([]) | map("regex_replace", "^(.*)$", "tesseract-ocr-\1") | list }}'
-    _paperless_ngx_dir: '{{ paperless_ngx_role_repo_extract_symlink_target }}'
-    _paperless_ngx_double_side_dir: '{{ paperless_ngx_config_consumption_dir if paperless_ngx_config_consumption_dir.endswith("/") else paperless_ngx_config_consumption_dir ~ "/" }}{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name }}'
+    _paperless_ngx_tesseract_packages: '{{
+        paperless_ngx_config_ocr_language | default([]) |
+        map("regex_replace", "^(.*)$", "tesseract-ocr-\1") | list
+      }}'
+    _paperless_ngx_dir: '{{ paperless_ngx_role_repo_extract_symlink }}'
+    _paperless_ngx_double_side_dir: '{{
+        paperless_ngx_config_consumption_dir
+        if paperless_ngx_config_consumption_dir.endswith("/") else
+        paperless_ngx_config_consumption_dir ~ "/"
+      }}{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name }}'
     _paperless_ngx_ghostscript_binary_url: '{{ _paperless_ngx_ghostscript_release_version }}/ghostscript-{{ _paperless_ngx_ghostscript_version }}.tar.xz'
 
 - name: 'Prep | manage users'
@@ -73,30 +90,39 @@
 
 # Use UID/GID as some media filesystems may be remote.
 - name: 'Config | manage directories'
-  ansible.builtin.file:
-    path: '{{ item }}'
-    owner: '{{ _paperless_ngx_uid }}'
-    group: '{{ _paperless_ngx_gid }}'
-    mode: '{{ paperless_ngx_media_perms_folder }}'
-    recurse: true
-    state: 'directory'
-  become: true
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.utils'
+    tasks_from: 'remote_file.yml'
+  vars:
+    file_path: '{{ item }}'
+    file_owner: '{{ _paperless_ngx_uid }}'
+    file_group: '{{ _paperless_ngx_gid }}'
+    file_mode: '{{ paperless_ngx_media_perms_folder }}'
+    file_recurse: true
+    file_state: 'directory'
   loop: '{{ paperless_ngx_media_folders }}'
 
 - name: 'Config | manage double-sided collate directory'
   when: paperless_ngx_config_consumer_enable_collate_double_sided
-  ansible.builtin.file:
-    path: '{{ _paperless_ngx_double_side_dir }}'
-    owner: '{{ _paperless_ngx_uid }}'
-    group: '{{ _paperless_ngx_gid }}'
-    mode: '{{ paperless_ngx_media_perms_folder }}'
-    state: 'directory'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.utils'
+    tasks_from: 'remote_file.yml'
+  vars:
+    file_path: '{{ _paperless_ngx_double_side_dir }}'
+    file_owner: '{{ _paperless_ngx_uid }}'
+    file_group: '{{ _paperless_ngx_gid }}'
+    file_mode: '{{ paperless_ngx_media_perms_folder }}'
+    file_recurse: false
+    file_state: 'directory'
 
 # Use UID/GID as some media filesystems may be remote.
 - name: 'Config | set media file permissions'
   when: paperless_ngx_media_set_perms_file_enable
-  ansible.builtin.shell: |
-    find '{{ item }}' -type f -exec chmod {{ paperless_ngx_media_perms_file }} {}; chown {{ _paperless_ngx_uid }}:{{ _paperless_ngx_gid }} {} \;
+  ansible.builtin.shell: >-
+    find '{{ item }}'
+    -type f
+    -exec chmod {{ paperless_ngx_media_perms_file }} {};
+      chown {{ _paperless_ngx_uid }}:{{ _paperless_ngx_gid }} {} \;
   changed_when: false
   loop: '{{ paperless_ngx_media_folders }}'
 
@@ -109,168 +135,430 @@
   ansible.builtin.set_fact:
     _paperless_ngx_config: {
       # Debug
-      PAPERLESS_DEBUG: '{{ paperless_ngx_config_debug | default(false) | lower }}',
+      PAPERLESS_DEBUG:
+        '{{ paperless_ngx_config_debug | default(false) | lower }}',
       # Required Services
-      PAPERLESS_REDIS: '{{ paperless_ngx_config_redis | default("redis://localhost:6379") }}',
-      PAPERLESS_REDIS_PREFIX: '{{ paperless_ngx_config_redis_prefix | default("") }}',
-      PAPERLESS_DBENGINE: '{{ paperless_ngx_config_dbengine | default("postgresql") }}',
-      PAPERLESS_DBHOST: '{{ paperless_ngx_config_dbhost | default("localhost") if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBPORT: '{{ paperless_ngx_config_dbport | default(5432) if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBNAME: '{{ paperless_ngx_config_dbname | default("paperless") if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBUSER: '{{ paperless_ngx_config_dbuser | default("paperless") if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBPASS: '{{ paperless_ngx_config_dbpass | default("paperless") if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBSSLMODE: '{{ paperless_ngx_config_dbsslmode | default("prefer") if paperless_ngx_config_dbengine != "sqlite" else "" }}',
-      PAPERLESS_DBSSLROOTCERT: '{{ paperless_ngx_config_dbsslrootcert | default("") }}',
-      PAPERLESS_DBSSLCERT: '{{ paperless_ngx_config_dbsslcert | default("") }}',
-      PAPERLESS_DBSSLKEY: '{{ paperless_ngx_config_dbsslkey | default("") }}',
-      PAPERLESS_DB_TIMEOUT: '{{ paperless_ngx_config_db_timeout | default(0) }}',
+      PAPERLESS_REDIS:
+        '{{ paperless_ngx_config_redis | default("redis://localhost:6379") }}',
+      PAPERLESS_REDIS_PREFIX:
+        '{{ paperless_ngx_config_redis_prefix | default("") }}',
+      PAPERLESS_DBENGINE:
+        '{{ paperless_ngx_config_dbengine | default("postgresql") }}',
+      PAPERLESS_DBHOST: '{{
+          paperless_ngx_config_dbhost | default("localhost")
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBPORT: '{{
+          paperless_ngx_config_dbport | default(5432)
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBNAME: '{{
+          paperless_ngx_config_dbname | default("paperless")
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBUSER: '{{
+          paperless_ngx_config_dbuser | default("paperless")
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBPASS: '{{
+          paperless_ngx_config_dbpass | default("paperless")
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBSSLMODE: '{{
+          paperless_ngx_config_dbsslmode | default("prefer")
+          if paperless_ngx_config_dbengine != "sqlite" else
+          ""
+        }}',
+      PAPERLESS_DBSSLROOTCERT:
+        '{{ paperless_ngx_config_dbsslrootcert | default("") }}',
+      PAPERLESS_DBSSLCERT:
+        '{{ paperless_ngx_config_dbsslcert | default("") }}',
+      PAPERLESS_DBSSLKEY:
+        '{{ paperless_ngx_config_dbsslkey | default("") }}',
+      PAPERLESS_DB_TIMEOUT:
+        '{{ paperless_ngx_config_db_timeout | default(0) }}',
       # Optional Services (Tika settings)
-      PAPERLESS_TIKA_ENABLED: '{{ paperless_ngx_config_tika_enabled | default(false) | lower }}',
-      PAPERLESS_TIKA_ENDPOINT: '{{ paperless_ngx_config_tika_endpoint | default("http://localhost:9998") }}',
-      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: '{{ paperless_ngx_config_tika_gotenberg_endpoint | default("http://localhost:3000") }}',
+      PAPERLESS_TIKA_ENABLED:
+        '{{ paperless_ngx_config_tika_enabled | default(false) | lower }}',
+      PAPERLESS_TIKA_ENDPOINT: '{{
+          paperless_ngx_config_tika_endpoint | default("http://localhost:9998")
+        }}',
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: '{{
+          paperless_ngx_config_tika_gotenberg_endpoint |
+          default("http://localhost:3000")
+        }}',
       # Paths and Folders
-      PAPERLESS_CONSUMPTION_DIR: '{{ paperless_ngx_config_consumption_dir | default("/data/consume") }}',
-      PAPERLESS_DATA_DIR: '{{ paperless_ngx_config_data_dir | default("/data/data") }}',
-      PAPERLESS_TRASH_DIR: '{{ paperless_ngx_config_empty_trash_dir | default("") }}',
-      PAPERLESS_MEDIA_ROOT: '{{ paperless_ngx_config_media_root | default("/data/media") }}',
-      PAPERLESS_STATICDIR: '{{ paperless_ngx_config_staticdir | default("../static") }}',
-      PAPERLESS_FILENAME_FORMAT: '{{ paperless_ngx_config_filename_format | default("") }}',
-      PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: '{{ paperless_ngx_config_filename_format_remove_none | default(false) | lower }}',
-      PAPERLESS_LOGGING_DIR: '{{ paperless_ngx_config_logging_dir | default("{{ paperless_ngx_config_data_dir }}/log") }}',
-      PAPERLESS_NLTK_DIR: '{{ paperless_ngx_config_nltk_dir | default("/usr/share/nltk_data") }}',
-      PAPERLESS_MODEL_FILE: '{{ paperless_ngx_config_model_file | default("{{ paperless_ngx_config_data_dir }}/classification_model.pickle") }}',
+      PAPERLESS_CONSUMPTION_DIR: '{{
+          paperless_ngx_config_consumption_dir | default("/data/consume")
+        }}',
+      PAPERLESS_DATA_DIR:
+        '{{ paperless_ngx_config_data_dir | default("/data/data") }}',
+      PAPERLESS_TRASH_DIR:
+        '{{ paperless_ngx_config_empty_trash_dir | default("") }}',
+      PAPERLESS_MEDIA_ROOT:
+        '{{ paperless_ngx_config_media_root | default("/data/media") }}',
+      PAPERLESS_STATICDIR:
+        '{{ paperless_ngx_config_staticdir | default("../static") }}',
+      PAPERLESS_FILENAME_FORMAT:
+        '{{ paperless_ngx_config_filename_format | default("") }}',
+      PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: '{{
+          paperless_ngx_config_filename_format_remove_none | default(false) |
+          lower
+        }}',
+      PAPERLESS_LOGGING_DIR: '{{
+          paperless_ngx_config_logging_dir |
+          default("{{ paperless_ngx_config_data_dir }}/log")
+        }}',
+      PAPERLESS_NLTK_DIR: '{{
+          paperless_ngx_config_nltk_dir |
+          default("/usr/share/nltk_data")
+        }}',
+      PAPERLESS_MODEL_FILE: '{{
+          paperless_ngx_config_model_file |
+          default("{{ paperless_ngx_config_data_dir }}/classification_model.pickle")
+        }}',
       # Logging
-      PAPERLESS_LOGROTATE_MAX_SIZE: '{{ paperless_ngx_config_logrotate_max_size | default(1) }}',
-      PAPERLESS_LOGROTATE_MAX_BACKUPS: '{{ paperless_ngx_config_logrotate_max_backups | default(20) }}',
+      PAPERLESS_LOGROTATE_MAX_SIZE:
+        '{{ paperless_ngx_config_logrotate_max_size | default(1) }}',
+      PAPERLESS_LOGROTATE_MAX_BACKUPS:
+        '{{ paperless_ngx_config_logrotate_max_backups | default(20) }}',
       # Hosting and security
-      PAPERLESS_SECRET_KEY: '{{ paperless_ngx_config_secret_key if paperless_ngx_config_secret_key | length > 0 else lookup("ansible.builtin.password", "/dev/null", chars=["ascii_lowercase", "ascii_uppercase", "digits"], length=50) }}',
+      PAPERLESS_SECRET_KEY: '{{
+          paperless_ngx_config_secret_key
+          if paperless_ngx_config_secret_key | length > 0 else
+          lookup("ansible.builtin.password",
+                 "/dev/null",
+                 chars=["ascii_lowercase", "ascii_uppercase", "digits"],
+                 length=50)
+        }}',
       PAPERLESS_URL: '{{ paperless_ngx_config_url | default("") }}',
-      PAPERLESS_CSRF_TRUSTED_ORIGINS: '{{ paperless_ngx_config_csrf_trusted_origins | default([]) | join(",") }}',
-      PAPERLESS_ALLOWED_HOSTS: '{{ paperless_ngx_config_allowed_hosts | default(["*"]) | join(",") }}',
-      PAPERLESS_CORS_ALLOWED_HOSTS: '{{ paperless_ngx_config_cors_allowed_hosts | default(["http://localhost:8000"]) | join(",") }}',
-      PAPERLESS_TRUSTED_PROXIES: '{{ paperless_ngx_config_trusted_proxies | default([]) | join(",") }}',
-      PAPERLESS_FORCE_SCRIPT_NAME: '{{ paperless_ngx_config_force_script_name | default("") }}',
-      PAPERLESS_STATIC_URL: '{{ paperless_ngx_config_static_url | default("/static/") }}',
-      PAPERLESS_AUTO_LOGIN_USERNAME: '{{ paperless_ngx_config_auto_login_username | default("") }}',
-      PAPERLESS_COOKIE_PREFIX: '{{ paperless_ngx_config_cookie_prefix | default("") }}',
-      PAPERLESS_ENABLE_HTTP_REMOTE_USER: '{{ paperless_ngx_config_enable_http_remote_user | default(false) | lower }}',
-      PAPERLESS_ENABLE_HTTP_REMOTE_USER_API: '{{ paperless_ngx_config_enable_http_remote_user_api | default(false) | lower }}',
-      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: '{{ paperless_ngx_config_http_remote_user_header_name | default("HTTP_REMOTE_USER") }}',
-      PAPERLESS_LOGOUT_REDIRECT_URL: '{{ paperless_ngx_config_logout_redirect_url | default("") }}',
-      PAPERLESS_USE_X_FORWARD_HOST: '{{ paperless_ngx_config_use_x_forward_host | default(false) | lower }}',
-      PAPERLESS_USE_X_FORWARD_PORT: '{{ paperless_ngx_config_use_x_forward_port | default(false) | lower }}',
-      PAPERLESS_PROXY_SSL_HEADER: '{{ ([paperless_ngx_config_proxy_ssl_header.header, paperless_ngx_config_proxy_ssl_header.value] | to_json) if paperless_ngx_config_proxy_ssl_header | length > 0 else "" }}',
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: '{{
+          paperless_ngx_config_csrf_trusted_origins | default([]) |
+          join(",")
+        }}',
+      PAPERLESS_ALLOWED_HOSTS: '{{
+          paperless_ngx_config_allowed_hosts | default(["*"]) | join(",") }}',
+      PAPERLESS_CORS_ALLOWED_HOSTS: '{{
+          paperless_ngx_config_cors_allowed_hosts |
+          default(["http://localhost:8000"]) |
+          join(",")
+        }}',
+      PAPERLESS_TRUSTED_PROXIES:
+        '{{ paperless_ngx_config_trusted_proxies | default([]) | join(",") }}',
+      PAPERLESS_FORCE_SCRIPT_NAME:
+        '{{ paperless_ngx_config_force_script_name | default("") }}',
+      PAPERLESS_STATIC_URL:
+        '{{ paperless_ngx_config_static_url | default("/static/") }}',
+      PAPERLESS_AUTO_LOGIN_USERNAME:
+        '{{ paperless_ngx_config_auto_login_username | default("") }}',
+      PAPERLESS_COOKIE_PREFIX:
+        '{{ paperless_ngx_config_cookie_prefix | default("") }}',
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER: '{{
+          paperless_ngx_config_enable_http_remote_user | default(false) |
+          lower
+        }}',
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER_API: '{{
+          paperless_ngx_config_enable_http_remote_user_api | default(false) |
+          lower
+        }}',
+      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: '{{
+          paperless_ngx_config_http_remote_user_header_name |
+          default("HTTP_REMOTE_USER")
+        }}',
+      PAPERLESS_LOGOUT_REDIRECT_URL:
+        '{{ paperless_ngx_config_logout_redirect_url | default("") }}',
+      PAPERLESS_USE_X_FORWARD_HOST: '{{
+          paperless_ngx_config_use_x_forward_host | default(false) | lower }}',
+      PAPERLESS_USE_X_FORWARD_PORT: '{{
+          paperless_ngx_config_use_x_forward_port | default(false) | lower }}',
+      PAPERLESS_PROXY_SSL_HEADER: '{{
+          ([paperless_ngx_config_proxy_ssl_header.header, paperless_ngx_config_proxy_ssl_header.value] | to_json)
+          if paperless_ngx_config_proxy_ssl_header | length > 0 else
+          ""
+        }}',
       # Hosting and security > Accounts
-      PAPERLESS_ADMIN_USER: '{{ paperless_ngx_config_admin_user | default("paperless") }}',
-      PAPERLESS_ADMIN_PASSWORD: '{{ paperless_ngx_config_admin_password | default("paperless") }}',
-      PAPERLESS_ADMIN_MAIL: '{{ paperless_ngx_config_admin_mail | default("root@localhost") }}',
-      PAPERLESS_EMAIL_CERTIFICATE_LOCATION: '{{ paperless_ngx_config_email_certificate_location | default("") }}',
+      PAPERLESS_ADMIN_USER:
+        '{{ paperless_ngx_config_admin_user | default("paperless") }}',
+      PAPERLESS_ADMIN_PASSWORD:
+        '{{ paperless_ngx_config_admin_password | default("paperless") }}',
+      PAPERLESS_ADMIN_MAIL:
+        '{{ paperless_ngx_config_admin_mail | default("root@localhost") }}',
+      PAPERLESS_EMAIL_CERTIFICATE_LOCATION:
+        '{{ paperless_ngx_config_email_certificate_location | default("") }}',
       # Hosting and security > Social Media Accounts
-      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{{ (paperless_ngx_config_socialaccount_providers | to_json) if paperless_ngx_config_socialaccount_providers | length > 0 else "" }}',
-      PAPERLESS_SOCIAL_AUTO_SIGNUP: '{{ paperless_ngx_config_social_auto_signup | default(false) | lower }}',
-      PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: '{{ paperless_ngx_config_socialaccount_allow_signups | default(true) | lower }}',
-      PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: '{{ paperless_ngx_config_account_allow_signup | default(false) | lower }}',
-      PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL: '{{ paperless_ngx_config_account_default_http_protocol | default("https") }}',
-      PAPERLESS_ACCOUNT_EMAIL_VERIFICATION: '{{ paperless_ngx_config_account_email_verification | default("none") }}',
-      PAPERLESS_DISABLE_REGULAR_LOGIN: '{{ paperless_ngx_config_disable_regular_login | default(false) | lower }}',
-      PAPERLESS_REDIRECT_LOGIN_TO_SSO: '{{ paperless_ngx_config_paperless_redirect_login_to_sso | default(false) | lower }}',
-      PAPERLESS_ACCOUNT_SESSION_REMEMBER: '{{ paperless_ngx_config_paperless_account_session_remember | default(true) | lower }}',
-      PAPERLESS_SESSION_COOKIE_AGE: '{{ paperless_ngx_config_paperless_session_cookie_age | default(1209600) }}',
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{{
+          (paperless_ngx_config_socialaccount_providers | to_json)
+          if paperless_ngx_config_socialaccount_providers | length > 0 else
+          ""
+        }}',
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: '{{
+          paperless_ngx_config_social_auto_signup | default(false) | lower
+        }}',
+      PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: '{{
+          paperless_ngx_config_socialaccount_allow_signups | default(true) |
+          lower
+        }}',
+      PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: '{{
+          paperless_ngx_config_account_allow_signup | default(false) | lower
+        }}',
+      PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL: '{{
+          paperless_ngx_config_account_default_http_protocol | default("https")
+        }}',
+      PAPERLESS_ACCOUNT_EMAIL_VERIFICATION: '{{
+          paperless_ngx_config_account_email_verification | default("none")
+        }}',
+      PAPERLESS_DISABLE_REGULAR_LOGIN: '{{
+          paperless_ngx_config_disable_regular_login | default(false) | lower
+        }}',
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: '{{
+          paperless_ngx_config_paperless_redirect_login_to_sso |
+          default(false) | lower
+        }}',
+      PAPERLESS_ACCOUNT_SESSION_REMEMBER: '{{
+          paperless_ngx_config_paperless_account_session_remember |
+          default(true) | lower
+        }}',
+      PAPERLESS_SESSION_COOKIE_AGE: '{{
+          paperless_ngx_config_paperless_session_cookie_age | default(1209600)
+        }}',
       # OCR settings
-      PAPERLESS_OCR_LANGUAGE: '{{ paperless_ngx_config_ocr_language | default(["eng"]) | join("+") }}',
-      PAPERLESS_OCR_MODE: '{{ paperless_ngx_config_ocr_mode | default("skip") | lower }}',
-      PAPERLESS_OCR_SKIP_ARCHIVE_FILE: '{{ paperless_ngx_config_ocr_skip_archive_file | default("never") | lower }}',
-      PAPERLESS_OCR_CLEAN: '{{ paperless_ngx_config_ocr_clean | default("clean") | lower }}',
-      PAPERLESS_OCR_DESKEW: '{{ paperless_ngx_config_ocr_deskew | default(true) | lower }}',
-      PAPERLESS_OCR_ROTATE_PAGES: '{{ paperless_ngx_config_ocr_rotate_pages | default(true) | lower }}',
-      PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: '{{ paperless_ngx_config_ocr_rotate_pages_threshold | default(12) }}',
-      PAPERLESS_OCR_OUTPUT_TYPE: '{{ paperless_ngx_config_ocr_output_type | default("pdfa") | lower }}',
-      PAPERLESS_OCR_PAGES: '{{ paperless_ngx_config_ocr_pages if paperless_ngx_config_ocr_pages > 0 else "" }}',  # Empty disables, not 0.
-      PAPERLESS_OCR_IMAGE_DPI: '{{ paperless_ngx_config_ocr_image_dpi if paperless_ngx_config_ocr_image_dpi > 0 else "" }}',  # Empty set auto, not 0.
-      PAPERLESS_OCR_MAX_IMAGE_PIXELS: '{{ paperless_ngx_config_ocr_max_image_pixels | default(89478485) }}',
-      PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY: '{{ paperless_ngx_config_ocr_color_conversion_strategy | default("RGB") }}',
-      PAPERLESS_OCR_USER_ARGS: '{{ (paperless_ngx_config_ocr_user_args | to_json) if paperless_ngx_config_ocr_user_args | length > 0 else "" }}',
+      PAPERLESS_OCR_LANGUAGE: '{{
+          paperless_ngx_config_ocr_language | default(["eng"]) | join("+")
+        }}',
+      PAPERLESS_OCR_MODE:
+        '{{ paperless_ngx_config_ocr_mode | default("skip") | lower }}',
+      PAPERLESS_OCR_SKIP_ARCHIVE_FILE: '{{
+          paperless_ngx_config_ocr_skip_archive_file | default("never") | lower
+        }}',
+      PAPERLESS_OCR_CLEAN:
+        '{{ paperless_ngx_config_ocr_clean | default("clean") | lower }}',
+      PAPERLESS_OCR_DESKEW:
+        '{{ paperless_ngx_config_ocr_deskew | default(true) | lower }}',
+      PAPERLESS_OCR_ROTATE_PAGES:
+        '{{ paperless_ngx_config_ocr_rotate_pages | default(true) | lower }}',
+      PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD:
+        '{{ paperless_ngx_config_ocr_rotate_pages_threshold | default(12) }}',
+      PAPERLESS_OCR_OUTPUT_TYPE:
+        '{{ paperless_ngx_config_ocr_output_type | default("pdfa") | lower }}',
+      PAPERLESS_OCR_PAGES: '{{
+          paperless_ngx_config_ocr_pages
+          if paperless_ngx_config_ocr_pages > 0 else
+          ""
+        }}',  # Empty disables, not 0.
+      PAPERLESS_OCR_IMAGE_DPI: '{{
+          paperless_ngx_config_ocr_image_dpi
+          if paperless_ngx_config_ocr_image_dpi > 0 else
+          ""
+        }}',  # Empty set auto, not 0.
+      PAPERLESS_OCR_MAX_IMAGE_PIXELS:
+        '{{ paperless_ngx_config_ocr_max_image_pixels | default(89478485) }}',
+      PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY: '{{
+          paperless_ngx_config_ocr_color_conversion_strategy | default("RGB")
+        }}',
+      PAPERLESS_OCR_USER_ARGS: '{{
+          (paperless_ngx_config_ocr_user_args | to_json)
+          if paperless_ngx_config_ocr_user_args | length > 0 else
+          ""
+        }}',
       # Software tweaks
-      PAPERLESS_TASK_WORKERS: '{{ paperless_ngx_config_task_workers | default(1) }}',
-      PAPERLESS_THREADS_PER_WORKER: '{{ paperless_ngx_config_threads_per_worker if paperless_ngx_config_threads_per_worker > 0 else "" }}',  # Empty set auto, not 0.
-      PAPERLESS_WORKER_TIMEOUT: '{{ paperless_ngx_config_worker_timeout | default(1800) }}',
-      PAPERLESS_TIME_ZONE: '{{ paperless_ngx_config_time_zone | default("UTC") }}',
-      PAPERLESS_ENABLE_NLTK: '{{ paperless_ngx_config_enable_nltk | default(true) | int }}',  # bool as int.
-      PAPERLESS_EMAIL_TASK_CRON: '{{ paperless_ngx_config_email_task_cron | default("*/10 * * * *") }}',
-      PAPERLESS_TRAIN_TASK_CRON: '{{ paperless_ngx_config_train_task_cron | default("5 */1 * * *") }}',
-      PAPERLESS_INDEX_TASK_CRON: '{{ paperless_ngx_config_index_task_cron | default("0 0 * * *") }}',
-      PAPERLESS_SANITY_TASK_CRON: '{{ paperless_ngx_config_sanity_task_cron | default("30 0 * * sun") }}',
-      PAPERLESS_ENABLE_COMPRESSION: '{{ paperless_ngx_config_enable_compression | default(true) | int }}',  # bool as int.
-      PAPERLESS_CONVERT_MEMORY_LIMIT: '{{ paperless_ngx_config_convert_memory_limit | default(0) }}',
-      PAPERLESS_CONVERT_TMPDIR: '{{ paperless_ngx_config_convert_tmpdir | default("/tmp") }}',
-      PAPERLESS_APPS: '{{ paperless_ngx_config_paperless_apps | default([]) | join(",") }}',
-      PAPERLESS_MAX_IMAGE_PIXELS: '{{ paperless_ngx_config_max_image_pixels if paperless_ngx_config_max_image_pixels > 0 else "" }}',  # 0 is empty; different from same setting above.
+      PAPERLESS_TASK_WORKERS:
+        '{{ paperless_ngx_config_task_workers | default(1) }}',
+      PAPERLESS_THREADS_PER_WORKER: '{{
+          paperless_ngx_config_threads_per_worker
+          if paperless_ngx_config_threads_per_worker > 0 else
+          ""
+        }}',  # Empty set auto, not 0.
+      PAPERLESS_WORKER_TIMEOUT:
+        '{{ paperless_ngx_config_worker_timeout | default(1800) }}',
+      PAPERLESS_TIME_ZONE:
+        '{{ paperless_ngx_config_time_zone | default("UTC") }}',
+      PAPERLESS_ENABLE_NLTK:  # bool as int.
+        '{{ paperless_ngx_config_enable_nltk | default(true) | int }}',
+      PAPERLESS_EMAIL_TASK_CRON:
+        '{{ paperless_ngx_config_email_task_cron | default("*/10 * * * *") }}',
+      PAPERLESS_TRAIN_TASK_CRON:
+        '{{ paperless_ngx_config_train_task_cron | default("5 */1 * * *") }}',
+      PAPERLESS_INDEX_TASK_CRON:
+        '{{ paperless_ngx_config_index_task_cron | default("0 0 * * *") }}',
+      PAPERLESS_SANITY_TASK_CRON: '{{
+          paperless_ngx_config_sanity_task_cron | default("30 0 * * sun")
+        }}',
+      PAPERLESS_ENABLE_COMPRESSION:  # bool as int.
+        '{{ paperless_ngx_config_enable_compression | default(true) | int }}',
+      PAPERLESS_CONVERT_MEMORY_LIMIT:
+        '{{ paperless_ngx_config_convert_memory_limit | default(0) }}',
+      PAPERLESS_CONVERT_TMPDIR:
+        '{{ paperless_ngx_config_convert_tmpdir | default("/tmp") }}',
+      PAPERLESS_APPS:
+        '{{ paperless_ngx_config_paperless_apps | default([]) | join(",") }}',
+      PAPERLESS_MAX_IMAGE_PIXELS: '{{
+          paperless_ngx_config_max_image_pixels
+          if paperless_ngx_config_max_image_pixels > 0 else
+          ""
+        }}',  # 0 is empty; different from same setting above.
       # Document consumption
-      PAPERLESS_CONSUMER_DELETE_DUPLICATES: '{{ paperless_ngx_config_consumer_delete_duplicates | default(false) | lower }}',
-      PAPERLESS_CONSUMER_RECURSIVE: '{{ paperless_ngx_config_consumer_recursive | default(false) | lower }}',
-      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: '{{ paperless_ngx_config_consumer_subdirs_as_tags | default(false) | lower }}',
-      PAPERLESS_CONSUMER_IGNORE_PATTERNS: '{{ (paperless_ngx_config_consumer_ignore_patterns | to_json) if paperless_ngx_config_consumer_ignore_patterns | length > 0 else "" }}',
-      PAPERLESS_CONSUMER_BARCODE_SCANNER: '{{ paperless_ngx_config_consumer_barcode_scanner | default("ZXING") | upper }}',
-      PAPERLESS_PRE_CONSUME_SCRIPT: '{{ paperless_ngx_config_pre_consume_script | default("") }}',
-      PAPERLESS_POST_CONSUME_SCRIPT: '{{ paperless_ngx_config_post_consume_script | default("") }}',
-      PAPERLESS_FILENAME_DATE_ORDER: '{{ paperless_ngx_config_filename_date_order | default("") }}',
-      PAPERLESS_NUMBER_OF_SUGGESTED_DATES: '{{ paperless_ngx_config_number_of_suggested_dates | default(3) }}',
-      PAPERLESS_THUMBNAIL_FONT_NAME: '{{ paperless_ngx_config_thumbnail_font_name | default("/usr/share/fonts/liberation/LiberationSerif-Regular.ttf") }}',
-      PAPERLESS_IGNORE_DATES: '{{ paperless_ngx_config_ignore_dates | default([]) | join(",") }}',
-      PAPERLESS_DATE_ORDER: '{{ paperless_ngx_config_date_order | default("DMY") }}',
-      PAPERLESS_ENABLE_GPG_DECRYPTOR: '{{ paperless_ngx_config_enable_gpg_decryptor | default(false) | lower }}',
+      PAPERLESS_CONSUMER_DELETE_DUPLICATES: '{{
+          paperless_ngx_config_consumer_delete_duplicates | default(false) |
+          lower
+        }}',
+      PAPERLESS_CONSUMER_RECURSIVE: '{{
+          paperless_ngx_config_consumer_recursive | default(false) | lower
+        }}',
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: '{{
+          paperless_ngx_config_consumer_subdirs_as_tags | default(false) |
+          lower
+        }}',
+      PAPERLESS_CONSUMER_IGNORE_PATTERNS: '{{
+          (paperless_ngx_config_consumer_ignore_patterns | to_json)
+          if paperless_ngx_config_consumer_ignore_patterns | length > 0 else
+          ""
+        }}',
+      PAPERLESS_CONSUMER_BARCODE_SCANNER: '{{
+          paperless_ngx_config_consumer_barcode_scanner | default("ZXING") |
+          upper
+        }}',
+      PAPERLESS_PRE_CONSUME_SCRIPT: '{{
+          paperless_ngx_config_pre_consume_script | default("") }}',
+      PAPERLESS_POST_CONSUME_SCRIPT:
+        '{{ paperless_ngx_config_post_consume_script | default("") }}',
+      PAPERLESS_FILENAME_DATE_ORDER:
+        '{{ paperless_ngx_config_filename_date_order | default("") }}',
+      PAPERLESS_NUMBER_OF_SUGGESTED_DATES: '{{
+          paperless_ngx_config_number_of_suggested_dates | default(3)
+        }}',
+      PAPERLESS_THUMBNAIL_FONT_NAME: '{{
+          paperless_ngx_config_thumbnail_font_name |
+          default("/usr/share/fonts/liberation/LiberationSerif-Regular.ttf")
+        }}',
+      PAPERLESS_IGNORE_DATES:
+        '{{ paperless_ngx_config_ignore_dates | default([]) | join(",") }}',
+      PAPERLESS_DATE_ORDER:
+        '{{ paperless_ngx_config_date_order | default("DMY") }}',
+      PAPERLESS_ENABLE_GPG_DECRYPTOR: '{{
+          paperless_ngx_config_enable_gpg_decryptor | default(false) | lower
+        }}',
       # Polling
-      PAPERLESS_CONSUMER_POLLING: '{{ paperless_ngx_config_consumer_polling | default(0) }}',
-      PAPERLESS_CONSUMER_POLLING_RETRY_COUNT: '{{ paperless_ngx_config_consumer_polling_retry_count | default(5) }}',
-      PAPERLESS_CONSUMER_POLLING_DELAY: '{{ paperless_ngx_config_consumer_polling_delay | default(5) }}',
+      PAPERLESS_CONSUMER_POLLING:
+        '{{ paperless_ngx_config_consumer_polling | default(0) }}',
+      PAPERLESS_CONSUMER_POLLING_RETRY_COUNT:
+        '{{ paperless_ngx_config_consumer_polling_retry_count | default(5) }}',
+      PAPERLESS_CONSUMER_POLLING_DELAY:
+        '{{ paperless_ngx_config_consumer_polling_delay | default(5) }}',
       # Inotify
-      PAPERLESS_CONSUMER_INOTIFY_DELAY: '{{ paperless_ngx_config_consumer_inotify_delay | default(0.5) }}',
+      PAPERLESS_CONSUMER_INOTIFY_DELAY:
+        '{{ paperless_ngx_config_consumer_inotify_delay | default(0.5) }}',
       # Incoming mail
-      PAPERLESS_OAUTH_CALLBACK_BASE_URL: '{{ paperless_ngx_config_oauth_callback_base_url | default("") }}',
-      PAPERLESS_GMAIL_OAUTH_CLIENT_ID: '{{ paperless_ngx_config_gmail_oauth_client_id | default("") }}',
-      PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET: '{{ paperless_ngx_config_gmail_oauth_client_secret | default("") }}',
-      PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID: '{{ paperless_ngx_config_outlook_oauth_client_id | default("") }}',
-      PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET: '{{ paperless_ngx_config_outlook_oauth_client_secret | default("") }}',
-      PAPERLESS_EMAIL_GNUPG_HOME: '{{ paperless_ngx_config_email_gnupg_home | default(".") }}',
+      PAPERLESS_OAUTH_CALLBACK_BASE_URL:
+        '{{ paperless_ngx_config_oauth_callback_base_url | default("") }}',
+      PAPERLESS_GMAIL_OAUTH_CLIENT_ID:
+        '{{ paperless_ngx_config_gmail_oauth_client_id | default("") }}',
+      PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET:
+        '{{ paperless_ngx_config_gmail_oauth_client_secret | default("") }}',
+      PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID:
+        '{{ paperless_ngx_config_outlook_oauth_client_id | default("") }}',
+      PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET:
+        '{{ paperless_ngx_config_outlook_oauth_client_secret | default("") }}',
+      PAPERLESS_EMAIL_GNUPG_HOME:
+        '{{ paperless_ngx_config_email_gnupg_home | default(".") }}',
       # Barcodes
-      PAPERLESS_CONSUMER_ENABLE_BARCODES: '{{ paperless_ngx_config_consumer_enable_barcodes | default(false) | lower }}',
-      PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT: '{{ paperless_ngx_config_consumer_barcode_tiff_support | default(false) | lower }}',
-      PAPERLESS_CONSUMER_BARCODE_STRING: '{{ paperless_ngx_config_consumer_barcode_string | default("PATCHT") }}',
-      PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES: '{{ paperless_ngx_config_consumer_barcode_retain_split_pages | default(false) | lower }}',
-      PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE: '{{ paperless_ngx_config_consumer_enable_asn_barcode | default(false) | lower }}',
-      PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX: '{{ paperless_ngx_config_consumer_asn_barcode_prefix | default("ASN") }}',
-      PAPERLESS_CONSUMER_BARCODE_UPSCALE: '{{ paperless_ngx_config_consumer_barcode_upscale | default(0.0) }}',
-      PAPERLESS_CONSUMER_BARCODE_DPI: '{{ paperless_ngx_config_consumer_barcode_dpi | default(300) }}',
-      PAPERLESS_CONSUMER_BARCODE_MAX_PAGES: '{{ paperless_ngx_config_consumer_barcode_max_pages | default(0) }}',
-      PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE: '{{ paperless_ngx_config_consumer_enable_tag_barcode | default(false) | lower }}',
-      PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING: '{{ (paperless_ngx_config_consumer_tag_barcode_mapping | to_json) if paperless_ngx_config_consumer_tag_barcode_mapping | length > 0 else "" }}',
+      PAPERLESS_CONSUMER_ENABLE_BARCODES: '{{
+          paperless_ngx_config_consumer_enable_barcodes | default(false) |
+          lower
+        }}',
+      PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT: '{{
+          paperless_ngx_config_consumer_barcode_tiff_support | default(false) |
+          lower
+        }}',
+      PAPERLESS_CONSUMER_BARCODE_STRING: '{{
+          paperless_ngx_config_consumer_barcode_string | default("PATCHT")
+        }}',
+      PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES: '{{
+          paperless_ngx_config_consumer_barcode_retain_split_pages |
+          default(false) | lower
+        }}',
+      PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE: '{{
+          paperless_ngx_config_consumer_enable_asn_barcode |
+          default(false) | lower
+        }}',
+      PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX: '{{
+          paperless_ngx_config_consumer_asn_barcode_prefix | default("ASN")
+        }}',
+      PAPERLESS_CONSUMER_BARCODE_UPSCALE:
+        '{{ paperless_ngx_config_consumer_barcode_upscale | default(0.0) }}',
+      PAPERLESS_CONSUMER_BARCODE_DPI:
+        '{{ paperless_ngx_config_consumer_barcode_dpi | default(300) }}',
+      PAPERLESS_CONSUMER_BARCODE_MAX_PAGES:
+        '{{ paperless_ngx_config_consumer_barcode_max_pages | default(0) }}',
+      PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE: '{{
+          paperless_ngx_config_consumer_enable_tag_barcode |
+          default(false) | lower
+        }}',
+      PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING: '{{
+          (paperless_ngx_config_consumer_tag_barcode_mapping | to_json)
+          if paperless_ngx_config_consumer_tag_barcode_mapping | length > 0 else
+          ""
+        }}',
       # Audit trails
-      PAPERLESS_AUDIT_LOG_ENABLED: '{{ paperless_ngx_config_audit_log_enabled | default(true) | lower }}',
+      PAPERLESS_AUDIT_LOG_ENABLED:
+        '{{ paperless_ngx_config_audit_log_enabled | default(true) | lower }}',
       # Collate double-sided documents
-      PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: '{{ paperless_ngx_config_consumer_enable_collate_double_sided | default(false) | lower }}',
-      PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME: '{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name | default("double-sided") }}',
-      PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: '{{ paperless_ngx_config_consumer_collate_double_sided_tiff_support | default(false) | lower }}',
+      PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: '{{
+          paperless_ngx_config_consumer_enable_collate_double_sided |
+          default(false) | lower
+        }}',
+      PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME: '{{
+          paperless_ngx_config_consumer_collate_double_sided_subdir_name |
+          default("double-sided")
+        }}',
+      PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: '{{
+          paperless_ngx_config_consumer_collate_double_sided_tiff_support |
+          default(false) | lower
+        }}',
       # Trash
-      PAPERLESS_EMPTY_TRASH_DELAY: '{{ paperless_ngx_config_empty_trash_delay | default(30) }}',
-      PAPERLESS_EMPTY_TRASH_TASK_CRON: '{{ paperless_ngx_config_empty_trash_task_cron | default("0 1 * * *") }}',
+      PAPERLESS_EMPTY_TRASH_DELAY:
+        '{{ paperless_ngx_config_empty_trash_delay | default(30) }}',
+      PAPERLESS_EMPTY_TRASH_TASK_CRON: '{{
+          paperless_ngx_config_empty_trash_task_cron | default("0 1 * * *")
+        }}',
       # Binaries
-      PAPERLESS_CONVERT_BINARY: '{{ paperless_ngx_config_convert_binary | default("/usr/bin/convert") }}',
-      PAPERLESS_GS_BINARY: '{{ paperless_ngx_config_gs_binary | default("/usr/bin/gs") }}',
+      PAPERLESS_CONVERT_BINARY: '{{
+          paperless_ngx_config_convert_binary | default("/usr/bin/convert")
+        }}',
+      PAPERLESS_GS_BINARY:
+        '{{ paperless_ngx_config_gs_binary | default("/usr/bin/gs") }}',
       # Frontend settings
-      PAPERLESS_APP_TITLE: '{{ paperless_ngx_config_app_title | default("Paperless-ngx") }}',
+      PAPERLESS_APP_TITLE:
+        '{{ paperless_ngx_config_app_title | default("Paperless-ngx") }}',
       PAPERLESS_APP_LOGO: '{{ paperless_ngx_config_app_logo | default("") }}',
-      # PAPERLESS_ENABLE_UPDATE_CHECK: '{{ paperless_ngx_config_enable_update_check | default(true) }}',  # WebUI; migration automatic if exists.
+      # WebUI; migration automatic if variable exists.
+      # PAPERLESS_ENABLE_UPDATE_CHECK:
+      #   '{{ paperless_ngx_config_enable_update_check | default(true) }}',
       # Email sending
-      PAPERLESS_EMAIL_HOST: '{{ paperless_ngx_config_email_host | default("localhost") }}',
-      PAPERLESS_EMAIL_PORT: '{{ paperless_ngx_config_email_port | default(25) }}',
-      PAPERLESS_EMAIL_HOST_USER: '{{ paperless_ngx_config_email_host_user | default("") }}',
-      PAPERLESS_EMAIL_FROM: '{{ paperless_ngx_config_email_from | default("") }}',
-      PAPERLESS_EMAIL_HOST_PASSWORD: '{{ paperless_ngx_config_email_host_password | default("") }}',
-      PAPERLESS_EMAIL_USE_TLS: '{{ paperless_ngx_config_email_use_tls | default(false) | lower }}',
-      PAPERLESS_EMAIL_USE_SSL: '{{ paperless_ngx_config_email_use_ssl | default(false) | lower }}'
+      PAPERLESS_EMAIL_HOST:
+        '{{ paperless_ngx_config_email_host | default("localhost") }}',
+      PAPERLESS_EMAIL_PORT:
+        '{{ paperless_ngx_config_email_port | default(25) }}',
+      PAPERLESS_EMAIL_HOST_USER:
+        '{{ paperless_ngx_config_email_host_user | default("") }}',
+      PAPERLESS_EMAIL_FROM:
+        '{{ paperless_ngx_config_email_from | default("") }}',
+      PAPERLESS_EMAIL_HOST_PASSWORD:
+        '{{ paperless_ngx_config_email_host_password | default("") }}',
+      PAPERLESS_EMAIL_USE_TLS:
+        '{{ paperless_ngx_config_email_use_tls | default(false) | lower }}',
+      PAPERLESS_EMAIL_USE_SSL:
+        '{{ paperless_ngx_config_email_use_ssl | default(false) | lower }}'
     }
 
 - name: 'Prep | add config extensions'
   when: paperless_ngx_config_extensions | length > 0
   ansible.builtin.set_fact:
-    _paperless_ngx_config: '{{ _paperless_ngx_config | combine(paperless_ngx_config_extensions, recursive=true) }}'
+    _paperless_ngx_config: '{{
+        _paperless_ngx_config |
+        combine(paperless_ngx_config_extensions, recursive=true)
+      }}'

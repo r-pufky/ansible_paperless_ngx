@@ -7,4 +7,6 @@ roles:
   - name: 'r_pufky.srv.avenv'
   - name: 'r_pufky.srv.repo'
   - name: 'r_pufky.srv.systemd'
+  - name: 'r_pufky.srv.tests'
   - name: 'r_pufky.srv.users'
+  - name: 'r_pufky.srv.utils'

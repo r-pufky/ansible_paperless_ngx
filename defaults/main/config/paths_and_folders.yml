@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Paths and Folders
 ###############################################################################
@@ -98,4 +97,5 @@ paperless_ngx_config_nltk_dir: '/usr/share/nltk_data'
 # Where paperless classification models are stored.
 #
 # Default: '{{ paperless_ngx_config_data_dir }}/classification_model.pickle'.
-paperless_ngx_config_model_file: '{{ paperless_ngx_config_data_dir }}/classification_model.pickle'
+paperless_ngx_config_model_file:
+  '{{ paperless_ngx_config_data_dir }}/classification_model.pickle'

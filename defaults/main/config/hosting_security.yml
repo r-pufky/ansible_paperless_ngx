@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Hosting and Security
 ###############################################################################
@@ -11,7 +10,12 @@
 # Used for session token generation.
 #
 # Default: Randomly generated 50 characters.
-paperless_ngx_config_secret_key: '{{ lookup("ansible.builtin.password", "/dev/null", chars=["ascii_lowercase", "ascii_uppercase", "digits"], length=50) }}'
+paperless_ngx_config_secret_key: '{{
+    lookup("ansible.builtin.password",
+           "/dev/null",
+           chars=["ascii_lowercase", "ascii_uppercase", "digits"],
+           length=50)
+  }}'
 
 # Set all CSRF, CORS, allowed hosts options at once.
 #

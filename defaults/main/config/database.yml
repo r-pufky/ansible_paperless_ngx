@@ -36,9 +36,12 @@ paperless_ngx_config_dbpass: 'paperless'
 # Database SSL mode.
 #
 # SSL mode to use when connecting to PostgreSQL or MariaDB; ignored for sqlite.
-# SSL mode values differ between PostgreSQL (prefer) and MariaDB (PREFERRED).
 #
-# Default: 'prefer'.
+# Special Case:
+#   postgresql: prefer (default).
+#   mariadb: PREFERRED.
+#
+# Default: 'prefer' (postgresql).
 #
 # Reference:
 # * https://www.postgresql.org/docs/current/libpq-ssl.html
