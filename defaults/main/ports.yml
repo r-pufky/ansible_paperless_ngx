@@ -2,7 +2,7 @@
 ###############################################################################
 # Ports Configuration
 ###############################################################################
-# Manage firewall with r_pufky.srv.ufw.
+# Manage firewall with r_pufky.deb.ufw.
 #
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw

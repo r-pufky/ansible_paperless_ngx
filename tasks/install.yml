@@ -31,7 +31,7 @@
   block:
     - name: 'Install | packages'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.apt'
+        name: 'r_pufky.deb.apt'
       vars:
         apt_packages:
           - '{{ paperless_ngx_role_python_deps }}'
@@ -63,7 +63,7 @@
 # Don't migrate data as we force users to use external locations.
 - name: 'Install | Paperless-NGX {{ paperless_ngx_service_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.repo'
+    name: 'r_pufky.deb.repo'
   vars:
     repo_release_owner: '{{ paperless_ngx_role_repo_release_owner }}'
     repo_release_repo: '{{ paperless_ngx_role_repo_release_repo }}'
@@ -95,7 +95,7 @@
 
 - name: 'Install | JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.repo'
+    name: 'r_pufky.deb.repo'
   vars:
     repo_release_owner: '{{ paperless_ngx_role_jbig2enc_owner }}'
     repo_release_repo: '{{ paperless_ngx_role_jbig2enc_repo }}'
@@ -107,12 +107,12 @@
     repo_extract_mode: 'a-st,o-rwx'
     repo_extract_extra_opts: '--strip-components=1'
 
-- name: 'Install | JBIG2enc configuration (may take a while)'
+- name: 'Install | JBIG2enc configuration 🗘'
   ansible.builtin.debug:
     msg: |
-      JBIG2enc is being built. This will take a few minutes.
+      🗘 JBIG2enc is being built. This will take a few minutes.
 
-- name: 'Install | Build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'  # yamllint disable-line rule:line-length
+- name: 'Install | Build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
   when: _repo_changed
   ansible.builtin.shell: >-
       set -o pipefail &&
@@ -156,7 +156,7 @@
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
 - name: 'Install | Ghostscript {{ paperless_ngx_role_ghostscript_version }}'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.repo'
+    name: 'r_pufky.deb.repo'
   vars:
     repo_release_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
     repo_release_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
@@ -169,10 +169,10 @@
     repo_extract_mode: 'a-st,o-rwx'
     repo_extract_extra_opts: '--strip-components=1'
 
-- name: 'Install | Ghostscript configuration (may take a while)'
+- name: 'Install | Ghostscript configuration 🗘'
   ansible.builtin.debug:
     msg: |
-      Ghostscript is being built. This will take a few minutes.
+      🗘 Ghostscript is being built. This will take a few minutes.
 
 - name: >
     Install | Build Ghostscript
@@ -191,7 +191,7 @@
 
 - name: 'Install | create virtual environment'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.avenv'
+    name: 'r_pufky.deb.avenv'
   vars:
     avenv_name: 'paperless'
     avenv_user: '{{ paperless_ngx_user }}'

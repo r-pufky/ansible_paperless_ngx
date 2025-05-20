@@ -10,7 +10,7 @@
 # Version.
 #
 # Older versions (<2) are not supported. Set repo_host_access_token if github
-# API is rate limited. See r_pufky.srv.repo.
+# API is rate limited. See r_pufky.deb.repo.
 #
 # Values:
 #   {VERSION}: Tagged release to use ('v2.14.7').
@@ -130,8 +130,8 @@ paperless_ngx_service_force_overwrite: false
 # Restarting the Paperless-NGX service will automatically apply any downloaded
 # auto updates.
 #
-# Default: True.
-paperless_ngx_service_restart_daily_enable: true
+# Default: False.
+paperless_ngx_service_restart_daily_enable: false
 
 # Max lifetime of Paperless cache files (minutes).
 #
@@ -192,7 +192,7 @@ paperless_ngx_group: 'paperless'
 
 # Create paperless_ngx_user, paperless_ngx_group if not detected?
 #
-# Applied via r_pufky.srv.users, see vars/main.yml for default user attributes.
+# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
 # Default: True.
 paperless_ngx_create_user: true

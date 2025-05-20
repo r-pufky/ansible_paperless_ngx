@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: 'paperless_ngx'
   author: 'r_pufky'
   description: 'Paperless NGX Server'
   company: 'N/A'

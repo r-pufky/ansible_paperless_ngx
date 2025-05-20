@@ -105,7 +105,7 @@
 
 - name: 'Config | set service definitions'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.systemd'
+    name: 'r_pufky.deb.systemd'
   vars:
     systemd_daemon_reload_enable: true
     systemd_services:

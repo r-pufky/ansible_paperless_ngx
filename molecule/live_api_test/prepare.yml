@@ -4,11 +4,11 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Live API test | prepare | API TESTING NOT ENABLED'
+    - name: 'Live API test | prepare | API TESTING NOT ENABLED ⚠'
       when: not repo_live_api_github_enable
       ansible.builtin.fail:
         msg: |
-          TEST WILL NOT EXECUTE UNLESS IT IS EXPLICITLY ENABLED.
+          ⚠ TEST WILL NOT EXECUTE UNLESS IT IS EXPLICITLY ENABLED.
 
           Enable live API commands.
 

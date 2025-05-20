@@ -21,6 +21,7 @@
 
 - name: 'Prep | assert data locations are not in install paths'
   ansible.builtin.assert:
+    quiet: true
     that:
       - not paperless_ngx_config_consumption_dir.startswith(paperless_ngx_role_repo_extract_dir)
       - not paperless_ngx_config_data_dir.startswith(paperless_ngx_role_repo_extract_dir)
@@ -28,7 +29,7 @@
       - not paperless_ngx_config_media_root.startswith(paperless_ngx_role_repo_extract_dir)
       - not paperless_ngx_config_logging_dir.startswith(paperless_ngx_role_repo_extract_dir)
     fail_msg: |
-      Data storage should not be in the same location as install.
+      ✘ Data storage should not be in the same location as install.
 
       Installs: '{{ paperless_ngx_role_repo_extract_dir }}'
 
@@ -65,12 +66,17 @@
         if paperless_ngx_config_consumption_dir.endswith("/") else
         paperless_ngx_config_consumption_dir ~ "/"
       }}{{ paperless_ngx_config_consumer_collate_double_sided_subdir_name }}'
-    _paperless_ngx_ghostscript_binary_url: '{{ _paperless_ngx_ghostscript_release_version }}/ghostscript-{{ _paperless_ngx_ghostscript_version }}.tar.xz'
+    _paperless_ngx_ghostscript_binary_url: '{{
+        _paperless_ngx_ghostscript_release_version ~
+        "/ghostscript-" ~
+        _paperless_ngx_ghostscript_version ~
+        ".tar.xz"
+      }}'
 
 - name: 'Prep | manage users'
   when: paperless_ngx_create_user
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.users'
+    name: 'r_pufky.deb.users'
     tasks_from: 'role_account_add.yml'
   vars:
     users_role_user: '{{ paperless_ngx_role_user }}'
@@ -91,7 +97,7 @@
 # Use UID/GID as some media filesystems may be remote.
 - name: 'Config | manage directories'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.utils'
+    name: 'r_pufky.lib.utils'
     tasks_from: 'remote_file.yml'
   vars:
     file_path: '{{ item }}'
@@ -105,7 +111,7 @@
 - name: 'Config | manage double-sided collate directory'
   when: paperless_ngx_config_consumer_enable_collate_double_sided
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.utils'
+    name: 'r_pufky.lib.utils'
     tasks_from: 'remote_file.yml'
   vars:
     file_path: '{{ _paperless_ngx_double_side_dir }}'
@@ -220,7 +226,8 @@
         }}',
       PAPERLESS_MODEL_FILE: '{{
           paperless_ngx_config_model_file |
-          default("{{ paperless_ngx_config_data_dir }}/classification_model.pickle")
+          default("{{ paperless_ngx_config_data_dir }}" ~
+                  "/classification_model.pickle")
         }}',
       # Logging
       PAPERLESS_LOGROTATE_MAX_SIZE:

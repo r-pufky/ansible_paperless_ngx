@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Default
 ###############################################################################
@@ -32,13 +31,22 @@ provisioner:
         repo_testing_versions:
           - comment: 'paperless'
             version: 'v2.14.7'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/paperless-ngx-v2.14.7.tar.xz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/paperless-ngx-v2.14.7.tar.xz"
+              }}'
           - comment: 'JBIG2enc'
             version: '0.30'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/0.30.tar.gz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/0.30.tar.gz"
+              }}'
           - comment: 'Ghostscript'
             version: 'gs10050'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/ghostpdl-10.05.0.tar.xz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/ghostpdl-10.05.0.tar.xz"
+              }}'
         paperless_ngx_service_nltk_data: []
         paperless_ngx_config_dbengine: 'sqlite'
         paperless_ngx_config_secret_key: 'test'

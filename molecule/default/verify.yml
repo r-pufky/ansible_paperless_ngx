@@ -1,5 +1,6 @@
 ---
 # yamllint disable rule:line-length
+
 - name: 'Default | verify'
   hosts: 'all'
   gather_facts: false
@@ -9,17 +10,20 @@
 
     - name: 'Default | verify | paperless.conf'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
         test_name: 'Default | verify | paperless.conf'
-        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/paperless.conf'
+        test_src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/paperless.conf"
+          }}'
         test_file: '/opt/paperless/paperless/paperless.conf'
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0640'
 
-    # Paperless will fail if configuration is bad (r_pufky.srv.systemd)
+    # Paperless will fail if configuration is bad (r_pufky.deb.systemd)
     - name: 'Default | verify | assert Paperless-NGX services active'
       ansible.builtin.assert:
         quiet: true
@@ -35,7 +39,7 @@
           - '"redis-server.service" in ansible_facts.services'
           - 'ansible_facts["services"]["redis-server.service"]["state"] == "running"'
         fail_msg: |
-          Paperless-NGX services should be enabled and running:
+          ✘ Paperless-NGX services should be enabled and running:
 
             paperless-consumer.service: {{ ansible_facts["services"]["paperless-consumer.service"]["state"] }}
            paperless-scheduler.service: {{ ansible_facts["services"]["paperless-scheduler.service"]["state"] }}
@@ -45,7 +49,7 @@
 
     - name: 'Default | verify | /opt/paperless/paperless/data'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: 'Default | verify | /opt/paperless/paperless/data'
@@ -57,7 +61,7 @@
 
     - name: 'Default | verify | /data/data/db.sqlite3'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: 'Default | verify | /data/data/db.sqlite3'
@@ -69,11 +73,14 @@
 
     - name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
         test_name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
-        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/policy.xml'
+        test_src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/policy.xml"
+          }}'
         test_file: '/etc/ImageMagick-6/policy.xml'
         test_owner: 'root'
         test_group: 'root'
@@ -81,11 +88,15 @@
 
     - name: 'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
-        test_src: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/gunicorn.conf.py'
+        test_name:
+          'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
+        test_src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/gunicorn.conf.py"
+          }}'
         test_file: '/opt/paperless/paperless/gunicorn.conf.py'
         test_owner: 'paperless'
         test_group: 'paperless'
@@ -93,7 +104,7 @@
 
     - name: 'Default | verify | /usr/local/bin/jbig2'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: 'Default | verify | /usr/local/bin/jbig2'
@@ -105,7 +116,7 @@
 
     - name: 'Default | verify | /usr/local/bin/gs'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: 'Default | verify | /usr/local/bin/gs'
