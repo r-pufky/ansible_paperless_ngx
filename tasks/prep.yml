@@ -95,7 +95,7 @@
     _paperless_ngx_gid: '{{ _paperless_ngx_user_query.group }}'
 
 # Use UID/GID as some media filesystems may be remote.
-- name: 'Config | manage directories'
+- name: 'Prep | manage directories'
   ansible.builtin.include_role:
     name: 'r_pufky.lib.utils'
     tasks_from: 'remote_file.yml'
@@ -108,7 +108,7 @@
     file_state: 'directory'
   loop: '{{ paperless_ngx_media_folders }}'
 
-- name: 'Config | manage double-sided collate directory'
+- name: 'Prep | manage double-sided collate directory'
   when: paperless_ngx_config_consumer_enable_collate_double_sided
   ansible.builtin.include_role:
     name: 'r_pufky.lib.utils'
@@ -122,7 +122,7 @@
     file_state: 'directory'
 
 # Use UID/GID as some media filesystems may be remote.
-- name: 'Config | set media file permissions'
+- name: 'Prep | set media file permissions'
   when: paperless_ngx_media_set_perms_file_enable
   ansible.builtin.shell: >-
     find '{{ item }}'

@@ -97,6 +97,7 @@
   ansible.builtin.include_role:
     name: 'r_pufky.deb.repo'
   vars:
+    repo_release_download_source_enable: true
     repo_release_owner: '{{ paperless_ngx_role_jbig2enc_owner }}'
     repo_release_repo: '{{ paperless_ngx_role_jbig2enc_repo }}'
     repo_release_tag: '{{ paperless_ngx_role_jbig2enc_version }}'
