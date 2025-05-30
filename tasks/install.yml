@@ -26,6 +26,7 @@
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
+# * https://redis.io/docs/getting-started/#securing-redis
 
 - name: 'Install'
   block:
@@ -113,7 +114,7 @@
     msg: |
       🗘 JBIG2enc is being built. This will take a few minutes.
 
-- name: 'Install | Build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
+- name: 'Install | build JBIG2enc {{ paperless_ngx_role_jbig2enc_version }}'
   when: _repo_changed
   ansible.builtin.shell: >-
       set -o pipefail &&
@@ -176,7 +177,7 @@
       🗘 Ghostscript is being built. This will take a few minutes.
 
 - name: >
-    Install | Build Ghostscript
+    Install | build Ghostscript
     {{ paperless_ngx_role_ghostscript_version }}
   when: _repo_changed
   ansible.builtin.shell: >-
@@ -190,6 +191,7 @@
   changed_when: _paperless_ngx_ghostscript_build.rc == 0
   register: _paperless_ngx_ghostscript_build
 
+# TODO(2.17+): Migrate to UV when it is the default manager.
 - name: 'Install | create virtual environment'
   ansible.builtin.include_role:
     name: 'r_pufky.deb.avenv'
@@ -200,6 +202,11 @@
     avenv_pip_extra_args: '--upgrade'
     avenv_pips: '{{ paperless_ngx_role_nltk_pip }}'
     avenv_pip_requirements_install: '{{ _paperless_ngx_dir }}'
+
+- name: 'Install | NTLK configuration 🗘'
+  ansible.builtin.debug:
+    msg: |
+      🗘 NTLK data is being downloaded. This will take a few minutes.
 
 - name: 'Install | additional NLTK data'
   when: paperless_ngx_service_nltk_data | length > 0

@@ -19,6 +19,47 @@
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 
+- name: 'Prep | parse source versions'
+  ansible.builtin.set_fact:
+    _paperless_ngx_jbig2_version: '{{
+        paperless_ngx_service_jbig2enc_version |
+        default(paperless_ngx_role_jbig2enc_version)
+      }}'
+    _paperless_ngx_ghostscript_version: '{{
+        paperless_ngx_service_ghostscript_version |
+        default(paperless_ngx_role_ghostscript_version)
+      }}'
+    _paperless_ngx_ghostscript_release_version: 'gs{{
+        paperless_ngx_service_ghostscript_version |
+        default(paperless_ngx_role_ghostscript_version) |
+        replace(".", "") | replace("-", "")
+      }}'
+    _paperless_ngx_role_version: '{{
+        paperless_ngx_role_validate_version[1:].split(".")[:2] | join(".")
+      }}'
+    _paperless_ngx_service_version: '{{
+        paperless_ngx_service_version[1:].split(".")[:2] | join(".")
+      }}'
+
+# Don't use ansible.builtin.version as we ignore patch differences.
+- name: 'Prep | officially supported role versions ⓘ'
+  when: _paperless_ngx_service_version != _paperless_ngx_role_version
+  ansible.builtin.debug:
+    msg: |
+      ⓘ {{ _paperless_ngx_role_version }}.x releases officially supported.
+
+      paperless_ngx_service_version: {{ paperless_ngx_service_version }}
+
+- name: 'Prep | fatal version mis-match'
+  when: >
+    _paperless_ngx_service_version != _paperless_ngx_role_version and
+    paperless_ngx_service_fatal_version_enable
+  ansible.builtin.fail:
+    msg: |
+      ✘ Fatal version mis-match.
+
+      Set paperless_ngx_service_fatal_version_enable=false to ignore.
+
 - name: 'Prep | assert data locations are not in install paths'
   ansible.builtin.assert:
     quiet: true
@@ -37,22 +78,6 @@
       paperless_ngx_config_data_dir: '{{ paperless_ngx_config_data_dir }}'
       paperless_ngx_config_empty_trash_dir: '{{ paperless_ngx_config_empty_trash_dir }}'
       paperless_ngx_config_media_root: '{{ paperless_ngx_config_media_root }}'
-
-- name: 'Prep | parse source versions'
-  ansible.builtin.set_fact:
-    _paperless_ngx_jbig2_version: '{{
-        paperless_ngx_service_jbig2enc_version |
-        default(paperless_ngx_role_jbig2enc_version)
-      }}'
-    _paperless_ngx_ghostscript_version: '{{
-        paperless_ngx_service_ghostscript_version |
-        default(paperless_ngx_role_ghostscript_version)
-      }}'
-    _paperless_ngx_ghostscript_release_version: 'gs{{
-        paperless_ngx_service_ghostscript_version |
-        default(paperless_ngx_role_ghostscript_version) |
-        replace(".", "") | replace("-", "")
-      }}'
 
 - name: 'Prep | generate directories and tesseract dependencies'
   ansible.builtin.set_fact:
@@ -198,6 +223,11 @@
           paperless_ngx_config_tika_gotenberg_endpoint |
           default("http://localhost:3000")
         }}',
+      # Email Parsing
+      PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT: '{{
+          paperless_ngx_config_email_parse_default_layout |
+          default(2)
+        }}',
       # Paths and Folders
       PAPERLESS_CONSUMPTION_DIR: '{{
           paperless_ngx_config_consumption_dir | default("/data/consume")
@@ -263,6 +293,12 @@
         '{{ paperless_ngx_config_static_url | default("/static/") }}',
       PAPERLESS_AUTO_LOGIN_USERNAME:
         '{{ paperless_ngx_config_auto_login_username | default("") }}',
+      PAPERLESS_ADMIN_USER:
+        '{{ paperless_ngx_config_admin_user | default("paperless") }}',
+      PAPERLESS_ADMIN_MAIL:
+        '{{ paperless_ngx_config_admin_mail | default("root@localhost") }}',
+      PAPERLESS_ADMIN_PASSWORD:
+        '{{ paperless_ngx_config_admin_password | default("paperless") }}',
       PAPERLESS_COOKIE_PREFIX:
         '{{ paperless_ngx_config_cookie_prefix | default("") }}',
       PAPERLESS_ENABLE_HTTP_REMOTE_USER: '{{
@@ -288,16 +324,15 @@
           if paperless_ngx_config_proxy_ssl_header | length > 0 else
           ""
         }}',
-      # Hosting and security > Accounts
-      PAPERLESS_ADMIN_USER:
-        '{{ paperless_ngx_config_admin_user | default("paperless") }}',
-      PAPERLESS_ADMIN_PASSWORD:
-        '{{ paperless_ngx_config_admin_password | default("paperless") }}',
-      PAPERLESS_ADMIN_MAIL:
-        '{{ paperless_ngx_config_admin_mail | default("root@localhost") }}',
       PAPERLESS_EMAIL_CERTIFICATE_LOCATION:
         '{{ paperless_ngx_config_email_certificate_location | default("") }}',
-      # Hosting and security > Social Media Accounts
+      # Authentication and SSO
+      PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: '{{
+          paperless_ngx_config_account_allow_signups | default(false) | lower
+        }}',
+      PAPERLESS_ACCOUNT_DEFAULT_GROUPS: '{{
+          paperless_ngx_config_account_default_groups | default([]) | join(",")
+        }}',
       PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{{
           (paperless_ngx_config_socialaccount_providers | to_json)
           if paperless_ngx_config_socialaccount_providers | length > 0 else
@@ -310,14 +345,23 @@
           paperless_ngx_config_socialaccount_allow_signups | default(true) |
           lower
         }}',
-      PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: '{{
-          paperless_ngx_config_account_allow_signup | default(false) | lower
+      PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS: '{{
+          paperless_ngx_config_social_account_sync_groups | default(false) |
+          lower
+        }}',
+      PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS: '{{
+          paperless_ngx_config_social_account_default_groups | default([]) |
+          join(",")
         }}',
       PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL: '{{
           paperless_ngx_config_account_default_http_protocol | default("https")
         }}',
       PAPERLESS_ACCOUNT_EMAIL_VERIFICATION: '{{
           paperless_ngx_config_account_email_verification | default("none")
+        }}',
+      PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS: '{{
+          paperless_ngx_config_account_email_unknown_accounts |
+          default(false) | lower
         }}',
       PAPERLESS_DISABLE_REGULAR_LOGIN: '{{
           paperless_ngx_config_disable_regular_login | default(false) | lower

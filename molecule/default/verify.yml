@@ -86,22 +86,6 @@
         test_group: 'root'
         test_mode: '0644'
 
-    - name: 'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
-      ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
-        tasks_from: 'copy.yml'
-      vars:
-        test_name:
-          'Default | verify | /opt/paperless/paperless/gunicorn.conf.py'
-        test_src: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/files/gunicorn.conf.py"
-          }}'
-        test_file: '/opt/paperless/paperless/gunicorn.conf.py'
-        test_owner: 'paperless'
-        test_group: 'paperless'
-        test_mode: '0640'
-
     - name: 'Default | verify | /usr/local/bin/jbig2'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'

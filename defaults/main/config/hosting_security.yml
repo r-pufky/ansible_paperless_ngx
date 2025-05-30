@@ -124,6 +124,23 @@ paperless_ngx_config_static_url: '/static/'
 # Default: '' (disabled).
 paperless_ngx_config_auto_login_username: ''
 
+# Paperless root user.
+#
+# This user will automatically be created and have root. It will not update the
+# user after the initial creation.
+#
+# Values:
+#   '': Disable account creation.
+#
+# Default: 'paperless'.
+paperless_ngx_config_admin_user: 'paperless'
+
+# Paperless root email. Default: 'root@localhost'.
+paperless_ngx_config_admin_mail: 'root@localhost'
+
+# Paperless root password. Default: 'paperless'
+paperless_ngx_config_admin_password: 'paperless'
+
 # Cookie prefix.
 #
 # Use when running multiple instances on the same system.
@@ -230,3 +247,16 @@ paperless_ngx_config_use_x_forward_port: false
 # Reference:
 # * https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header
 paperless_ngx_config_proxy_ssl_header: {}
+
+# Additional SSL certificate to validate mail provider SSL connections.
+#
+# Configures an additional SSL certificate file containing a certificate or
+# certificate chain which should be trusted for validating SSL connections
+# against mail providers. This is for use with self-signed certificates against
+# local IMAP servers.
+#
+# Settings this value has security implications for the security of your email.
+# Understand what it does and be sure you need to before setting.
+#
+# Default: '' (disabled).
+paperless_ngx_config_email_certificate_location: ''

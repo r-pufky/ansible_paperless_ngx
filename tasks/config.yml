@@ -30,7 +30,7 @@
 # * https://github.com/paperless-ngx/paperless-ngx/issues/2433
 # * https://github.com/paperless-ngx/paperless-ngx/issues/9483
 
-- name: 'Config | set certs'
+- name: 'Prep | set certs'
   when: paperless_ngx_service_certs_path | length > 0
   ansible.builtin.copy:
     src: '{{
@@ -77,8 +77,8 @@
     chdir: '{{ _paperless_ngx_dir }}/src'
   environment:
     PAPERLESS_ADMIN_USER: "{{ paperless_ngx_config_admin_user }}"
-    PAPERLESS_ADMIN_MAIL: "{{ paperless_ngx_config_admin_password }}"
-    PAPERLESS_ADMIN_PASSWORD: "{{ paperless_ngx_config_admin_mail }}"
+    PAPERLESS_ADMIN_MAIL: "{{ paperless_ngx_config_admin_mail }}"
+    PAPERLESS_ADMIN_PASSWORD: "{{ paperless_ngx_config_admin_password }}"
   become: true
   become_user: "{{ paperless_ngx_user }}"
   register: _paperless_ngx_admin
@@ -91,17 +91,6 @@
     regexp: '(\s+)<policy domain="coder" rights=".*" pattern="PDF" />'
     line: '\1<policy domain="coder" rights="read|write" pattern="PDF" />'
     backrefs: true
-
-- name: >
-    Config | set listen
-    {{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}
-  notify: 'Handlers | reload paperless_ngx'  # noqa name[template] ip:port.
-  ansible.builtin.lineinfile:
-    path: '{{ _paperless_ngx_dir }}/gunicorn.conf.py'
-    regexp: '^bind = '
-    line: >-
-      bind =
-      '{{ paperless_ngx_services_address }}:{{ paperless_ngx_services_port }}'
 
 - name: 'Config | set service definitions'
   ansible.builtin.include_role:
@@ -200,9 +189,11 @@
         service:
           exec_start:
             - >-
-              {{ _avenv_venv }}/bin/gunicorn
-              -c {{ _paperless_ngx_dir }}/gunicorn.conf.py
-              paperless.asgi:application
+              /bin/sh -c '
+              exec {{ _avenv_venv }}/bin/python3 -m granian
+              --interface asginl
+              --ws "paperless.asgi:application"
+              '
           runtime_max_sec: '{{
               "1d"
               if paperless_ngx_service_restart_daily_enable else
@@ -212,6 +203,17 @@
           user: '{{ paperless_ngx_user }}'
           group: '{{ paperless_ngx_group }}'
           working_directory: '{{ _paperless_ngx_dir }}/src'
+          environment:
+            - var: 'GRANIAN_HOST'
+              value: '{{ paperless_ngx_service_address | default("0.0.0.0") }}'
+            - var: 'GRANIAN_PORT'
+              value: '{{ paperless_ngx_service_port | default(8000) }}'
+            - var: 'GRANIAN_WORKERS'
+              value:
+                '{{ paperless_ngx_service_webserver_workers | default(1) }}'
+            - var: 'GRANIAN_URL_PATH_PREFIX'
+              value:
+                '{{ paperless_ngx_config_force_script_name | default("") }}'
           protect_system: 'full'
           no_new_privileges: true
           private_users: true

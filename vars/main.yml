@@ -4,14 +4,27 @@
 ###############################################################################
 # Default required packages for Paperless-NGX install.
 #
+# Updates:
+# * New MAJOR, MINOR releases should hard branch at version before starting
+#   (e.g. 2.14.x branch).
+# * Keep a separate change log as changes are made, you will not remember all
+#   of them.
+# * Use bare-metal docs to validate package/process changes.
+# * Update role defaults (includes updating defaults, tasks):
+#   * Use configuration docs to add new variables.
+#   * Use defaults/ to remove any changed/deprecated variables.
+# * Update tests for any changes.
+# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Tag with MAJOR.MINOR version, with PATCH representing role change.
+#
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
 # Last time Paperless-NGS options were validated against default configuration.
-paperless_ngx_role_validate_date: '2025-03-20'
+paperless_ngx_role_validate_date: '2025-05-29'
 paperless_ngx_role_validate_release: 'bookworm'
-paperless_ngx_role_validate_version: 'v2.14.7'
+paperless_ngx_role_validate_version: 'v2.16.2'
 
 ###############################################################################
 # APT Packages

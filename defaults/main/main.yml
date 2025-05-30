@@ -1,23 +1,39 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Paperless-NGX Service Configuration
 ###############################################################################
 # Existing databases are migrated automatically when new versions are
 # installed. Migration between database platforms is not supported and must be
 # done manually.
-
-# Version.
 #
-# Older versions (<2) are not supported. Set repo_host_access_token if github
-# API is rate limited. See r_pufky.deb.repo.
+# Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
+
+# Paperless-NGX Release.
+#
+# Versions (Schematic):
+#       MAJOR: Unsafe - requires major role changes; only default MAJOR version
+#              is supported. See other branches if they exist.
+#       MINOR: Unsafe - Paperless has a history of introducing breaking changes
+#              on minor updates (see 2.14, 2.15, 2.16). These should be
+#              considered MAJOR versions. See other branches if they exist.
+#       PATCH: Safe - Usually requires no role updates. Some have included
+#              breaking changes (2.16.0 - 2.16.2).
+#   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v2.14.7').
+#   {VERSION}: Tagged release to use ('v2.16.2').
 #      latest: Use latest stable release.
 #
-# Default: 'latest'.
-paperless_ngx_service_version: 'latest'
+# Default: 'v2.16.2'.
+paperless_ngx_service_version: 'v2.16.2'
+
+# Enable fatal version mis-matches?
+#
+# Stop role execution if requested version does not match role supported
+# MAJOR.MINOR version. 'latest' will always trigger version mismatch.
+#
+# Default: True.
+paperless_ngx_service_fatal_version_enable: true
 
 # Enable installation of Redis memcache server?
 #
@@ -158,7 +174,9 @@ paperless_ngx_service_cache_lifetime: 30
 # Useful when adding a change without reconfiguring the whole system or
 # checking and installing a new version. Suggest applying with extra options:
 #
-#   ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_service_force_config_only_enable=true'
+#   ansible-playbook site.yml
+#       --tags Paperless-NGX
+#       -e 'paperless_ngx_service_force_config_only_enable=true
 #
 # Default: False.
 paperless_ngx_service_force_config_only_enable: false
@@ -167,10 +185,18 @@ paperless_ngx_service_force_config_only_enable: false
 paperless_ngx_service_log_level: 'info'
 
 # WebUI listen interface (IPv4, IPv6). Default: '0.0.0.0' (all interfaces).
-paperless_ngx_services_address: '0.0.0.0'
+paperless_ngx_service_address: '0.0.0.0'
 
 # WebUI listen port. Default: 8000.
-paperless_ngx_services_port: 8000
+paperless_ngx_service_port: 8000
+
+# WebUI worker threads.
+#
+# More worker processes result in faster data loads at the cost of loading the
+# entire application into memory separately.
+#
+# Default: 1.
+paperless_ngx_service_webserver_workers: 1
 
 ###############################################################################
 # Paperless-NGX User
@@ -235,7 +261,9 @@ paperless_ngx_media_perms_folder: '0750'
 # Useful when first configuring to ensure service has access to all specified
 # media locations. Suggest applying with extra options:
 #
-#   ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_media_set_perms_file_enable=true'
+#   ansible-playbook site.yml
+#       --tags Paperless-NGX
+#       -e 'paperless_ngx_media_set_perms_file_enable=true'
 #
 # Default: False.
 paperless_ngx_media_set_perms_file_enable: false

@@ -1,42 +1,20 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# Hosting and Security > Accounts
+# Authentication and SSO
 ###############################################################################
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#authentication
 
-# Paperless root user.
-#
-# This user will automatically be created and have root. It will not update the
-# user after the initial creation.
-#
-# Values:
-#   '': Disable account creation.
-#
-# Default: 'paperless'.
-paperless_ngx_config_admin_user: 'paperless'
+# Enable users to sign-up for a new Paperless-ngx account? Default: False.
+paperless_ngx_config_account_allow_signups: false
 
-# Paperless root password. Default: 'paperless'
-paperless_ngx_config_admin_password: 'paperless'
-
-# Paperless root email. Default: 'root@localhost'.
-paperless_ngx_config_admin_mail: 'root@localhost'
-
-# Additional SSL certificate to validate mail provider SSL connections.
+# List of group names to add to user when signing up for new account.
 #
-# Configures an additional SSL certificate file containing a certificate or
-# certificate chain which should be trusted for validating SSL connections
-# against mail providers. This is for use with self-signed certificates against
-# local IMAP servers.
+# Groups listed here must already exist.
 #
-# Settings this value has security implications for the security of your email.
-# Understand what it does and be sure you need to before setting.
-#
-# Default: '' (disabled).
-paperless_ngx_config_email_certificate_location: ''
-
-###############################################################################
-# Social Media Accounts
-###############################################################################
+# Default: [].
+paperless_ngx_config_account_default_groups: []
 
 # Configure social media account logins.
 #
@@ -81,8 +59,34 @@ paperless_ngx_config_social_auto_signup: false
 # Default: True.
 paperless_ngx_config_socialaccount_allow_signups: true
 
-# Enable users to sign-up for a new Paperless-ngx account? Default: False.
-paperless_ngx_config_account_allow_signup: false
+# Sync third party groups (e.g. OIDC) to Paperless-NGX.
+#
+# Users will be added or removed from groups based on their group membership in
+# the third party authentication system. Groups are updated upon logging in.
+# See django-allauth documentation.
+#
+# In order to pass groups from the authentication system you will need to
+# add top-level "SCOPES" which includes "groups", e.g.:
+#
+#   paperless_ngx_config_socialaccount_providers:
+#     {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
+#
+# Special Case:
+#   * Groups must already exist in Paperless-NGX with the same name.
+#
+# Default: False (disabled).
+paperless_ngx_config_social_account_sync_groups: false
+
+# List of group names to add to user when siging up using social media.
+#
+# Groups listed here must already exist.
+#
+# Special Case:
+#   * User added to both sets of groups if
+#     paperless_ngx_config_account_default_groups set.
+#
+# Default: [].
+paperless_ngx_config_social_account_default_groups: []
 
 # Default login callback URL protocol.
 #
@@ -107,6 +111,11 @@ paperless_ngx_config_account_default_http_protocol: 'https'
 # * https://docs.allauth.org/en/latest/account/configuration.html
 # * https://docs.paperless-ngx.com/configuration/#PAPERLESS_EMAIL_HOST
 paperless_ngx_config_account_email_verification: 'none'
+
+# Enable emailing password reset attempts for unknown accounts?
+#
+# Default: True.
+paperless_ngx_config_account_email_unknown_accounts: true
 
 # Disable standard username/password login?
 #

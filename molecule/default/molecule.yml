@@ -6,8 +6,8 @@
 #
 # Tests:
 # * paperless.conf set.
-# * paperless ngx services are active and running.
-# * gunicorn overrides are set correctly.
+# * Paperless-NGX services are active and running.
+# * Granian overrides are set correctly.
 # * ImageMaick has PDF processing enabled.
 # * install directory locations are removed.
 # * sqlite database exists in data directory.
@@ -30,10 +30,10 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
-            version: 'v2.14.7'
+            version: 'v2.16.2'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.14.7.tar.xz"
+                "/molecule/cache/paperless-ngx-v2.16.2.tar.xz"
               }}'
           - comment: 'JBIG2enc'
             version: '0.30'
@@ -58,6 +58,8 @@ platforms:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
     command: '/lib/systemd/systemd'
     pre_build_image: true
+    published_ports:
+      - '8000/tcp'
 verifier:
   name: 'ansible'
 lint: |
