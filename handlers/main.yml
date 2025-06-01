@@ -5,7 +5,7 @@
 
 - name: 'Handlers | reload redis memcache'
   listen: 'Handlers | reload paperless_ngx'
-  when: paperless_ngx_service_redis_enable
+  when: paperless_ngx_service_redis_enable.raw
   ansible.builtin.systemd:
     name: 'redis-server'
     enabled: true

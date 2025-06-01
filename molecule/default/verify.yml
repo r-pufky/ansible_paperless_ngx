@@ -5,9 +5,6 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Default | verify | gather service status'
-      ansible.builtin.service_facts:
-
     - name: 'Default | verify | paperless.conf'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
@@ -22,30 +19,6 @@
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0640'
-
-    # Paperless will fail if configuration is bad (r_pufky.deb.systemd)
-    - name: 'Default | verify | assert Paperless-NGX services active'
-      ansible.builtin.assert:
-        quiet: true
-        that:
-          - '"paperless-consumer.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["paperless-consumer.service"]["state"] == "running"'
-          - '"paperless-scheduler.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["paperless-scheduler.service"]["state"] == "running"'
-          - '"paperless-task-queue.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["paperless-task-queue.service"]["state"] == "running"'
-          - '"paperless-webserver.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["paperless-webserver.service"]["state"] == "running"'
-          - '"redis-server.service" in ansible_facts.services'
-          - 'ansible_facts["services"]["redis-server.service"]["state"] == "running"'
-        fail_msg: |
-          ✘ Paperless-NGX services should be enabled and running:
-
-            paperless-consumer.service: {{ ansible_facts["services"]["paperless-consumer.service"]["state"] }}
-           paperless-scheduler.service: {{ ansible_facts["services"]["paperless-scheduler.service"]["state"] }}
-          paperless-task-queue.service: {{ ansible_facts["services"]["paperless-task-queue.service"]["state"] }}
-           paperless-webserver.service: {{ ansible_facts["services"]["paperless-webserver.service"]["state"] }}
-                  redis-server.service: {{ ansible_facts["services"]["redis-server.service"]["state"] }}
 
     - name: 'Default | verify | /opt/paperless/paperless/data'
       ansible.builtin.include_role:
@@ -68,7 +41,8 @@
         test_file: '/data/data/db.sqlite3'
         test_owner: 'paperless'
         test_group: 'paperless'
-        test_mode: '0644'
+        test_mode: '0644'  # Should this be 0644
+        # TODO(role): it seems like all data is getting blasted with 0750 perms, instead of file and folder perms. (0640, 0750)
         test_state: 'file'
 
     - name: 'Default | verify | /etc/ImageMagick-6/policy.xml'

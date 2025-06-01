@@ -1,9 +1,10 @@
 ---
 ###############################################################################
-# Configure Paperless-NGX
+# Configure Services
 ###############################################################################
 # Set configuration and migrate / update database schemas before updating
-# service definitions and restarting service.
+# service definitions and restarting service. Use UID/GID as some media
+# filesystems may be remote.
 #
 # Executing python3 command directly requires first moving into the src/
 # directory (due to incorrect Python path use within Paperless) or path finding
@@ -19,10 +20,7 @@
 # the developers.
 #
 # Args:
-#   _paperless_ngx_uid: int - Paperless-NGX user UID.
-#   _paperless_ngx_gid: int - Paperless-NGX user GID.
 #   _paperless_ngx_dir: str - Path shortcut for github install location.
-#   _paperless_ngx_config: dict - Sanitized Paperless-NGX config.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -30,17 +28,57 @@
 # * https://github.com/paperless-ngx/paperless-ngx/issues/2433
 # * https://github.com/paperless-ngx/paperless-ngx/issues/9483
 
-- name: 'Prep | set certs'
-  when: paperless_ngx_service_certs_path | length > 0
-  ansible.builtin.copy:
-    src: '{{
-        paperless_ngx_service_certs_path
-        if paperless_ngx_service_certs_path.endswith("/") else
-        paperless_ngx_service_certs_path ~ "/"
+- name: 'Config | manage directories'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: '{{ paperless_ngx_user.parsed }}'
+    group: '{{ paperless_ngx_group.parsed }}'
+    mode: '{{ paperless_ngx_media_perms_folder.raw }}'
+    state: 'directory'
+  become: '{{ true if paperless_ngx_user_data_manage_enable.raw else omit }}'
+  become_user: '{{
+      paperless_ngx_user.raw
+      if paperless_ngx_user_data_manage_enable.raw else
+      omit
+    }}'
+  loop: '{{ paperless_ngx_media_folders.raw }}'
+
+- name: 'Config | manage double-sided collate directory'
+  when: paperless_ngx_config_consumer_enable_collate_double_sided.raw
+  ansible.builtin.file:
+    path: '{{
+        paperless_ngx_config_consumer_collate_double_sided_subdir_name.parsed
       }}'
+    owner: '{{ paperless_ngx_user.parsed }}'
+    group: '{{ paperless_ngx_group.parsed }}'
+    mode: '{{ paperless_ngx_media_perms_folder.raw }}'
+    state: 'directory'
+  become: '{{ true if paperless_ngx_user_data_manage_enable.raw else omit }}'
+  become_user: '{{
+      paperless_ngx_user.raw
+      if paperless_ngx_user_data_manage_enable.raw else
+      omit
+    }}'
+
+# yamllint disable rule:line-length
+- name: 'Config | set media file permissions'
+  when: paperless_ngx_media_set_perms_file_enable.raw
+  ansible.builtin.shell: >-
+    find '{{ item }}'
+    -type f
+    -exec chmod {{ paperless_ngx_media_perms_file.raw }} {};
+      chown {{ paperless_ngx_user.parsed }}:{{ paperless_ngx_group.parsed }} {} \;
+  changed_when: false
+  loop: '{{ paperless_ngx_media_folders.raw }}'
+# yamllint enable rule:line-length
+
+- name: 'Config | set certs'
+  when: paperless_ngx_service_certs_path.raw | length > 0
+  ansible.builtin.copy:
+    src: '{{ paperless_ngx_service_certs_path.parsed }}'
     dest: '{{ paperless_ngx_role_repo_extract_dir }}/certs'
-    owner: '{{ _paperless_ngx_uid }}'
-    group: '{{ _paperless_ngx_gid }}'
+    owner: '{{ paperless_ngx_user.parsed }}'
+    group: '{{ paperless_ngx_group.parsed }}'
     mode: '0600'
     directory_mode: '0750'
     force: true
@@ -50,9 +88,9 @@
   ansible.builtin.template:
     src: 'paperless.conf.j2'
     dest: '{{ _paperless_ngx_dir }}/paperless.conf'
-    owner: '{{ _paperless_ngx_uid }}'
-    group: '{{ _paperless_ngx_gid }}'
-    mode: '0640'  # passwords.
+    owner: '{{ paperless_ngx_user.parsed }}'
+    group: '{{ paperless_ngx_group.parsed }}'
+    mode: '0640'
 
 - name: 'Config | migrate database schema'
   ansible.builtin.command:
@@ -62,13 +100,13 @@
       - 'migrate'
     chdir: '{{ _paperless_ngx_dir }}/src'
   become: true
-  become_user: '{{ paperless_ngx_user }}'
+  become_user: '{{ paperless_ngx_user.raw }}'
   register: _paperless_ngx_db
   changed_when: '"No migrations to apply." not in _paperless_ngx_db.stdout'
 
 # manage_superuser will create the root user if it does not exist; no need to
 # run 'manage.py createsuperuser'.
-- name: 'Config | set root user'
+- name: 'Config | set admin user'
   ansible.builtin.command:
     argv:
       - '{{ _avenv_venv }}/bin/python3'
@@ -80,10 +118,10 @@
     PAPERLESS_ADMIN_MAIL: "{{ paperless_ngx_config_admin_mail }}"
     PAPERLESS_ADMIN_PASSWORD: "{{ paperless_ngx_config_admin_password }}"
   become: true
-  become_user: "{{ paperless_ngx_user }}"
+  become_user: '{{ paperless_ngx_user.raw }}'
   register: _paperless_ngx_admin
   changed_when: '"Created superuser" in _paperless_ngx_admin.stdout'
-  no_log: true  # passwords.
+  no_log: true  # Password.
 
 - name: 'Config | enable ImageMagick PDF processing'
   ansible.builtin.lineinfile:
@@ -109,12 +147,12 @@
             - '{{ _avenv_venv }}/bin/python3 manage.py document_consumer'
           runtime_max_sec: '{{
               "1d"
-              if paperless_ngx_service_restart_daily_enable else
+              if paperless_ngx_service_restart_daily_enable.raw else
               "infinity"
             }}'
         exec:
-          user: '{{ paperless_ngx_user }}'
-          group: '{{ paperless_ngx_group }}'
+          user: '{{ paperless_ngx_user.raw }}'
+          group: '{{ paperless_ngx_group.raw }}'
           working_directory: '{{ _paperless_ngx_dir }}/src'
           protect_system: 'full'
           no_new_privileges: true
@@ -134,15 +172,15 @@
               {{ _avenv_venv }}/bin/celery
               --app paperless beat
               --loglevel
-              {{ paperless_ngx_service_log_level | default("info") | upper }}
+              {{ paperless_ngx_service_log_level.raw }}
           runtime_max_sec: '{{
               "1d"
-              if paperless_ngx_service_restart_daily_enable else
+              if paperless_ngx_service_restart_daily_enable.raw else
               "infinity"
             }}'
         exec:
-          user: '{{ paperless_ngx_user }}'
-          group: '{{ paperless_ngx_group }}'
+          user: '{{ paperless_ngx_user.raw }}'
+          group: '{{ paperless_ngx_group.raw }}'
           working_directory: '{{ _paperless_ngx_dir }}/src'
           protect_system: 'full'
           no_new_privileges: true
@@ -162,15 +200,15 @@
               {{ _avenv_venv }}/bin/celery
               --app paperless worker
               --loglevel
-              {{ paperless_ngx_service_log_level | default("info") | upper }}
+              {{ paperless_ngx_service_log_level.raw }}
           runtime_max_sec: '{{
               "1d"
-              if paperless_ngx_service_restart_daily_enable else
+              if paperless_ngx_service_restart_daily_enable.raw else
               "infinity"
             }}'
         exec:
-          user: '{{ paperless_ngx_user }}'
-          group: '{{ paperless_ngx_group }}'
+          user: '{{ paperless_ngx_user.raw }}'
+          group: '{{ paperless_ngx_group.raw }}'
           working_directory: '{{ _paperless_ngx_dir }}/src'
           protect_system: 'full'
           no_new_privileges: true
@@ -196,24 +234,23 @@
               '
           runtime_max_sec: '{{
               "1d"
-              if paperless_ngx_service_restart_daily_enable else
+              if paperless_ngx_service_restart_daily_enable.raw else
               "infinity"
             }}'
-        exec:
-          user: '{{ paperless_ngx_user }}'
-          group: '{{ paperless_ngx_group }}'
+        exec:  # something in execute is not parsing right
+          user: '{{ paperless_ngx_user.raw }}'
+          group: '{{ paperless_ngx_group.raw }}'
           working_directory: '{{ _paperless_ngx_dir }}/src'
           environment:
             - var: 'GRANIAN_HOST'
-              value: '{{ paperless_ngx_service_address | default("0.0.0.0") }}'
+              value: '{{ paperless_ngx_service_address.raw }}'
             - var: 'GRANIAN_PORT'
-              value: '{{ paperless_ngx_service_port | default(8000) }}'
+              value: '{{ paperless_ngx_service_port.raw }}'
             - var: 'GRANIAN_WORKERS'
-              value:
-                '{{ paperless_ngx_service_webserver_workers | default(1) }}'
+              value: '{{ paperless_ngx_service_webserver_workers.raw }}'
             - var: 'GRANIAN_URL_PATH_PREFIX'
               value:
-                '{{ paperless_ngx_config_force_script_name | default("") }}'
+                '{{ paperless_ngx_config_force_script_name.raw }}'
           protect_system: 'full'
           no_new_privileges: true
           private_users: true
@@ -233,15 +270,15 @@
           exec_start:
             - >-
               /usr/bin/find
-              "{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}"
-              -cmin +{{ paperless_ngx_service_cache_lifetime }}
+              "{{ paperless_ngx_config_convert_tmpdir.raw }}"
+              -cmin +{{ paperless_ngx_service_cache_lifetime.raw }}
               -type f
               -delete
         exec:
           user: 'root'
           group: 'root'
           working_directory:
-            '{{ _paperless_ngx_config.PAPERLESS_CONVERT_TMPDIR }}'
+            '{{ paperless_ngx_config_convert_tmpdir.raw }}'
         install:
           wanted_by: ['multi-user.target']
     systemd_timers:
@@ -254,6 +291,6 @@
         timer:
           unit: 'paperless-cache.service'
           on_unit_active_sec:
-            '{{ paperless_ngx_service_cache_lifetime | default(30) }}m'
+            '{{ paperless_ngx_service_cache_lifetime.parsed }}'
         install:
           wanted_by: ['timers.target']

@@ -216,6 +216,16 @@ paperless_ngx_user: 'paperless'
 # Default: 'paperless'.
 paperless_ngx_group: 'paperless'
 
+# Enable user management of data/media files?
+#
+# Use paperless_ngx_user to execute data/media management commands. Role
+# applies media permissions using 'root' by default. For mounted data locations
+# (NFS with squashed mounts, mapped container mounts, etc) the local root user
+# will not have sufficient privileges to modify these files.
+#
+# Default: False.
+paperless_ngx_user_data_manage_enable: false
+
 # Create paperless_ngx_user, paperless_ngx_group if not detected?
 #
 # Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
