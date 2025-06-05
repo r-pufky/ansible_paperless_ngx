@@ -5,7 +5,7 @@
 ###############################################################################
 
 # Number of tasks to run in parallel. Default: 1.
-paperless_ngx_config_task_workers: 1
+paperless_ngx_cfg_task_workers: 1
 
 # Number of pages paperless will process in parallel on a single document.
 #
@@ -29,14 +29,14 @@ paperless_ngx_config_task_workers: 1
 #
 # Values:
 #   0: Adjust threads per worker automatically. Requires
-#      paperless_ngx_config_task_workers set.
+#      paperless_ngx_cfg_task_workers set.
 #   #: Number of threads per worker.
 #
 # Default: 0.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/configuration/#software_tweaks
-paperless_ngx_config_threads_per_worker: 0
+paperless_ngx_cfg_threads_per_worker: 0
 
 # Document processing timeout before force failing (seconds).
 #
@@ -44,7 +44,7 @@ paperless_ngx_config_threads_per_worker: 0
 # reasonable amounts of time.
 #
 # Default: 1800
-paperless_ngx_config_worker_timeout: 1800
+paperless_ngx_cfg_worker_timeout: 1800
 
 # Timezone for document processing.
 #
@@ -52,7 +52,7 @@ paperless_ngx_config_worker_timeout: 1800
 #
 # Reference:
 # * https://docs.djangoproject.com/en/4.1/ref/settings/#std:setting-TIME_ZONE
-paperless_ngx_config_time_zone: 'UTC'
+paperless_ngx_cfg_time_zone: 'UTC'
 
 # Enable natural language processing during automatic classification?
 #
@@ -62,7 +62,7 @@ paperless_ngx_config_time_zone: 'UTC'
 # before matching.
 #
 # Default: True.
-paperless_ngx_config_enable_nltk: true
+paperless_ngx_cfg_enable_nltk: true
 
 # Scheduled email fetch frequency.
 #
@@ -74,7 +74,7 @@ paperless_ngx_config_enable_nltk: true
 #
 # Reference:
 # * https://en.wikipedia.org/wiki/Cron
-paperless_ngx_config_email_task_cron: '*/10 * * * *'
+paperless_ngx_cfg_email_task_cron: '*/10 * * * *'
 
 # Scheduled automatic classifier training frequency.
 #
@@ -86,7 +86,7 @@ paperless_ngx_config_email_task_cron: '*/10 * * * *'
 #
 # Reference:
 # * https://en.wikipedia.org/wiki/Cron
-paperless_ngx_config_train_task_cron: '5 */1 * * *'
+paperless_ngx_cfg_train_task_cron: '5 */1 * * *'
 
 # Scheduled search index update frequency.
 #
@@ -98,7 +98,7 @@ paperless_ngx_config_train_task_cron: '5 */1 * * *'
 #
 # Reference:
 # * https://en.wikipedia.org/wiki/Cron
-paperless_ngx_config_index_task_cron: '0 0 * * *'
+paperless_ngx_cfg_index_task_cron: '0 0 * * *'
 
 # Scheduled sanity checker frequency.
 #
@@ -110,7 +110,7 @@ paperless_ngx_config_index_task_cron: '0 0 * * *'
 #
 # Reference:
 # * https://en.wikipedia.org/wiki/Cron
-paperless_ngx_config_sanity_task_cron: '30 0 * * sun'
+paperless_ngx_cfg_sanity_task_cron: '30 0 * * sun'
 
 # Enable compression of webserver responses.
 #
@@ -119,7 +119,7 @@ paperless_ngx_config_sanity_task_cron: '30 0 * * sun'
 # It is more efficient to enable compression in the proxy than here.
 #
 # Default: True.
-paperless_ngx_config_enable_compression: true
+paperless_ngx_cfg_enable_compression: true
 
 # Document conversion memory limit (MB).
 #
@@ -134,7 +134,7 @@ paperless_ngx_config_enable_compression: true
 #
 # Reference:
 # * https://imagemagick.org/script/resources.php
-paperless_ngx_config_convert_memory_limit: 0
+paperless_ngx_cfg_convert_memory_limit: 0
 
 # Document conversion temp directory.
 #
@@ -145,7 +145,7 @@ paperless_ngx_config_convert_memory_limit: 0
 #      cleared only on boot. In cases where there are mass processing of
 #      documents it is better to use disk and then switch to TMPFS afterwards
 #      to prevent confusing error messages that do not reflect the actual
-#      cause. See paperless_ngx_service_clear_cache.
+#      cause. See paperless_ngx_srv_clear_cache.
 #
 # Values:
 #   {PATH}: HIGHLY recommended to use disk-backed location over TMPFS (RAM)
@@ -156,20 +156,20 @@ paperless_ngx_config_convert_memory_limit: 0
 # location.
 #
 # Default: '/tmp'.
-paperless_ngx_config_convert_tmpdir: '/tmp'
+paperless_ngx_cfg_convert_tmpdir: '/tmp'
 
 # List of Django apps to be included in Django's INSTALLED_APPS.
 #
 # Used to setup login and sign-up via social account providers which are
 # compatible with django-allauth. You will also need to include the relevant
-# Django 'providers' inside the paperless_ngx_config_socialaccount_providers
+# Django 'providers' inside the paperless_ngx_cfg_socialaccount_providers
 # setting to activate that specific authentication provider.
 #
 # Default: [] (disabled).
 #
 # Reference:
 # * https://docs.paperless-ngx.com/configuration/#PAPERLESS_APPS
-paperless_ngx_config_paperless_apps: []
+paperless_ngx_cfg_paperless_apps: []
 
 # Max PIL image pixel limit.
 #
@@ -190,4 +190,4 @@ paperless_ngx_config_paperless_apps: []
 #
 # Reference:
 # * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS
-paperless_ngx_config_max_image_pixels: 0
+paperless_ngx_cfg_max_image_pixels: 0

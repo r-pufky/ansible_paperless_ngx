@@ -18,4 +18,4 @@
 #   4: Text only.
 #
 # Default: 2 (HTML than text).
-paperless_ngx_config_email_parse_default_layout: 2
+paperless_ngx_cfg_email_parse_default_layout: 2

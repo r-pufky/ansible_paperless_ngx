@@ -1,10 +1,11 @@
 ---
 ###############################################################################
-# Default
+# User Data
 ###############################################################################
-# Default configuration is deployed successfully.
+# Default test with user data management enabled.
 #
 # Tests:
+# * paperless_ngx_srv_user_data_manage_enable=true.
 # * paperless.conf set.
 # * Paperless-NGX services are active and running.
 # * Granian overrides are set correctly.
@@ -27,6 +28,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        paperless_ngx_srv_user_data_manage_enable: true
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
@@ -51,7 +53,7 @@ provisioner:
         paperless_ngx_cfg_dbengine: 'sqlite'
         paperless_ngx_cfg_secret_key: 'test'
 platforms:
-  - name: 'paperless_ngx-debian-12-default'
+  - name: 'paperless_ngx-debian-12-user_data'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:

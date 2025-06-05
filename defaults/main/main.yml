@@ -25,7 +25,7 @@
 #      latest: Use latest stable release.
 #
 # Default: 'v2.16.2'.
-paperless_ngx_service_version: 'v2.16.2'
+paperless_ngx_srv_version: 'v2.16.2'
 
 # Enable fatal version mis-matches?
 #
@@ -33,7 +33,7 @@ paperless_ngx_service_version: 'v2.16.2'
 # MAJOR.MINOR version. 'latest' will always trigger version mismatch.
 #
 # Default: True.
-paperless_ngx_service_fatal_version_enable: true
+paperless_ngx_srv_fatal_version_enable: true
 
 # Enable installation of Redis memcache server?
 #
@@ -41,12 +41,12 @@ paperless_ngx_service_fatal_version_enable: true
 # it is required for Paperless-NGX. Disable if managing Redis externally.
 #
 # Default: True.
-paperless_ngx_service_redis_enable: true
+paperless_ngx_srv_redis_enable: true
 
 # Install additional NLTK machine learning data (~21MB)?
 #
 # NLTK improves automatically text processing and classification. Downloaded to
-# paperless_ngx_config_nltk_dir.
+# paperless_ngx_cfg_nltk_dir.
 #
 # Values:
 #    *: NLTK data package name.
@@ -60,7 +60,7 @@ paperless_ngx_service_redis_enable: true
 #
 # Reference:
 # * https://www.nltk.org/nltk_data/
-paperless_ngx_service_nltk_data:
+paperless_ngx_srv_nltk_data:
   - 'snowball_data'
   - 'rslp'
   - 'stopwords'
@@ -74,50 +74,24 @@ paperless_ngx_service_nltk_data:
 #
 # Reference:
 # * https://github.com/agl/jbig2enc/releases
-paperless_ngx_service_jbig2enc_version: '0.30'
+paperless_ngx_srv_jbig2enc_version: '0.30'
 
 # Ghostscript version.
 #
 # Ghostscript is automatically built from source and installed. It is used to
 # manipulate and transform documents. Debian provided package is 10.0.0 which
-# has multiple vulnerabilities as well as PDF corruption issues.
+# has multiple vulnerabilities as well as PDF corruption issues. See
+# vars/main.yml for list of CVE's addressed.
 #
 # Special Case:
 #   *: Use the version listed for the 'ghostscript-{VERSION}.tar.xz', not the
 #      release tag.
 #
-# Security: CVE-2023-43115
-#   CVE:
-#   * https://nvd.nist.gov/vuln/detail/cve-2023-43115
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27835
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27832
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27831
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27836
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27830
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27833
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27837
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27834
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46951
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46952
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46953
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46954
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46955
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46956
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33869
-#   * https://nvd.nist.gov/vuln/detail/cve-2023-52722
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33870
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33871
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
-#  Decision: do not use package - multiple vulnerabilities with PDF corruption
-#      for existing files, bookworm package (and backport) affected.
-#  Mitigation: use source release. Default gs binary to custom binary
-#      /usr/local/bin/gs instead of /usr/bin/gs.
 #  Reference:
-#  * https://github.com/tteck/Proxmox/discussions/3265
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
 #
-# Default: '10.05.0'.
-paperless_ngx_service_ghostscript_version: '10.05.0'
+# Default: '10.05.1'.
+paperless_ngx_srv_ghostscript_version: '10.05.1'
 
 # Path to custom certificates.
 #
@@ -125,13 +99,13 @@ paperless_ngx_service_ghostscript_version: '10.05.0'
 # /opt/paperless/certs with correct permissions. Be sure to set appropriate
 # paths for Paperless-NGX configuration settings.
 #
-# paperless_ngx_service_certs_path: 'host_vars/ngx.example.com/data/certs'
+# paperless_ngx_srv_certs_path: 'host_vars/ngx.example.com/data/certs'
 #
 # Default: '' (disabled).
-paperless_ngx_service_certs_path: ''
+paperless_ngx_srv_certs_path: ''
 
 # Remove old installs on upgrade success? Default: True.
-paperless_ngx_service_delete_old_versions_enable: true
+paperless_ngx_srv_delete_old_versions_enable: true
 
 # Force overwrite existing install?
 #
@@ -139,19 +113,18 @@ paperless_ngx_service_delete_old_versions_enable: true
 # directories (if any). Any user data in these directories are DESTROYED.
 #
 # Default: False.
-paperless_ngx_service_force_overwrite: false
+paperless_ngx_srv_force_overwrite: false
 
-# Automatically restart Paperless-NGX daily?
+# Automatically restart Paperless-NGX daily (unsafe)?
 #
-# Restarting the Paperless-NGX service will automatically apply any downloaded
-# auto updates.
+# Set RuntimeMaxSec for systemd units; which may result in unclean restarts.
 #
 # Default: False.
-paperless_ngx_service_restart_daily_enable: false
+paperless_ngx_srv_restart_daily_enable: false
 
 # Max lifetime of Paperless cache files (minutes).
 #
-# Requires paperless_ngx_config_convert_tmpdir.
+# Requires paperless_ngx_cfg_convert_tmpdir.
 #
 # Paperless does not clean cache aggressively and TMPFS is typically cleared
 # only on boot. Setting this to a lower value will aggressively clear the cache
@@ -162,12 +135,12 @@ paperless_ngx_service_restart_daily_enable: false
 # documents.
 #
 # Default: 30 (minutes).
-paperless_ngx_service_cache_lifetime: 30
+paperless_ngx_srv_cache_lifetime: 30
 
 # Only apply configuration?
 #
 # Reduces role application time by ONLY applying configuration changes. Does
-# NOT affect paperless_ngx_media_set_perms_file_enable.
+# NOT affect paperless_ngx_srv_media_set_perms_file_enable.
 #
 # This should ONLY be used after the role has been fully run once.
 #
@@ -176,19 +149,19 @@ paperless_ngx_service_cache_lifetime: 30
 #
 #   ansible-playbook site.yml
 #       --tags Paperless-NGX
-#       -e 'paperless_ngx_service_force_config_only_enable=true
+#       -e 'paperless_ngx_srv_force_config_only_enable=true
 #
 # Default: False.
-paperless_ngx_service_force_config_only_enable: false
+paperless_ngx_srv_force_config_only_enable: false
 
 # Systemd service logging levels (separate from application). Default: 'info'.
-paperless_ngx_service_log_level: 'info'
+paperless_ngx_srv_log_level: 'info'
 
 # WebUI listen interface (IPv4, IPv6). Default: '0.0.0.0' (all interfaces).
-paperless_ngx_service_address: '0.0.0.0'
+paperless_ngx_srv_address: '0.0.0.0'
 
 # WebUI listen port. Default: 8000.
-paperless_ngx_service_port: 8000
+paperless_ngx_srv_port: 8000
 
 # WebUI worker threads.
 #
@@ -196,7 +169,7 @@ paperless_ngx_service_port: 8000
 # entire application into memory separately.
 #
 # Default: 1.
-paperless_ngx_service_webserver_workers: 1
+paperless_ngx_srv_webserver_workers: 1
 
 ###############################################################################
 # Paperless-NGX User
@@ -204,34 +177,38 @@ paperless_ngx_service_webserver_workers: 1
 
 # User that Paperless-NGX will run under.
 #
-# Enable paperless_ngx_create_user if this account is not externally managed.
+# Enable paperless_ngx_srv_create_user if account is not externally managed.
 #
 # Default: 'paperless'.
-paperless_ngx_user: 'paperless'
+paperless_ngx_srv_user: 'paperless'
 
 # Group that Paperless-NGX will run under.
 #
-# Enable paperless_ngx_create_user if this group is not externally managed.
+# Enable paperless_ngx_srv_create_user if group is not externally managed.
 #
 # Default: 'paperless'.
-paperless_ngx_group: 'paperless'
+paperless_ngx_srv_group: 'paperless'
 
 # Enable user management of data/media files?
 #
-# Use paperless_ngx_user to execute data/media management commands. Role
+# Use paperless_ngx_srv_user to execute data/media management commands. Role
 # applies media permissions using 'root' by default. For mounted data locations
 # (NFS with squashed mounts, mapped container mounts, etc) the local root user
 # will not have sufficient privileges to modify these files.
 #
+# Applies to :
+# * paperless_ngx_srv_media_folders
+# * paperless_ngx_cfg_consumer_enable_collate_double_sided
+#
 # Default: False.
-paperless_ngx_user_data_manage_enable: false
+paperless_ngx_srv_user_data_manage_enable: false
 
-# Create paperless_ngx_user, paperless_ngx_group if not detected?
+# Create paperless_ngx_srv_user, paperless_ngx_srv_group if not detected?
 #
 # Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
 # Default: True.
-paperless_ngx_create_user: true
+paperless_ngx_srv_create_user: true
 
 ###############################################################################
 # Media Permissions
@@ -241,42 +218,39 @@ paperless_ngx_create_user: true
 #
 # Recommend using folders listed in paths_and_folders.
 #
-# Folders will be created/set with paperless_ngx_user, paperless_ngx_group,
-# paperless_ngx_media_perms_folder.
-#
 # Default:
 #   - '/data/consume'
 #   - '/data/data'
 #   - '/data/media'
-paperless_ngx_media_folders:
+paperless_ngx_srv_media_folders:
   - '/data/consume'
   - '/data/data'
   - '/data/media'
 
 # Media folder permissions octal.
 #
-# Media folders specified by paperless_ngx_media_folders will always be
-# recursively set using paperless_ngx_media_perms_folder, paperless_ngx_user,
-# and paperless_ngx_group.
+# Media folders specified by paperless_ngx_srv_media_folders will always be
+# recursively set using paperless_ngx_srv_media_perms_folder,
+# paperless_ngx_srv_user, and paperless_ngx_srv_group.
 #
 # Default: '0750'.
-paperless_ngx_media_perms_folder: '0750'
+paperless_ngx_srv_media_perms_folder: '0750'
 
 # Enable setting of media file permissions?
 #
-# Set file permissions within paperless_ngx_media_folders using
-# paperless_ngx_media_perms_file, paperless_ngx_user, and paperless_ngx_group.
-# Large sets of files may be slow to set permissions.
+# Set file permissions within paperless_ngx_srv_media_folders using
+# paperless_ngx_srv_media_perms_file, paperless_ngx_srv_user, and
+# paperless_ngx_srv_group. Large sets of files may be slow to set permissions.
 #
 # Useful when first configuring to ensure service has access to all specified
 # media locations. Suggest applying with extra options:
 #
 #   ansible-playbook site.yml
 #       --tags Paperless-NGX
-#       -e 'paperless_ngx_media_set_perms_file_enable=true'
+#       -e 'paperless_ngx_srv_media_set_perms_file_enable=true'
 #
 # Default: False.
-paperless_ngx_media_set_perms_file_enable: false
+paperless_ngx_srv_media_set_perms_file_enable: false
 
 # Media file permissions octal. Default: '0640'.
-paperless_ngx_media_perms_file: '0640'
+paperless_ngx_srv_media_perms_file: '0640'

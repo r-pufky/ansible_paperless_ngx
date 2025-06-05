@@ -37,8 +37,8 @@ provisioner:
     group_vars:
       all:
         paperless_ngx_live_api_enable: false
-        paperless_ngx_config_dbengine: 'sqlite'
-        paperless_ngx_config_secret_key: 'test'
+        paperless_ngx_cfg_dbengine: 'sqlite'
+        paperless_ngx_cfg_secret_key: 'test'
 platforms:
   - name: 'paperless_ngx-debian-12-live_api_test'
     image: 'ghcr.io/hifis-net/debian-systemd:12'

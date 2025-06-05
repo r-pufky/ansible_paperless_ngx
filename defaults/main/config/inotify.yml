@@ -10,4 +10,4 @@
 # working on the same file. Configure this to prevent that.
 #
 # Default: 0.5.
-paperless_ngx_config_consumer_inotify_delay: 0.5
+paperless_ngx_cfg_consumer_inotify_delay: 0.5

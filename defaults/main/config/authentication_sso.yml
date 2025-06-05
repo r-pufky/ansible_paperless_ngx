@@ -7,14 +7,14 @@
 # * https://docs.paperless-ngx.com/configuration/#authentication
 
 # Enable users to sign-up for a new Paperless-ngx account? Default: False.
-paperless_ngx_config_account_allow_signups: false
+paperless_ngx_cfg_account_allow_signups: false
 
 # List of group names to add to user when signing up for new account.
 #
 # Groups listed here must already exist.
 #
 # Default: [].
-paperless_ngx_config_account_default_groups: []
+paperless_ngx_cfg_account_default_groups: []
 
 # Configure social media account logins.
 #
@@ -24,7 +24,7 @@ paperless_ngx_config_account_default_groups: []
 # compatible with django-allauth. See the corresponding django-allauth
 # documentation for a list of provider configurations. You will also need to
 # include the relevant Django 'application' inside the
-# paperless_ngx_config_paperless_apps setting to activate that specific
+# paperless_ngx_cfg_paperless_apps setting to activate that specific
 # authentication provider (e.g. allauth.socialaccount.providers.openid_connect
 # for the OIDC Connect provider).
 #
@@ -38,7 +38,7 @@ paperless_ngx_config_account_default_groups: []
 # * https://docs.allauth.org/en/latest/socialaccount/providers/index.html
 # * https://docs.paperless-ngx.com/configuration/#PAPERLESS_APPS
 # * https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
-paperless_ngx_config_socialaccount_providers: ''
+paperless_ngx_cfg_socialaccount_providers: ''
 
 # Enable automatic account sign-up from social media providers?
 #
@@ -49,7 +49,7 @@ paperless_ngx_config_socialaccount_providers: ''
 #
 # Reference:
 # * https://docs.allauth.org/en/latest/account/configuration.html
-paperless_ngx_config_social_auto_signup: false
+paperless_ngx_cfg_social_auto_signup: false
 
 # Enable account sign-up from social media providers?
 #
@@ -57,7 +57,7 @@ paperless_ngx_config_social_auto_signup: false
 # setup third party authentication systems.
 #
 # Default: True.
-paperless_ngx_config_socialaccount_allow_signups: true
+paperless_ngx_cfg_socialaccount_allow_signups: true
 
 # Sync third party groups (e.g. OIDC) to Paperless-NGX.
 #
@@ -68,14 +68,14 @@ paperless_ngx_config_socialaccount_allow_signups: true
 # In order to pass groups from the authentication system you will need to
 # add top-level "SCOPES" which includes "groups", e.g.:
 #
-#   paperless_ngx_config_socialaccount_providers:
+#   paperless_ngx_cfg_socialaccount_providers:
 #     {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
 #
 # Special Case:
 #   * Groups must already exist in Paperless-NGX with the same name.
 #
 # Default: False (disabled).
-paperless_ngx_config_social_account_sync_groups: false
+paperless_ngx_cfg_social_account_sync_groups: false
 
 # List of group names to add to user when siging up using social media.
 #
@@ -83,10 +83,10 @@ paperless_ngx_config_social_account_sync_groups: false
 #
 # Special Case:
 #   * User added to both sets of groups if
-#     paperless_ngx_config_account_default_groups set.
+#     paperless_ngx_cfg_account_default_groups set.
 #
 # Default: [].
-paperless_ngx_config_social_account_default_groups: []
+paperless_ngx_cfg_social_account_default_groups: []
 
 # Default login callback URL protocol.
 #
@@ -94,7 +94,7 @@ paperless_ngx_config_social_account_default_groups: []
 #
 # Reference:
 # * https://docs.allauth.org/en/latest/account/configuration.html
-paperless_ngx_config_account_default_http_protocol: 'https'
+paperless_ngx_cfg_account_default_http_protocol: 'https'
 
 # Email verification method during user account sign-up.
 #
@@ -110,12 +110,12 @@ paperless_ngx_config_account_default_http_protocol: 'https'
 # Reference:
 # * https://docs.allauth.org/en/latest/account/configuration.html
 # * https://docs.paperless-ngx.com/configuration/#PAPERLESS_EMAIL_HOST
-paperless_ngx_config_account_email_verification: 'none'
+paperless_ngx_cfg_account_email_verification: 'none'
 
 # Enable emailing password reset attempts for unknown accounts?
 #
 # Default: True.
-paperless_ngx_config_account_email_unknown_accounts: true
+paperless_ngx_cfg_account_email_unknown_accounts: true
 
 # Disable standard username/password login?
 #
@@ -125,19 +125,19 @@ paperless_ngx_config_account_email_unknown_accounts: true
 # your web server or reverse proxy configuration.
 #
 # You can optionally also automatically redirect users to the SSO login with
-# paperless_ngx_config_redirect_login_to_sso=true.
+# paperless_ngx_cfg_redirect_login_to_sso=true.
 #
 # Default: False.
-paperless_ngx_config_disable_regular_login: false
+paperless_ngx_cfg_disable_regular_login: false
 
 # Automatically redirect to first SSO provider login?
 #
 # You may still want to disable the frontend login form for clarity.
 #
 # Default: False.
-paperless_ngx_config_paperless_redirect_login_to_sso: false
+paperless_ngx_cfg_paperless_redirect_login_to_sso: false
 
-# Use paperless_ngx_config_session_cookie_age for session expiration?
+# Use paperless_ngx_cfg_session_cookie_age for session expiration?
 #
 # sessions expire at browser close if disabled.
 #
@@ -145,14 +145,14 @@ paperless_ngx_config_paperless_redirect_login_to_sso: false
 #
 # Reference:
 # * https://docs.allauth.org/en/latest/account/configuration.html
-paperless_ngx_config_paperless_account_session_remember: true
+paperless_ngx_cfg_paperless_account_session_remember: true
 
 # Login session cookie expiration (seconds).
 #
-# Requires paperless_ngx_config_paperless_account_session_remember=true.
+# Requires paperless_ngx_cfg_paperless_account_session_remember=true.
 #
 # Default: 1209600 (2 weeks).
 #
 # Reference:
 # * https://docs.allauth.org/en/latest/account/configuration.html
-paperless_ngx_config_paperless_session_cookie_age: 1209600
+paperless_ngx_cfg_paperless_session_cookie_age: 1209600

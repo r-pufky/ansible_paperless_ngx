@@ -6,18 +6,18 @@
 # * https://docs.paperless-ngx.com/configuration/#consume_config
 
 # Delete detected duplicate documents? Default: False.
-paperless_ngx_config_consumer_delete_duplicates: false
+paperless_ngx_cfg_consumer_delete_duplicates: false
 
-# Enable recursive watch of paperless_ngx_config_consumption_dir?
+# Enable recursive watch of paperless_ngx_cfg_consumption_dir?
 #
 # Detects file changes for processing.
 #
 # Default: False.
-paperless_ngx_config_consumer_recursive: false
+paperless_ngx_cfg_consumer_recursive: false
 
-# Autotag documents based on paperless_ngx_config_consumption_dir?
+# Autotag documents based on paperless_ngx_cfg_consumption_dir?
 #
-# Requires paperless_ngx_config_consumer_recursive=true.
+# Requires paperless_ngx_cfg_consumer_recursive=true.
 #
 # Subdirectories will be converted to tags (<CONSUMPTION_DIR>/foo/bar/file.pdf
 # will add tags 'foo' and 'bar' to consumed file). Tags will be created if
@@ -27,9 +27,9 @@ paperless_ngx_config_consumer_recursive: false
 # prior to consumption.
 #
 # Default: False.
-paperless_ngx_config_consumer_subdirs_as_tags: false
+paperless_ngx_cfg_consumer_subdirs_as_tags: false
 
-# Files to ignore in paperless_ngx_config_consumption_dir.
+# Files to ignore in paperless_ngx_cfg_consumption_dir.
 #
 # Default:
 #   - '.DS_Store/*'
@@ -41,7 +41,7 @@ paperless_ngx_config_consumer_subdirs_as_tags: false
 #   - 'desktop.ini'
 #   - '@eaDir/*'
 #   - 'Thumbs.db'
-paperless_ngx_config_consumer_ignore_patterns:
+paperless_ngx_cfg_consumer_ignore_patterns:
   - '.DS_Store/*'
   - '.DS_STORE/*'
   - '._*'
@@ -63,7 +63,7 @@ paperless_ngx_config_consumer_ignore_patterns:
 #    ZXING: Use ZXing libraries.
 #
 # Default: 'ZXING'.
-paperless_ngx_config_consumer_barcode_scanner: 'ZXING'
+paperless_ngx_cfg_consumer_barcode_scanner: 'ZXING'
 
 # Pre process document with user defined script.
 #
@@ -75,7 +75,7 @@ paperless_ngx_config_consumer_barcode_scanner: 'ZXING'
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#pre-consume-script
-paperless_ngx_config_pre_consume_script: ''
+paperless_ngx_cfg_pre_consume_script: ''
 
 # Post process document with user defined script.
 #
@@ -87,7 +87,7 @@ paperless_ngx_config_pre_consume_script: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#pre-consume-script
-paperless_ngx_config_post_consume_script: ''
+paperless_ngx_cfg_post_consume_script: ''
 
 # Use specified format for automatic document date detection.
 #
@@ -104,7 +104,7 @@ paperless_ngx_config_post_consume_script: ''
 #
 # Reference:
 # * https://dateparser.readthedocs.io/en/latest/settings.html#date-order
-paperless_ngx_config_filename_date_order: 'YMD'
+paperless_ngx_cfg_filename_date_order: 'YMD'
 
 # Search document for alternative created date suggestions.
 #
@@ -123,7 +123,7 @@ paperless_ngx_config_filename_date_order: 'YMD'
 #   0: Disables.
 #
 # Default: 3.
-paperless_ngx_config_number_of_suggested_dates: 3
+paperless_ngx_cfg_number_of_suggested_dates: 3
 
 # Font to use for plain text file thumbnail generation.
 #
@@ -134,7 +134,7 @@ paperless_ngx_config_number_of_suggested_dates: 3
 # changed here.
 #
 # Default: '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'.
-paperless_ngx_config_thumbnail_font_name:
+paperless_ngx_cfg_thumbnail_font_name:
   '/usr/share/fonts/liberation/LiberationSerif-Regular.ttf'
 
 # List of dates that should be ignored during creation date detection.
@@ -142,13 +142,13 @@ paperless_ngx_config_thumbnail_font_name:
 # Useful for special dates (like date of birth) that appear in documents
 # regularly but are very unlikely to be the documents creation date.
 #
-# Date parsed using format in paperless_ngx_config_date_order.
+# Date parsed using format in paperless_ngx_cfg_date_order.
 #
 # Default: [] (consider all dates).
 #
 # Reference:
 # * https://dateparser.readthedocs.io/en/latest/#popular-formats
-paperless_ngx_config_ignore_dates: []
+paperless_ngx_cfg_ignore_dates: []
 
 # Date format expected in documents.
 #
@@ -163,7 +163,7 @@ paperless_ngx_config_ignore_dates: []
 #   [DMY][DMY][DMY]: Any combination of D (day), M (month), Y (year).
 #
 # Default: 'DMY'.
-paperless_ngx_config_date_order: 'DMY'
+paperless_ngx_cfg_date_order: 'DMY'
 
 # Enable GPG decryptor for encrypted emails?
 #
@@ -173,4 +173,4 @@ paperless_ngx_config_date_order: 'DMY'
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#gpg-decryptor
-paperless_ngx_config_enable_gpg_decryptor: false
+paperless_ngx_cfg_enable_gpg_decryptor: false

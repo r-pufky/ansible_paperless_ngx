@@ -28,7 +28,7 @@
 #
 # Reference:
 # * https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html
-paperless_ngx_config_ocr_language:
+paperless_ngx_cfg_ocr_language:
   - 'eng'
 
 # How to perform OCR document scanning.
@@ -59,7 +59,7 @@ paperless_ngx_config_ocr_language:
 #
 # Reference:
 # * https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped
-paperless_ngx_config_ocr_mode: 'skip'
+paperless_ngx_cfg_ocr_mode: 'skip'
 
 # Skip creating an archive version of scanned documents.
 #
@@ -73,14 +73,14 @@ paperless_ngx_config_ocr_mode: 'skip'
 #      always: Always skip creating an archived version.
 #
 # Default: 'never'.
-paperless_ngx_config_ocr_skip_archive_file: 'never'
+paperless_ngx_cfg_ocr_skip_archive_file: 'never'
 
 # Use unpaper to clean document before sending to tesseract.
 #
 # Uses more resources but generally results in better OCR results.
 #
 # Special Case:
-#   clean-final: Incompatible with paperless_ngx_config_ocr_mode=redo. When
+#   clean-final: Incompatible with paperless_ngx_cfg_ocr_mode=redo. When
 #                both clean-final and redo are configured, clean is used.
 #
 # Values:
@@ -90,7 +90,7 @@ paperless_ngx_config_ocr_skip_archive_file: 'never'
 #          none: Do not apply unpaper.
 #
 # Default: 'clean'.
-paperless_ngx_config_ocr_clean: 'clean'
+paperless_ngx_cfg_ocr_clean: 'clean'
 
 # Deskew images?
 #
@@ -98,21 +98,21 @@ paperless_ngx_config_ocr_clean: 'clean'
 # scanning).
 #
 # Special Case:
-#   True: Incompatible with paperless_ngx_config_ocr_mode=redo. Disabled
+#   True: Incompatible with paperless_ngx_cfg_ocr_mode=redo. Disabled
 #         automatically if both are set.
 #
 # Default: True.
-paperless_ngx_config_ocr_deskew: true
+paperless_ngx_cfg_ocr_deskew: true
 
 # Rotate pages to correct orientation based tesseract analysis?
 #
 # Tells paperless to correct page rotation (90°, 180° and 270° rotation). If
 # you notice that paperless is not rotating incorrectly rotated pages (or vice
-# versa), try adjusting paperless_ngx_config_ocr_rotate_pages_threshold up or
+# versa), try adjusting paperless_ngx_cfg_ocr_rotate_pages_threshold up or
 # down.
 #
 # Default: True.
-paperless_ngx_config_ocr_rotate_pages: true
+paperless_ngx_cfg_ocr_rotate_pages: true
 
 # Threshold for automatic page rotation.
 #
@@ -124,7 +124,7 @@ paperless_ngx_config_ocr_rotate_pages: true
 #   ~15: Conservative.
 #
 # Default: 12.
-paperless_ngx_config_ocr_rotate_pages_threshold: 12
+paperless_ngx_cfg_ocr_rotate_pages_threshold: 12
 
 # Type of documents that OCR should produce.
 #
@@ -138,14 +138,14 @@ paperless_ngx_config_ocr_rotate_pages_threshold: 12
 #   pdfa-{#}: Exact version of PDF/A to use.
 #
 # Default: 'pdfa'.
-paperless_ngx_config_ocr_output_type: 'pdfa'
+paperless_ngx_cfg_ocr_output_type: 'pdfa'
 
 # Number of pages to process with OCR.
 #
 # Documents with less than the specified amount of pages get OCR'ed completely.
 #
 # Special Case:
-#   *: When paperless_ngx_config_ocr_mode=redo|force text found on excluded
+#   *: When paperless_ngx_cfg_ocr_mode=redo|force text found on excluded
 #      pages will be copied verbatim.
 #
 # Values:
@@ -153,7 +153,7 @@ paperless_ngx_config_ocr_output_type: 'pdfa'
 #   #: Process OCR to page #.
 #
 # Default: 0 (disabled).
-paperless_ngx_config_ocr_pages: 0
+paperless_ngx_cfg_ocr_pages: 0
 
 # DPI of scanned images.
 #
@@ -166,7 +166,7 @@ paperless_ngx_config_ocr_pages: 0
 #   #: Set to printer image scan DPI.
 #
 # Default: 600.
-paperless_ngx_config_ocr_image_dpi: 600
+paperless_ngx_cfg_ocr_image_dpi: 600
 
 # Max OCR image pixel limit.
 #
@@ -190,11 +190,11 @@ paperless_ngx_config_ocr_image_dpi: 600
 #
 # Reference:
 # * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS
-paperless_ngx_config_ocr_max_image_pixels: 89478485
+paperless_ngx_cfg_ocr_max_image_pixels: 89478485
 
 # Ghostscript color conversion strategy when creating the archive file.
 #
-# Requires paperless_ngx_config_ocr_output_type=pdfa.
+# Requires paperless_ngx_cfg_ocr_output_type=pdfa.
 #
 # Utilizing some of the options may result in errors when creating archive
 # files from PDFs.
@@ -210,7 +210,7 @@ paperless_ngx_config_ocr_max_image_pixels: 89478485
 #
 # Reference:
 # * https://ghostscript.readthedocs.io/en/latest/VectorDevices.html#color-conversion-and-management
-paperless_ngx_config_ocr_color_conversion_strategy: 'RGB'
+paperless_ngx_cfg_ocr_color_conversion_strategy: 'RGB'
 
 # Dict containing additional OCRmyPDF options.
 #
@@ -234,6 +234,6 @@ paperless_ngx_config_ocr_color_conversion_strategy: 'RGB'
 # Reference:
 # * https://ocrmypdf.readthedocs.io/en/latest/api.html#reference
 # * https://ocrmypdf.readthedocs.io/en/latest/cookbook.html#pdf-optimization
-paperless_ngx_config_ocr_user_args:
+paperless_ngx_cfg_ocr_user_args:
   optimize: 1
   jbig2_lossy: false

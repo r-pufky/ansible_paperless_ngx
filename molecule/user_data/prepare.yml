@@ -49,3 +49,14 @@
             "ghostpdl-10.05.1.tar.xz"
           }}'
         test_mode: '0640'
+
+- name: 'Prepare'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Prepare | simulate user media restriction'
+      ansible.builtin.file:
+        path: '/data'
+        owner: 950
+        group: 950
+        state: 'directory'

@@ -1,19 +1,19 @@
 ---
 # yamllint disable rule:line-length
 
-- name: 'Live API test | verify'
+- name: 'Verify'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Live API test | verify | gather service status'
+    - name: 'Verify | gather service status'
       ansible.builtin.service_facts:
 
-    - name: 'Default | verify | paperless.conf'
+    - name: 'Verify | paperless.conf'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Default | verify | paperless.conf'
+        test_name: 'Verify | paperless.conf'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/paperless.conf"
@@ -24,7 +24,7 @@
         test_mode: '0640'
 
     # Paperless will fail if configuration is bad (r_pufky.deb.systemd)
-    - name: 'Live API test | verify | assert Paperless-NGX services active'
+    - name: 'Verify | assert Paperless-NGX services active'
       ansible.builtin.assert:
         quiet: true
         that:
@@ -47,36 +47,36 @@
            paperless-webserver.service: {{ ansible_facts["services"]["paperless-webserver.service"]["state"] }}
                   redis-server.service: {{ ansible_facts["services"]["redis-server.service"]["state"] }}
 
-    - name: 'Default | verify | /opt/paperless/paperless/data'
+    - name: 'Verify | /opt/paperless/paperless/data'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /opt/paperless/paperless/data'
+        test_name: 'Verify | /opt/paperless/paperless/data'
         test_file: '/opt/paperless/paperless/data'
         test_owner: '{{ omit }}'
         test_group: '{{ omit }}'
         test_mode: '{{ omit }}'
         test_state: 'absent'
 
-    - name: 'Default | verify | /data/data/db.sqlite3'
+    - name: 'Verify | /data/data/db.sqlite3'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /data/data/db.sqlite3'
+        test_name: 'Verify | /data/data/db.sqlite3'
         test_file: '/data/data/db.sqlite3'
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0644'
         test_state: 'file'
 
-    - name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
+    - name: 'Verify | /etc/ImageMagick-6/policy.xml'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Default | verify | /etc/ImageMagick-6/policy.xml'
+        test_name: 'Verify | /etc/ImageMagick-6/policy.xml'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/policy.xml"
@@ -86,24 +86,24 @@
         test_group: 'root'
         test_mode: '0644'
 
-    - name: 'Default | verify | /usr/local/bin/jbig2'
+    - name: 'Verify | /usr/local/bin/jbig2'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /usr/local/bin/jbig2'
+        test_name: 'Verify | /usr/local/bin/jbig2'
         test_file: '/usr/local/bin/jbig2'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0755'
         test_state: 'file'
 
-    - name: 'Default | verify | /usr/local/bin/gs'
+    - name: 'Verify | /usr/local/bin/gs'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /usr/local/bin/gs'
+        test_name: 'Verify | /usr/local/bin/gs'
         test_file: '/usr/local/bin/gs'
         test_owner: 'root'
         test_group: 'root'

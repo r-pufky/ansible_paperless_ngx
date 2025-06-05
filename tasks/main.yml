@@ -3,8 +3,11 @@
   ansible.builtin.import_tasks: 'annotate.yml'
 - name: 'Prep'
   ansible.builtin.import_tasks: 'prep.yml'
+
 - name: 'Install'
+  when: not paperless_ngx_srv_force_config_only_enable.raw
   ansible.builtin.import_tasks: 'install.yml'
+
 - name: 'Config'
   ansible.builtin.import_tasks: 'config.yml'
 - name: 'Validate'

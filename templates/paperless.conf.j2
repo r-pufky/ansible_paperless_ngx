@@ -5,9 +5,9 @@
 #
 # Precedence: config > environment.
 
-{% for header in _paperless_ngx_config_order %}
+{% for header in _paperless_ngx_cfg_order %}
 # {{ header }}
-{% for section in _paperless_ngx_config_map | selectattr("value.section", "match", header) | sort(attribute="value.order") %}
+{% for section in _paperless_ngx_cfg_map | selectattr("value.section", "match", header) | sort(attribute="value.order") %}
 {% if section.value.raw | string | length > 0 and not section.value.deprecated %}
 {{ section.value.key }}={{ section.value.raw }}
 {% endif %}

@@ -28,16 +28,16 @@ is highly customizable and you should fully read through defaults before using.
   roles:
      - 'r_pufky.srv.paperless_ngx'
   vars:
-    paperless_ngx_config_dbengine: 'sqlite'
-    paperless_ngx_config_admin_user: 'example_user'
-    paperless_ngx_config_admin_mail: 'user@example.com'
-    paperless_ngx_config_admin_password: '{{ vault_paperless_ngx_admin_password }}'
-    paperless_ngx_config_filename_format: !unsafe '{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]'
+    paperless_ngx_cfg_dbengine: 'sqlite'
+    paperless_ngx_cfg_admin_user: 'example_user'
+    paperless_ngx_cfg_admin_mail: 'user@example.com'
+    paperless_ngx_cfg_admin_password: '{{ vault_paperless_ngx_admin_password }}'
+    paperless_ngx_cfg_filename_format: !unsafe '{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]'
 ```
 
 Changes updating the configuration only can be done to speed role application:
 ``` bash
-ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_service_force_config_only_enable=true'
+ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_srv_force_config_only_enable=true'
 ```
 
 ### Reverse Proxy
@@ -103,10 +103,10 @@ Suggested Use (based on archivst recommendations):
 [Reference](https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/)
 
 ## Using Management Utilities
-Login and switch to `paperless_ngx_user` to run management utilities.
+Login and switch to `paperless_ngx_srv_user` to run management utilities.
 
 ```bash
-su - -s /bin/bash {{ paperless_ngx_user }}
+su - -s /bin/bash {{ paperless_ngx_srv_user }}
 . /var/venv/paperless/bin/activate
 cd /opt/paperless/paperless/src
 python3 manage.py document_renamer
@@ -207,7 +207,7 @@ Paperless does not clean cache aggressively and TMPFS is typically cleared only
 on boot. In cases where there are mass processing of documents it is better to
 use disk. Some paperless subprocesses will always use `/tmp`.
 
-Check logs for specific errors. Increase `paperless_ngx_config_convert_tmpdir`
+Check logs for specific errors. Increase `paperless_ngx_cfg_convert_tmpdir`
 backing space if necessary and restart the machine or the consumption service:
 
 ``` bash
@@ -216,12 +216,12 @@ systemctl restart paperless-consumer.service
 * Tasks may also be restarted in the django admin interface
   `settings > Open Django Admin > Paperless tasks`.
 
-The service may also be stopped and `paperless_ngx_config_convert_tmpdir` and
+The service may also be stopped and `paperless_ngx_cfg_convert_tmpdir` and
 `/tmp` cleared:
 ``` bash
 systemctl stop paperless-*
 rm -rf /tmp/paperless*
-rm -rf {{ paperless_ngx_config_convert_tmpdir }}
+rm -rf {{ paperless_ngx_cfg_convert_tmpdir }}
 systemctl start paperless-*
 ```
 

@@ -16,22 +16,22 @@
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#mysql-caveats
-paperless_ngx_config_dbengine: 'postgresql'
+paperless_ngx_cfg_dbengine: 'postgresql'
 
 # Database host (ignored for sqlite). Default: 'localhost'.
-paperless_ngx_config_dbhost: 'localhost'
+paperless_ngx_cfg_dbhost: 'localhost'
 
 # Database port (ignored for sqlite). Default: 5432.
-paperless_ngx_config_dbport: 5432
+paperless_ngx_cfg_dbport: 5432
 
 # Database name (ignored for sqlite). Default: 'paperless'.
-paperless_ngx_config_dbname: 'paperless'
+paperless_ngx_cfg_dbname: 'paperless'
 
 # Database user (ignored for sqlite). Default: 'paperless'.
-paperless_ngx_config_dbuser: 'paperless'
+paperless_ngx_cfg_dbuser: 'paperless'
 
 # Database pass (ignored for sqlite). Default: 'paperless'.
-paperless_ngx_config_dbpass: 'paperless'
+paperless_ngx_cfg_dbpass: 'paperless'
 
 # Database SSL mode.
 #
@@ -46,7 +46,7 @@ paperless_ngx_config_dbpass: 'paperless'
 # Reference:
 # * https://www.postgresql.org/docs/current/libpq-ssl.html
 # * https://dev.mysql.com/doc/refman/8.0/en/connection-options.html
-paperless_ngx_config_dbsslmode: 'prefer'
+paperless_ngx_cfg_dbsslmode: 'prefer'
 
 # Database SSL root certificate path.
 #
@@ -55,7 +55,7 @@ paperless_ngx_config_dbsslmode: 'prefer'
 # Reference:
 # * https://www.postgresql.org/docs/current/libpq-ssl.html
 # * https://dev.mysql.com/doc/refman/8.0/en/connection-options.html
-paperless_ngx_config_dbsslrootcert: ''
+paperless_ngx_cfg_dbsslrootcert: ''
 
 # Database SSL client certificate path.
 #
@@ -64,7 +64,7 @@ paperless_ngx_config_dbsslrootcert: ''
 # Reference:
 # * https://www.postgresql.org/docs/current/libpq-ssl.html
 # * https://dev.mysql.com/doc/refman/8.0/en/connection-options.html
-paperless_ngx_config_dbsslcert: ''
+paperless_ngx_cfg_dbsslcert: ''
 
 # Database SSL client key path.
 #
@@ -73,7 +73,7 @@ paperless_ngx_config_dbsslcert: ''
 # Reference:
 # * https://www.postgresql.org/docs/current/libpq-ssl.html
 # * https://dev.mysql.com/doc/refman/8.0/en/connection-options.html
-paperless_ngx_config_dbsslkey: ''
+paperless_ngx_cfg_dbsslkey: ''
 
 # Database timeout in seconds.
 #
@@ -82,4 +82,4 @@ paperless_ngx_config_dbsslkey: ''
 # postgresql if you are having concurrency problems with sqlite.
 #
 # Default: 0 (default).
-paperless_ngx_config_db_timeout: 0
+paperless_ngx_cfg_db_timeout: 0

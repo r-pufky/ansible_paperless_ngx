@@ -7,7 +7,7 @@
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw
 
-paperless_ngx_ports:
+paperless_ngx_srv_ports:
   - proto: 'tcp'
     from_ip: 'any'
     to_port: 8000

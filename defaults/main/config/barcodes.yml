@@ -19,16 +19,16 @@
 # Reference:
 # * https://www.alliancegroup.co.uk/patch-codes.htm
 # * https://docs.paperless-ngx.com/advanced_usage/#barcodes
-paperless_ngx_config_consumer_enable_barcodes: false
+paperless_ngx_cfg_consumer_enable_barcodes: false
 
 # Scan TIFF images for barcodes?
 #
-# Requires paperless_ngx_config_consumer_enable_barcodes=true.
+# Requires paperless_ngx_cfg_consumer_enable_barcodes=true.
 #
 # Automatically converts TIFF images to PDF for processing.
 #
 # Default: False.
-paperless_ngx_config_consumer_barcode_tiff_support: false
+paperless_ngx_cfg_consumer_barcode_tiff_support: false
 
 # Defines string to be detected as a separator barcode.
 #
@@ -36,10 +36,10 @@ paperless_ngx_config_consumer_barcode_tiff_support: false
 # this.
 #
 # Default: 'PATCHT'.
-paperless_ngx_config_consumer_barcode_string: 'PATCHT'
+paperless_ngx_cfg_consumer_barcode_string: 'PATCHT'
 
 # Keep all pages that are split by a barcode (such as PATCHT)? Default: False.
-paperless_ngx_config_consumer_barcode_retain_split_pages: false
+paperless_ngx_cfg_consumer_barcode_retain_split_pages: false
 
 # Enable detection of barcodes and setting of ASN (archive serial number)?
 #
@@ -55,17 +55,17 @@ paperless_ngx_config_consumer_barcode_retain_split_pages: false
 # and an error logged.
 #
 # Default: False.
-paperless_ngx_config_consumer_enable_asn_barcode: false
+paperless_ngx_cfg_consumer_enable_asn_barcode: false
 
 # Define prefix used to identify barcode as ASN (archive serial number).
 #
 # Default: 'ASN'.
-paperless_ngx_config_consumer_asn_barcode_prefix: 'ASN'
+paperless_ngx_cfg_consumer_asn_barcode_prefix: 'ASN'
 
 # Defines the upscale factor used in barcode detection.
 #
 # Upscale document before barcode detection process to improve detection of
-# small barcodes. Use with paperless_ngx_config_consumer_barcode_dpi to set
+# small barcodes. Use with paperless_ngx_cfg_consumer_barcode_dpi to set
 # higher values.
 #
 # Values:
@@ -73,17 +73,17 @@ paperless_ngx_config_consumer_asn_barcode_prefix: 'ASN'
 #    0.0: Disabled (default).
 #
 # Default: 0.0.
-paperless_ngx_config_consumer_barcode_upscale: 0.0
+paperless_ngx_cfg_consumer_barcode_upscale: 0.0
 
 # Barcode image DPI for barcode detection.
 #
 # During barcode detection every page from a PDF document needs to be converted
 # to an image. A DPI value can be specified in the conversion process. Default
 # is 300. If the detection of small barcodes fails a bigger dpi value i.e. 600
-# can fix the issue. Use with paperless_ngx_config_consumer_barcode_upscale.
+# can fix the issue. Use with paperless_ngx_cfg_consumer_barcode_upscale.
 #
 # Default: 300.
-paperless_ngx_config_consumer_barcode_dpi: 300
+paperless_ngx_cfg_consumer_barcode_dpi: 300
 
 # Limit barcode detection to the first X pages.
 #
@@ -93,7 +93,7 @@ paperless_ngx_config_consumer_barcode_dpi: 300
 # sensible to set this as the limit here.
 #
 # Default: 0 (check all pages).
-paperless_ngx_config_consumer_barcode_max_pages: 0
+paperless_ngx_cfg_consumer_barcode_max_pages: 0
 
 # Enable barcode detection in scanned document and tag?
 #
@@ -106,7 +106,7 @@ paperless_ngx_config_consumer_barcode_max_pages: 0
 #   *: Matching is case insensitive.
 #
 # Default: False.
-paperless_ngx_config_consumer_enable_tag_barcode: false
+paperless_ngx_cfg_consumer_enable_tag_barcode: false
 
 # Dict of filter regex and substitute expressions.
 #
@@ -121,16 +121,16 @@ paperless_ngx_config_consumer_enable_tag_barcode: false
 #    *: YAML will automatically be converted to JSON object.
 #   "": Use double quotes for correct escape character interpretation for JSON.
 #
-# paperless_ngx_config_consumer_tag_barcode_mapping:
+# paperless_ngx_cfg_consumer_tag_barcode_mapping:
 #       list of dict - Barcode regex test matching to tag mapping rules.
 #   - {REGEX}: {RULE} str - Python regex to match against barcode text.
 #
-# paperless_ngx_config_consumer_tag_barcode_mapping
+# paperless_ngx_cfg_consumer_tag_barcode_mapping
 #   "ASN12.*": "JOHN"  # maps ASN12nnnn barcode to john.
 #   "ASN13.*": "SMITH"  # maps ASN13nnnn barcode to smith.
 #   "TAG:(.*)": "\\g<1>"  # maps TAG:{TAG} barcode to {TAG}.
 #
 # Default:
 #  "TAG:(.*)": "\\g<1>"
-paperless_ngx_config_consumer_tag_barcode_mapping:
+paperless_ngx_cfg_consumer_tag_barcode_mapping:
   "TAG:(.*)": "\\g<1>"

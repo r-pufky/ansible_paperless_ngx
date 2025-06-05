@@ -9,11 +9,11 @@
 #
 # Used to construct full URL for OAuth callback. This should be the URL that
 # the Paperless instance is accessible at. To enable OAuth this or
-# paperless_ngx_config_paperless_url must be set. This setting only applies to
+# paperless_ngx_cfg_paperless_url must be set. This setting only applies to
 # OAuth Email setup (not to SSO setup).
 #
-# Default: '' (use paperless_ngx_config_paperless_url).
-paperless_ngx_config_oauth_callback_base_url: ''
+# Default: '' (use paperless_ngx_cfg_paperless_url).
+paperless_ngx_cfg_oauth_callback_base_url: ''
 
 # Gmail OAuth client ID.
 #
@@ -23,7 +23,7 @@ paperless_ngx_config_oauth_callback_base_url: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/usage/#oauth-email-setup
-paperless_ngx_config_gmail_oauth_client_id: ''
+paperless_ngx_cfg_gmail_oauth_client_id: ''
 
 # Gmail OAuth client secret.
 #
@@ -33,7 +33,7 @@ paperless_ngx_config_gmail_oauth_client_id: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/usage/#oauth-email-setup
-paperless_ngx_config_gmail_oauth_client_secret: ''
+paperless_ngx_cfg_gmail_oauth_client_secret: ''
 
 # OAuth client ID for Outlook.
 #
@@ -43,7 +43,7 @@ paperless_ngx_config_gmail_oauth_client_secret: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/usage/#oauth-email-setup.
-paperless_ngx_config_outlook_oauth_client_id: ''
+paperless_ngx_cfg_outlook_oauth_client_id: ''
 
 # OAuth client secret for Outlook.
 #
@@ -53,7 +53,7 @@ paperless_ngx_config_outlook_oauth_client_id: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/usage/#oauth-email-setup.
-paperless_ngx_config_outlook_oauth_client_secret: ''
+paperless_ngx_cfg_outlook_oauth_client_secret: ''
 
 # Set GNUPG_HOME path to use with GPG decryptor for encrypted emails.
 #
@@ -63,4 +63,4 @@ paperless_ngx_config_outlook_oauth_client_secret: ''
 #
 # Reference:
 # * https://docs.paperless-ngx.com/advanced_usage/#gpg-decryptor
-paperless_ngx_config_email_gnupg_home: '.'
+paperless_ngx_cfg_email_gnupg_home: '.'

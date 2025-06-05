@@ -11,7 +11,7 @@
 #   1: Minimum.
 #
 # Default: 30.
-paperless_ngx_config_empty_trash_delay: 30
+paperless_ngx_cfg_empty_trash_delay: 30
 
 # Schedule to empty trash of expired deleted documents.
 #
@@ -23,4 +23,4 @@ paperless_ngx_config_empty_trash_delay: 30
 #
 # Reference:
 # * https://en.wikipedia.org/wiki/Cron
-paperless_ngx_config_empty_trash_task_cron: '0 1 * * *'
+paperless_ngx_cfg_empty_trash_task_cron: '0 1 * * *'

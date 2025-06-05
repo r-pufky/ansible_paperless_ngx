@@ -1,10 +1,10 @@
 ---
 # yamllint disable rule:line-length
-- name: 'Live API test | prepare'
+- name: 'Prepare'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Live API test | prepare | API TESTING NOT ENABLED ⚠'
+    - name: 'Prepare | API TESTING NOT ENABLED ⚠'
       when: not repo_live_api_github_enable
       ansible.builtin.fail:
         msg: |

@@ -16,7 +16,7 @@
 #          requirepass=true, use 'redis://:{PASS}...'.
 #
 # Default: 'redis://localhost:6379'.
-paperless_ngx_config_redis: 'redis://localhost:6379'
+paperless_ngx_cfg_redis: 'redis://localhost:6379'
 
 # Redis prefix.
 #
@@ -24,4 +24,4 @@ paperless_ngx_config_redis: 'redis://localhost:6379'
 # Redis server among multiple Paperless instances.
 #
 # Default: '' (no prefix).
-paperless_ngx_config_redis_prefix: ''
+paperless_ngx_cfg_redis_prefix: ''

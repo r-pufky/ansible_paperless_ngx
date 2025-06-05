@@ -19,8 +19,7 @@
 - name: 'Validate | assert services running'
   ansible.builtin.assert:
     quiet: true
-    that:
-      - ansible_facts.services[item].state == 'running'
+    that: ansible_facts.services[item].state == 'running'
     fail_msg: '✘ {{ item }} should be running.'
   loop:
     - 'paperless-consumer.service'
@@ -31,8 +30,7 @@
 - name: 'Validate | assert timer services enabled'
   ansible.builtin.assert:
     quiet: true
-    that:
-      - ansible_facts.services[item].status == 'enabled'
+    that: ansible_facts.services[item].status == 'enabled'
     fail_msg: '✘ {{ item }} should be enabled.'
   loop:
     - 'paperless-cache.service'
@@ -47,6 +45,7 @@
 
 - name: 'Validate | cleanup data'
   ansible.builtin.set_fact:
-    _paperless_ngx_config_map: '{{ {} }}'
-    _paperless_ngx_config_order: '{{ [] }}'
+    _paperless_ngx: '{{ {} }}'
+    _paperless_ngx_cfg_map: '{{ {} }}'
+    _paperless_ngx_cfg_order: '{{ [] }}'
     _paperless_ngx_timers: '{{ {} }}'

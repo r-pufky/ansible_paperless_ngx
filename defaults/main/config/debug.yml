@@ -4,4 +4,4 @@
 ###############################################################################
 
 # Enable development debugging? Default: False.
-paperless_ngx_config_debug: false
+paperless_ngx_cfg_debug: false

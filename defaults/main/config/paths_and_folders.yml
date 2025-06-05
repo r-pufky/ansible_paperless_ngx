@@ -10,7 +10,7 @@
 # This is where your documents should go to be consumed (processed).
 #
 # Default: '/data/consume'.
-paperless_ngx_config_consumption_dir: '/data/consume'
+paperless_ngx_cfg_consumption_dir: '/data/consume'
 
 # Location of configuration data.
 #
@@ -18,7 +18,7 @@ paperless_ngx_config_consumption_dir: '/data/consume'
 # classification model, etc).
 #
 # Default: '/data/data'.
-paperless_ngx_config_data_dir: '/data/data'
+paperless_ngx_cfg_data_dir: '/data/data'
 
 # Location of trashed items.
 #
@@ -30,14 +30,14 @@ paperless_ngx_config_data_dir: '/data/data'
 #   '': Permanently delete files instead of moving to trash (default).
 #
 # Default: ''.
-paperless_ngx_config_empty_trash_dir: ''
+paperless_ngx_cfg_empty_trash_dir: ''
 
 # Location of stored user data (documents, thumbnails, etc).
 #
-# May be the same as paperless_ngx_config_data_dir.
+# May be the same as paperless_ngx_cfg_data_dir.
 #
 # Default: '/data/media'.
-paperless_ngx_config_media_root: '/data/media'
+paperless_ngx_cfg_media_root: '/data/media'
 
 # Location of static serving directory.
 #
@@ -48,15 +48,15 @@ paperless_ngx_config_media_root: '/data/media'
 # If you don't know why you should change this, don't.
 #
 # Default: '../static'.
-paperless_ngx_config_staticdir: '../static'
+paperless_ngx_cfg_staticdir: '../static'
 
 # Ingested media file naming conventions.
 #
 # If this is changed after documents are loaded run 'document_renamer' to mass
 # update files. You many need to temporarily enable the
-# paperless_ngx_user user shell to login and run the command.
+# paperless_ngx_srv_user user shell to login and run the command.
 #
-#   su - paperless_ngx_user
+#   su - paperless_ngx_srv_user
 #   . /var/venv/paperless/bin/activate
 #   cd /var/lib/paperless-ngx-X.X.X/src
 #   python3 manage.py document_renamer
@@ -74,17 +74,17 @@ paperless_ngx_config_staticdir: '../static'
 # * https://docs.paperless-ngx.com/advanced_usage/#advanced-file-name-handling
 # * https://docs.paperless-ngx.com/administration/#management-utilities
 # * https://docs.paperless-ngx.com/administration/#renamer
-paperless_ngx_config_filename_format: !unsafe ''
+paperless_ngx_cfg_filename_format: !unsafe ''
 
 # Omit filename/directory placeholders that resolve to 'none'.
 #
-# Applied to paperless_ngx_config_filename_format transformations.
+# Applied to paperless_ngx_cfg_filename_format transformations.
 #
 # Default: False (disabled).
-paperless_ngx_config_filename_format_remove_none: false
+paperless_ngx_cfg_filename_format_remove_none: false
 
-# Log location. Default: '{{ paperless_ngx_config_data_dir }}/log'.
-paperless_ngx_config_logging_dir: '{{ paperless_ngx_config_data_dir }}/log'
+# Log location. Default: '{{ paperless_ngx_cfg_data_dir }}/log'.
+paperless_ngx_cfg_logging_dir: '{{ paperless_ngx_cfg_data_dir }}/log'
 
 # Location for NLTK data processing if used.
 #
@@ -92,10 +92,10 @@ paperless_ngx_config_logging_dir: '{{ paperless_ngx_config_data_dir }}/log'
 # removed.
 #
 # Defaults: '/usr/share/nltk_data'.
-paperless_ngx_config_nltk_dir: '/usr/share/nltk_data'
+paperless_ngx_cfg_nltk_dir: '/usr/share/nltk_data'
 
 # Where paperless classification models are stored.
 #
-# Default: '{{ paperless_ngx_config_data_dir }}/classification_model.pickle'.
-paperless_ngx_config_model_file:
-  '{{ paperless_ngx_config_data_dir }}/classification_model.pickle'
+# Default: '{{ paperless_ngx_cfg_data_dir }}/classification_model.pickle'.
+paperless_ngx_cfg_model_file:
+  '{{ paperless_ngx_cfg_data_dir }}/classification_model.pickle'
