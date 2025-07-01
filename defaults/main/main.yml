@@ -196,7 +196,7 @@ paperless_ngx_srv_group: 'paperless'
 # (NFS with squashed mounts, mapped container mounts, etc) the local root user
 # will not have sufficient privileges to modify these files.
 #
-# Applies to :
+# Applies to:
 # * paperless_ngx_srv_media_folders
 # * paperless_ngx_cfg_consumer_enable_collate_double_sided
 #

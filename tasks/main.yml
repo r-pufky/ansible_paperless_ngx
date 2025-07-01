@@ -5,7 +5,7 @@
   ansible.builtin.import_tasks: 'prep.yml'
 
 - name: 'Install'
-  when: not paperless_ngx_srv_force_config_only_enable.raw
+  when: not _paperless_ngx_srv_force_config_only_enable.raw
   ansible.builtin.import_tasks: 'install.yml'
 
 - name: 'Config'

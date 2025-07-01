@@ -42,10 +42,3 @@
       - _paperless_ngx_timers.rc == 0
       - '"Active: active" in _paperless_ngx_timers.stdout'
     fail_msg: '✘ plex-update.timer should be enabled.'
-
-- name: 'Validate | cleanup data'
-  ansible.builtin.set_fact:
-    _paperless_ngx: '{{ {} }}'
-    _paperless_ngx_cfg_map: '{{ {} }}'
-    _paperless_ngx_cfg_order: '{{ [] }}'
-    _paperless_ngx_timers: '{{ {} }}'

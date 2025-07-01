@@ -14,42 +14,42 @@
   ansible.builtin.assert:
     quiet: true
     that:
-      - not paperless_ngx_cfg_consumption_dir.raw.startswith(
+      - not _paperless_ngx_cfg_consumption_dir.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
-      - not paperless_ngx_cfg_data_dir.raw.startswith(
+      - not _paperless_ngx_cfg_data_dir.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
-      - not paperless_ngx_cfg_empty_trash_dir.raw.startswith(
+      - not _paperless_ngx_cfg_empty_trash_dir.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
-      - not paperless_ngx_cfg_media_root.raw.startswith(
+      - not _paperless_ngx_cfg_media_root.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
-      - not paperless_ngx_cfg_logging_dir.raw.startswith(
+      - not _paperless_ngx_cfg_logging_dir.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
     fail_msg: |
       ✘ Data storage should not be in the same location as install.
 
       Installs: '{{ paperless_ngx_role_repo_extract_dir }}'
 
-      paperless_ngx_cfg_consumption_dir: '{{ paperless_ngx_cfg_consumption_dir.raw }}'
-             paperless_ngx_cfg_data_dir: '{{ paperless_ngx_cfg_data_dir.raw }}'
-      paperless_ngx_cfg_empty_trash_dir: '{{ paperless_ngx_cfg_empty_trash_dir.raw }}'
-           paperless_ngx_cfg_media_root: '{{ paperless_ngx_cfg_media_root.raw }}'
+      paperless_ngx_cfg_consumption_dir: '{{ _paperless_ngx_cfg_consumption_dir.raw }}'
+             paperless_ngx_cfg_data_dir: '{{ _paperless_ngx_cfg_data_dir.raw }}'
+      paperless_ngx_cfg_empty_trash_dir: '{{ _paperless_ngx_cfg_empty_trash_dir.raw }}'
+           paperless_ngx_cfg_media_root: '{{ _paperless_ngx_cfg_media_root.raw }}'
 # yamllint enable rule:line-length
 
 # Don't use ansible.builtin.version as we ignore patch differences.
 - name: 'Prep | officially supported release version ⓘ'
   when:
-    paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
+    _paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
   ansible.builtin.debug:
     msg: |
       ⓘ {{ paperless_ngx_role_major_version }}.x releases supported.
 
-      paperless_ngx_srv_version: {{ paperless_ngx_srv_version.raw }}
+      paperless_ngx_srv_version: {{ _paperless_ngx_srv_version.raw }}
 
 - name: 'Prep | fatal version mis-match'
   when: >
-    paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
+    _paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
     and
-    paperless_ngx_srv_fatal_version_enable.raw
+    _paperless_ngx_srv_fatal_version_enable.raw
   ansible.builtin.fail:
     msg: |
       ✘ Fatal version mis-match.
@@ -57,7 +57,7 @@
       Set paperless_ngx_srv_fatal_version_enable=false to ignore.
 
 - name: 'Prep | manage users'
-  when: paperless_ngx_srv_create_user.raw
+  when: _paperless_ngx_srv_create_user.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.users'
     tasks_from: 'role_account_add.yml'
@@ -65,21 +65,21 @@
     users_role_user: '{{ paperless_ngx_role_user }}'
     users_role_group: '{{ paperless_ngx_role_group }}'
 
-- name: 'Prep | enumerate system user {{ paperless_ngx_srv_user.raw }}'
+- name: 'Prep | enumerate system user {{ _paperless_ngx_srv_user.raw }}'
   ansible.builtin.user:
-    name: '{{ paperless_ngx_srv_user.raw }}'
+    name: '{{ _paperless_ngx_srv_user.raw }}'
   check_mode: true
   changed_when: false
   register: _paperless_ngx_srv_user_query
 
 - name: 'Prep | parse system user UID/GID'
   ansible.builtin.set_fact:
-    paperless_ngx_srv_user: '{{
-        paperless_ngx_srv_user |
+    _paperless_ngx_srv_user: '{{
+        _paperless_ngx_srv_user |
         combine({"parsed": _paperless_ngx_srv_user_query.uid})
       }}'
-    paperless_ngx_srv_group: '{{
-        paperless_ngx_srv_group |
+    _paperless_ngx_srv_group: '{{
+        _paperless_ngx_srv_group |
         combine({"parsed": _paperless_ngx_srv_user_query.group})
       }}'
 

@@ -22,6 +22,7 @@
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0640'
+        test_diff: true
 
     # Paperless will fail if configuration is bad (r_pufky.deb.systemd)
     - name: 'Verify | assert Paperless-NGX services active'
@@ -58,6 +59,7 @@
         test_group: '{{ omit }}'
         test_mode: '{{ omit }}'
         test_state: 'absent'
+        test_diff: true
 
     - name: 'Verify | /data/data/db.sqlite3'
       ansible.builtin.include_role:
@@ -70,6 +72,7 @@
         test_group: 'paperless'
         test_mode: '0644'
         test_state: 'file'
+        test_diff: true
 
     - name: 'Verify | /etc/ImageMagick-6/policy.xml'
       ansible.builtin.include_role:
@@ -85,6 +88,7 @@
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'
+        test_diff: true
 
     - name: 'Verify | /usr/local/bin/jbig2'
       ansible.builtin.include_role:
@@ -97,6 +101,7 @@
         test_group: 'root'
         test_mode: '0755'
         test_state: 'file'
+        test_diff: true
 
     - name: 'Verify | /usr/local/bin/gs'
       ansible.builtin.include_role:
@@ -109,3 +114,4 @@
         test_group: 'root'
         test_mode: '0755'
         test_state: 'file'
+        test_diff: true

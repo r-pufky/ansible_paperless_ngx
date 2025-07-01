@@ -49,3 +49,15 @@
             "ghostpdl-10.05.1.tar.xz"
           }}'
         test_mode: '0640'
+
+- name: 'Prepare'
+  hosts: 'paperless_ngx-debian-12-user_data'
+  gather_facts: false
+  tasks:
+    - name: 'Prepare | simulate user media restriction'
+      ansible.builtin.file:
+        path: '/data'
+        owner: 950
+        group: 950
+        mode: '0755'
+        state: 'directory'
