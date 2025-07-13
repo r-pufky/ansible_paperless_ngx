@@ -10,7 +10,7 @@
 #          venv: ~650MB.
 #   ghostscript: ~750MB.
 #      jbig2enc: ~13MB.
-#     NTLK data: ~21MB.
+#     NTLK data: ~25MB.
 #     paperless: ~450MB.
 #
 # Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
@@ -50,7 +50,7 @@ paperless_ngx_srv_fatal_version_enable: true
 # Default: True.
 paperless_ngx_srv_redis_enable: true
 
-# Install additional NLTK machine learning data (~21MB)?
+# Install additional NLTK machine learning data (~25MB)?
 #
 # NLTK improves automatically text processing and classification. Downloaded to
 # paperless_ngx_cfg_nltk_dir.
@@ -64,6 +64,7 @@ paperless_ngx_srv_redis_enable: true
 #   - 'rslp' # 3805B
 #   - 'stopwords' # 34276B
 #   - 'punkt' # 13.9MB
+#   - 'punkt_tab' # 4.3MB
 #
 # Reference:
 # * https://www.nltk.org/nltk_data/
@@ -72,6 +73,7 @@ paperless_ngx_srv_nltk_data:
   - 'rslp'
   - 'stopwords'
   - 'punkt'
+  - 'punkt_tab'  # 2.17.1 added dependency without documentation.
 
 # JBIG2 version.
 #
