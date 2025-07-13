@@ -6,6 +6,13 @@
 # installed. Migration between database platforms is not supported and must be
 # done manually.
 #
+# Install size: ~2GB
+#          venv: ~650MB.
+#   ghostscript: ~750MB.
+#      jbig2enc: ~13MB.
+#     NTLK data: ~21MB.
+#     paperless: ~450MB.
+#
 # Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
 
 # Paperless-NGX Release.
@@ -17,15 +24,15 @@
 #              on minor updates (see 2.14, 2.15, 2.16). These should be
 #              considered MAJOR versions. See other branches if they exist.
 #       PATCH: Safe - Usually requires no role updates. Some have included
-#              breaking changes (2.16.0 - 2.16.2).
+#              breaking changes (2.16.0 - 2.16.3).
 #   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v2.16.2').
+#   {VERSION}: Tagged release to use ('v2.17.1').
 #      latest: Use latest stable release.
 #
-# Default: 'v2.16.2'.
-paperless_ngx_srv_version: 'v2.16.2'
+# Default: 'v2.17.1'.
+paperless_ngx_srv_version: 'v2.17.1'
 
 # Enable fatal version mis-matches?
 #

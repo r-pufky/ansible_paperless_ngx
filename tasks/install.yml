@@ -182,18 +182,28 @@
     msg: |
       🗘 NTLK data is being downloaded. This will take a few minutes.
 
+# TODO(bug): Use a bare shell to execute virtual environment commands.
+#     ansible.builtin.command hangs indefinitely on bare metal using the exact
+#     same command parameters. Potentially something to do with arg spacing &
+#     quoting when Anziballz command package is extracted, run, and executed in
+#     a ansible virtual environment and then sub-executed in another virtual
+#     environment.
+#
+# Reference:
+# * https://github.com/ansible/ansible/issues/30411
 - name: 'Install | additional NLTK data'
   when: _paperless_ngx_srv_nltk_data.raw | length > 0
-  ansible.builtin.command:
-    argv:
-      - '{{ _paperless_ngx.dir }}/bin/python3'
-      - '-W'
-      - 'ignore::RuntimeWarning'
-      - '-m'
-      - 'nltk.downloader'
-      - '-d'
-      - '{{ _paperless_ngx_cfg_nltk_dir.raw }}'
-      - '{{ _paperless_ngx_srv_nltk_data.parsed }}'
+  ansible.builtin.shell: >-
+      {{ _paperless_ngx.dir }}/bin/python3
+      -W
+      ignore::RuntimeWarning
+      -m
+      nltk.downloader
+      -d
+      {{ _paperless_ngx_cfg_nltk_dir.raw }}
+      {{ _paperless_ngx_srv_nltk_data.parsed }}
+  args:
+    executable: '/bin/bash'
     chdir: '{{ _paperless_ngx.symlink }}/src'
   register: _paperless_ngx_nltk
   changed_when: '"already up-to-date" not in _paperless_ngx_nltk.stderr'

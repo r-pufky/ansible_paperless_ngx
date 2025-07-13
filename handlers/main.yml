@@ -9,39 +9,45 @@
   ansible.builtin.systemd:
     name: 'redis-server'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'
 
 - name: 'Handlers | reload paperless-consumer'
   listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
     name: 'paperless-consumer'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'
 
 - name: 'Handlers | reload paperless-scheduler'
   listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
     name: 'paperless-scheduler'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'
 
 - name: 'Handlers | reload paperless-task-queue'
   listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
     name: 'paperless-task-queue'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'
 
 - name: 'Handlers | reload paperless-webserver'
   listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
     name: 'paperless-webserver'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'
 
 - name: 'Handlers | reload paperless-cache'
   listen: 'Handlers | reload paperless_ngx'
   ansible.builtin.systemd:
     name: 'paperless-cache'
     enabled: true
-    state: 'restarted'
+    daemon_reload: true
+    state: 'started'

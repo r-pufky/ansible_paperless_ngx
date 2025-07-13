@@ -24,7 +24,7 @@
 # Last time Paperless-NGS options were validated against default configuration.
 paperless_ngx_role_validate_date: '2025-05-29'
 paperless_ngx_role_validate_release: 'bookworm'
-paperless_ngx_role_validate_version: 'v2.16.2'
+paperless_ngx_role_validate_version: 'v2.17.1'
 
 paperless_ngx_role_major_version:
   '{{ paperless_ngx_role_validate_version[1:].split(".")[:2] | join(".") }}'

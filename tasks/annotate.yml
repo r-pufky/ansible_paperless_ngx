@@ -78,8 +78,7 @@
     _paperless_ngx_srv_fatal_version_enable: {
       section: '',
       key: '',
-      raw:
-        '{{ paperless_ngx_srv_fatal_version_enable | default(true) }}',
+      raw: '{{ paperless_ngx_srv_fatal_version_enable | default(true) }}',
       hint: 'bool',
       added: '0.0.0',
       sensitive: false,
@@ -356,8 +355,7 @@
     _paperless_ngx_cfg_redis: {
       section: 'Required Services',
       key: 'PAPERLESS_REDIS',
-      raw:
-        '{{ paperless_ngx_cfg_redis | default("redis://localhost:6379") }}',
+      raw: '{{ paperless_ngx_cfg_redis | default("redis://localhost:6379") }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -511,8 +509,7 @@
     _paperless_ngx_cfg_tika_enabled: {
       section: 'Optional Services (Tika settings)',
       key: 'PAPERLESS_TIKA_ENABLED',
-      raw:
-        '{{ paperless_ngx_cfg_tika_enabled | default(false) | lower }}',
+      raw: '{{ paperless_ngx_cfg_tika_enabled | default(false) | lower }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -766,8 +763,7 @@
     _paperless_ngx_cfg_trusted_proxies: {
       section: 'Hosting and Security',
       key: 'PAPERLESS_TRUSTED_PROXIES',
-      raw:
-        '{{ paperless_ngx_cfg_trusted_proxies | default([]) | join(",") }}',
+      raw: '{{ paperless_ngx_cfg_trusted_proxies | default([]) | join(",") }}',
       hint: 'str',
       added: '1.14.0',
       sensitive: false,
@@ -817,8 +813,7 @@
     _paperless_ngx_cfg_admin_mail: {
       section: 'Hosting and Security',
       key: 'PAPERLESS_ADMIN_MAIL',
-      raw:
-        '{{ paperless_ngx_cfg_admin_mail | default("root@localhost") }}',
+      raw: '{{ paperless_ngx_cfg_admin_mail | default("root@localhost") }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -828,8 +823,7 @@
     _paperless_ngx_cfg_admin_password: {
       section: 'Hosting and Security',
       key: 'PAPERLESS_ADMIN_PASSWORD',
-      raw:
-        '{{ paperless_ngx_cfg_admin_password | default("paperless") }}',
+      raw: '{{ paperless_ngx_cfg_admin_password | default("paperless") }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: true,
@@ -1340,8 +1334,7 @@
     _paperless_ngx_cfg_email_task_cron: {
       section: 'Software Tweaks',
       key: 'PAPERLESS_EMAIL_TASK_CRON',
-      raw:
-        '{{ paperless_ngx_cfg_email_task_cron | default("*/10 * * * *") }}',
+      raw: '{{ paperless_ngx_cfg_email_task_cron | default("*/10 * * * *") }}',
       hint: 'str',
       added: '1.12.0',
       sensitive: false,
@@ -1351,8 +1344,7 @@
     _paperless_ngx_cfg_train_task_cron: {
       section: 'Software Tweaks',
       key: 'PAPERLESS_TRAIN_TASK_CRON',
-      raw:
-        '{{ paperless_ngx_cfg_train_task_cron | default("5 */1 * * *") }}',
+      raw: '{{ paperless_ngx_cfg_train_task_cron | default("5 */1 * * *") }}',
       hint: 'str',
       added: '1.12.0',
       sensitive: false,
@@ -1362,8 +1354,7 @@
     _paperless_ngx_cfg_index_task_cron: {
       section: 'Software Tweaks',
       key: 'PAPERLESS_INDEX_TASK_CRON',
-      raw:
-        '{{ paperless_ngx_cfg_index_task_cron | default("0 0 * * *") }}',
+      raw: '{{ paperless_ngx_cfg_index_task_cron | default("0 0 * * *") }}',
       hint: 'str',
       added: '1.12.0',
       sensitive: false,
@@ -1417,8 +1408,7 @@
     _paperless_ngx_cfg_paperless_apps: {
       section: 'Software Tweaks',
       key: 'PAPERLESS_APPS',
-      raw:
-        '{{ paperless_ngx_cfg_paperless_apps | default([]) | join(",") }}',
+      raw: '{{ paperless_ngx_cfg_paperless_apps | default([]) | join(",") }}',
       hint: 'str',
       added: '2.5.0',
       sensitive: false,
@@ -1562,8 +1552,7 @@
     _paperless_ngx_cfg_ignore_dates: {
       section: 'Document Consumption',
       key: 'PAPERLESS_IGNORE_DATES',
-      raw:
-        '{{ paperless_ngx_cfg_ignore_dates | default([]) | join(",") }}',
+      raw: '{{ paperless_ngx_cfg_ignore_dates | default([]) | join(",") }}',
       hint: 'str',
       added: '0.0.0',
       sensitive: false,
@@ -1605,8 +1594,7 @@
     _paperless_ngx_cfg_consumer_polling_retry_count: {
       section: 'Polling',
       key: 'PAPERLESS_CONSUMER_POLLING_RETRY_COUNT',
-      raw:
-        '{{ paperless_ngx_cfg_consumer_polling_retry_count | default(5) }}',
+      raw: '{{ paperless_ngx_cfg_consumer_polling_retry_count | default(5) }}',
       hint: 'int',
       added: '0.0.0',
       sensitive: false,
@@ -1626,8 +1614,7 @@
     _paperless_ngx_cfg_consumer_inotify_delay: {
       section: 'Inotify',
       key: 'PAPERLESS_CONSUMER_INOTIFY_DELAY',
-      raw:
-        '{{ paperless_ngx_cfg_consumer_inotify_delay | default(0.5) }}',
+      raw: '{{ paperless_ngx_cfg_consumer_inotify_delay | default(0.5) }}',
       hint: 'float',
       added: '0.0.0',
       sensitive: false,
@@ -1637,8 +1624,7 @@
     _paperless_ngx_cfg_oauth_callback_base_url: {
       section: 'Incoming Mail',
       key: 'PAPERLESS_OAUTH_CALLBACK_BASE_URL',
-      raw:
-        '{{ paperless_ngx_cfg_oauth_callback_base_url | default("") }}',
+      raw: '{{ paperless_ngx_cfg_oauth_callback_base_url | default("") }}',
       hint: 'str',
       added: '2.12.0',
       sensitive: false,
@@ -1658,8 +1644,7 @@
     _paperless_ngx_cfg_gmail_oauth_client_secret: {
       section: 'Incoming Mail',
       key: 'PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET',
-      raw:
-        '{{ paperless_ngx_cfg_gmail_oauth_client_secret | default("") }}',
+      raw: '{{ paperless_ngx_cfg_gmail_oauth_client_secret | default("") }}',
       hint: 'str',
       added: '2.12.0',
       sensitive: true,
@@ -1669,8 +1654,7 @@
     _paperless_ngx_cfg_outlook_oauth_client_id: {
       section: 'Incoming Mail',
       key: 'PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID',
-      raw:
-        '{{ paperless_ngx_cfg_outlook_oauth_client_id | default("") }}',
+      raw: '{{ paperless_ngx_cfg_outlook_oauth_client_id | default("") }}',
       hint: 'str',
       added: '2.12.0',
       sensitive: false,
@@ -1680,8 +1664,7 @@
     _paperless_ngx_cfg_outlook_oauth_client_secret: {
       section: 'Incoming Mail',
       key: 'PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET',
-      raw:
-        '{{ paperless_ngx_cfg_outlook_oauth_client_secret | default("") }}',
+      raw: '{{ paperless_ngx_cfg_outlook_oauth_client_secret | default("") }}',
       hint: 'str',
       added: '2.12.0',
       sensitive: true,
@@ -1778,8 +1761,7 @@
     _paperless_ngx_cfg_consumer_barcode_upscale: {
       section: 'Barcodes',
       key: 'PAPERLESS_CONSUMER_BARCODE_UPSCALE',
-      raw:
-        '{{ paperless_ngx_cfg_consumer_barcode_upscale | default(0.0) }}',
+      raw: '{{ paperless_ngx_cfg_consumer_barcode_upscale | default(0.0) }}',
       hint: 'float',
       added: '1.16.0',
       sensitive: false,
@@ -1799,8 +1781,7 @@
     _paperless_ngx_cfg_consumer_barcode_max_pages: {
       section: 'Barcodes',
       key: 'PAPERLESS_CONSUMER_BARCODE_MAX_PAGES',
-      raw:
-        '{{ paperless_ngx_cfg_consumer_barcode_max_pages | default(0) }}',
+      raw: '{{ paperless_ngx_cfg_consumer_barcode_max_pages | default(0) }}',
       hint: 'int',
       added: '2.12.0',
       sensitive: false,
@@ -1837,8 +1818,7 @@
     _paperless_ngx_cfg_audit_log_enabled: {
       section: 'Audit Trails',
       key: 'PAPERLESS_AUDIT_LOG_ENABLED',
-      raw:
-        '{{ paperless_ngx_cfg_audit_log_enabled | default(true) | lower }}',
+      raw: '{{ paperless_ngx_cfg_audit_log_enabled | default(true) | lower }}',
       hint: 'str',
       added: '2.0.0',
       sensitive: false,
@@ -2013,8 +1993,7 @@
     _paperless_ngx_cfg_email_use_tls: {
       section: 'Email Sending',
       key: 'PAPERLESS_EMAIL_USE_TLS',
-      raw:
-        '{{ paperless_ngx_cfg_email_use_tls | default(false) | lower }}',
+      raw: '{{ paperless_ngx_cfg_email_use_tls | default(false) | lower }}',
       hint: 'str',
       added: '2.0.0',
       sensitive: false,
@@ -2024,8 +2003,7 @@
     _paperless_ngx_cfg_email_use_ssl: {
       section: 'Email Sending',
       key: 'PAPERLESS_EMAIL_USE_SSL',
-      raw:
-        '{{ paperless_ngx_cfg_email_use_ssl | default(false) | lower }}',
+      raw: '{{ paperless_ngx_cfg_email_use_ssl | default(false) | lower }}',
       hint: 'str',
       added: '2.0.0',
       sensitive: false,

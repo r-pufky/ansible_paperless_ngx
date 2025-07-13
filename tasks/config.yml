@@ -83,7 +83,6 @@
     force: true
 
 - name: 'Config | set paperless config'
-  notify: 'Handlers | reload paperless_ngx'
   ansible.builtin.template:
     src: 'paperless.conf.j2'
     dest: '{{ _paperless_ngx.symlink }}/paperless.conf'
@@ -92,11 +91,12 @@
     mode: '0640'
 
 - name: 'Config | migrate database schema'
-  ansible.builtin.command:
-    argv:
-      - '{{ _paperless_ngx.dir }}/bin/python3'
-      - '{{ _paperless_ngx.symlink }}/src/manage.py'
-      - 'migrate'
+  ansible.builtin.shell: >-
+      {{ _paperless_ngx.dir }}/bin/python3
+      {{ _paperless_ngx.symlink }}/src/manage.py
+      migrate
+  args:
+    executable: '/bin/bash'
     chdir: '{{ _paperless_ngx.symlink }}/src'
   become: true
   become_user: '{{ _paperless_ngx_srv_user.raw }}'
@@ -106,16 +106,17 @@
 # manage_superuser will create the root user if it does not exist; no need to
 # run 'manage.py createsuperuser'.
 - name: 'Config | set admin user'
-  ansible.builtin.command:
-    argv:
-      - '{{ _paperless_ngx.dir }}/bin/python3'
-      - '{{ _paperless_ngx.symlink }}/src/manage.py'
-      - 'manage_superuser'
+  ansible.builtin.shell: >-
+      {{ _paperless_ngx.dir }}/bin/python3
+      {{ _paperless_ngx.symlink }}/src/manage.py
+      manage_superuser
+  args:
+    executable: '/bin/bash'
     chdir: '{{ _paperless_ngx.symlink }}/src'
   environment:
-    PAPERLESS_ADMIN_USER: "{{ _paperless_ngx_cfg_admin_user }}"
-    PAPERLESS_ADMIN_MAIL: "{{ _paperless_ngx_cfg_admin_mail }}"
-    PAPERLESS_ADMIN_PASSWORD: "{{ _paperless_ngx_cfg_admin_password }}"
+    PAPERLESS_ADMIN_USER: "{{ _paperless_ngx_cfg_admin_user.raw }}"
+    PAPERLESS_ADMIN_MAIL: "{{ _paperless_ngx_cfg_admin_mail.raw }}"
+    PAPERLESS_ADMIN_PASSWORD: "{{ _paperless_ngx_cfg_admin_password.raw }}"
   become: true
   become_user: '{{ _paperless_ngx_srv_user.raw }}'
   register: _paperless_ngx_admin
