@@ -7,11 +7,12 @@
 # done manually.
 #
 # Install size: ~2GB
+#     Paperless: ~450MB.
+#      Packages: ~103MB.
 #          venv: ~650MB.
-#   ghostscript: ~750MB.
+#   Ghostscript: ~750MB.
 #      jbig2enc: ~13MB.
 #     NTLK data: ~25MB.
-#     paperless: ~450MB.
 #
 # Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
 
