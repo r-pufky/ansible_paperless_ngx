@@ -192,6 +192,21 @@ following conditions are met:
 ## Troubleshooting
 https://docs.paperless-ngx.com/troubleshooting/
 
+### HTTP 500 Error During Import
+Uploading a document produces a HTTP 500 error. Check logs - typically this is
+due to Paperless updating classification models and not rebuilding the
+`classification_model.pickle` object:
+
+``` log
+[ERROR] [paperless.classifier] Unknown error while loading document classification model
+```
+
+Remove the classification model and restart all services:
+``` bash
+rm paperless_ngx_cfg_data_dir/classification_model.pickle
+systemctl restart paperless-*
+```
+
 ### PDF's fail to ingest with older ICC profiles.
 Some PDF's with older ICC profiles may fail to be injested. Though rare, these
 can be manually pre-processed to fix the ICC profiles:
