@@ -38,7 +38,8 @@
 # Don't use ansible.builtin.version as we ignore patch differences.
 - name: 'Prep | officially supported release version ⓘ'
   when:
-    _paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
+    _paperless_ngx_srv_version.role_major_version !=
+    paperless_ngx_role_major_version
   ansible.builtin.debug:
     msg: |
       ⓘ {{ paperless_ngx_role_major_version }}.x releases supported.
@@ -47,7 +48,8 @@
 
 - name: 'Prep | fatal version mis-match'
   when: >
-    _paperless_ngx_srv_version.parsed != paperless_ngx_role_major_version
+    _paperless_ngx_srv_version.role_major_version !=
+    paperless_ngx_role_major_version
     and
     _paperless_ngx_srv_fatal_version_enable.raw
   ansible.builtin.fail:
@@ -76,11 +78,11 @@
   ansible.builtin.set_fact:
     _paperless_ngx_srv_user: '{{
         _paperless_ngx_srv_user |
-        combine({"parsed": _paperless_ngx_srv_user_query.uid})
+        combine({"role_uid": _paperless_ngx_srv_user_query.uid})
       }}'
     _paperless_ngx_srv_group: '{{
         _paperless_ngx_srv_group |
-        combine({"parsed": _paperless_ngx_srv_user_query.group})
+        combine({"role_gid": _paperless_ngx_srv_user_query.group})
       }}'
 
 - name: 'Prep | stop services'

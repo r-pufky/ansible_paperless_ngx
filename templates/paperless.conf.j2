@@ -1,15 +1,29 @@
 # https://docs.paperless-ngx.com/configuration/ - ordered by section.
 #
-# Application default used if not specified. Only valid database options can
-# exist for the specified DB engine, otherwise paperless fails to start.
+# * Application default used if not specified.
+# * Unset options are removed.
+# * Only valid database options may exist for the specified DB engine,
+#   otherwise paperless fails to start.
 #
 # Precedence: config > environment.
 
 {% for header in _paperless_ngx_order %}
 # {{ header }}
 {%   for section in _paperless_ngx_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
-{%     if section.value.raw | string | length > 0 and not section.value.deprecated %}
+{%     if not section.value.deprecated and not section.value.role_unset | default(false) %}
+{%       if section.value.hint == 'list of str' and section.value.data | length > 0 %}
+{{ section.value.key }}={{ section.value.data }}
+{%       elif section.value.hint == 'json' and section.value.raw | length > 0 %}
+{{ section.value.key }}={{ section.value.data }}
+{%       elif section.value.hint == 'bool' %}
+{{ section.value.key }}={{ section.value.raw | lower }}
+{%       elif section.value.hint == 'bool as int' %}
+{{ section.value.key }}={{ section.value.raw | int }}
+{%       elif section.value.data is defined %}
+{{ section.value.key }}={{ section.value.data }}
+{%       else %}
 {{ section.value.key }}={{ section.value.raw }}
+{%       endif %}
 {%     endif %}
 {%   endfor %}
 {% endfor %}

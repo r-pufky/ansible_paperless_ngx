@@ -39,7 +39,7 @@ paperless_ngx_cfg_dbpass: 'paperless'
 #
 # Special Case:
 #   postgresql: prefer (default).
-#   mariadb: PREFERRED.
+#      mariadb: PREFERRED.
 #
 # Default: 'prefer' (postgresql).
 #
@@ -81,5 +81,13 @@ paperless_ngx_cfg_dbsslkey: ''
 # Mostly applicable for sqlite based installation. Consider changing to
 # postgresql if you are having concurrency problems with sqlite.
 #
-# Default: 0 (default).
-paperless_ngx_cfg_db_timeout: 0
+# Special Case:
+#   * paperless_ngx_cfg_dbengine=sqlite - How long to wait if the database is
+#     locked.
+#   * paperless_ngx_cfg_dbengine!=sqlite - Connection timeout.
+#
+# Values:
+#   -1: Use Django built-in defaults (default).
+#
+# Default: -1 (default).
+paperless_ngx_cfg_db_timeout: -1

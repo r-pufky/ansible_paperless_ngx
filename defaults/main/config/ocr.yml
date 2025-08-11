@@ -185,6 +185,7 @@ paperless_ngx_cfg_ocr_image_dpi: 600
 #   2*#: Refuse to OCR images which are more than twice this limit (may result
 #        in dropping images).
 #     0: Disables limit.
+#    -1: Use value determined by Pillow.
 #
 # Default: 89478485 (~250MB 24bit/3bpp image).
 #

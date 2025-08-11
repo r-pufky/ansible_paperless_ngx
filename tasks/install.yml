@@ -9,18 +9,13 @@
 #
 # OCR packages are installed if OCR is enabled, include tesseract OCR data.
 #
-# JBIG2enc is used for loseless PDF/A compression (not listed in bare-metal
+# JBIG2enc is used for lossless PDF/A compression (not listed in bare-metal
 # instructions) but used in Docker configuration which is based on Bookworm.
 #
 # NLTK is installed and extra data is downloaded if specified.
 #
 # All database libraries are installed (except sqlite) as they are required
 # for the project to run.
-#
-# Args:
-#   _paperless_ngx: dict - Processed internal role settings.
-#   _paperless_ngx.tesseract_packages: list of str - Additional OCR packages.
-#   _paperless_ngx_ghostscript_binary_url: str - Parsed ghostscript binary url.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -39,8 +34,8 @@
           []
         }}'
       - '{{
-          _paperless_ngx.tesseract_packages
-          if _paperless_ngx.tesseract_packages | length > 0 else
+          _paperless_ngx_cfg_ocr_language.role_packages
+          if _paperless_ngx_cfg_ocr_language.role_packages | length > 0 else
           []
         }}'
       - '{{ paperless_ngx_role_jbig2enc }}'
@@ -135,7 +130,7 @@
     repo_release_owner: '{{ paperless_ngx_role_ghostscript_owner }}'
     repo_release_repo: '{{ paperless_ngx_role_ghostscript_repo }}'
     repo_release_tag:
-      '{{ _paperless_ngx_srv_ghostscript_version.parsed }}'
+      '{{ _paperless_ngx_srv_ghostscript_version.role_release_tag }}'
     repo_release_asset:
       'ghostpdl-{{ _paperless_ngx_srv_ghostscript_version.raw }}.tar.xz'
     repo_extract_dir: '{{ paperless_ngx_role_ghostscript_extract_dir }}'
@@ -169,8 +164,8 @@
   ansible.builtin.include_role:
     name: 'r_pufky.deb.avenv'
   vars:
-    avenv_config_dir: '{{ _paperless_ngx.config }}'
-    avenv_name: '{{ _paperless_ngx.name }}'
+    avenv_config_dir: '{{ _paperless_ngx.venv_config_dir }}'
+    avenv_name: '{{ _paperless_ngx.venv_name }}'
     avenv_user: '{{ _paperless_ngx_srv_user.raw }}'
     avenv_group: '{{ _paperless_ngx_srv_group.raw }}'
     avenv_pip_extra_args: '--upgrade'
@@ -194,16 +189,16 @@
 - name: 'Install | additional NLTK data'
   when: _paperless_ngx_srv_nltk_data.raw | length > 0
   ansible.builtin.shell: >-
-      {{ _paperless_ngx.dir }}/bin/python3
+      {{ _paperless_ngx.venv_dir ~ "/bin/python3" }}
       -W
       ignore::RuntimeWarning
       -m
       nltk.downloader
       -d
       {{ _paperless_ngx_cfg_nltk_dir.raw }}
-      {{ _paperless_ngx_srv_nltk_data.parsed }}
+      {{ _paperless_ngx_srv_nltk_data.role_packages }}
   args:
     executable: '/bin/bash'
-    chdir: '{{ _paperless_ngx.symlink }}/src'
+    chdir: '{{ _paperless_ngx.symlink ~ "/src" }}'
   register: _paperless_ngx_nltk
   changed_when: '"already up-to-date" not in _paperless_ngx_nltk.stderr'

@@ -28,16 +28,15 @@
 - name: 'Config | manage media directories'
   ansible.builtin.file:
     path: '{{ item }}'
-    owner: '{{ _paperless_ngx_srv_user.parsed }}'
-    group: '{{ _paperless_ngx_srv_group.parsed }}'
+    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
+    group: '{{ _paperless_ngx_srv_group.role_gid }}'
     mode: '{{ _paperless_ngx_srv_media_perms_folder.raw }}'
     state: 'directory'
-  become:
-    '{{ true if _paperless_ngx_srv_user_data_manage_enable.raw else omit }}'
+  become: true
   become_user: '{{
       _paperless_ngx_srv_user.raw
       if _paperless_ngx_srv_user_data_manage_enable.raw else
-      omit
+      "root"
     }}'
   loop: '{{ _paperless_ngx_srv_media_folders.raw }}'
 
@@ -45,18 +44,17 @@
   when: _paperless_ngx_cfg_consumer_enable_collate_double_sided.raw
   ansible.builtin.file:
     path: '{{
-        _paperless_ngx_cfg_consumer_collate_double_sided_subdir_name.parsed
+        _paperless_ngx_cfg_consumer_collate_double_sided_subdir_name.role_dest
       }}'
-    owner: '{{ _paperless_ngx_srv_user.parsed }}'
-    group: '{{ _paperless_ngx_srv_group.parsed }}'
+    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
+    group: '{{ _paperless_ngx_srv_group.role_gid }}'
     mode: '{{ _paperless_ngx_srv_media_perms_folder.raw }}'
     state: 'directory'
-  become:
-    '{{ true if _paperless_ngx_srv_user_data_manage_enable.raw else omit }}'
+  become: true
   become_user: '{{
       _paperless_ngx_srv_user.raw
       if _paperless_ngx_srv_user_data_manage_enable.raw else
-      omit
+      "root"
     }}'
 
 # yamllint disable rule:line-length
@@ -66,7 +64,7 @@
     find '{{ item }}'
     -type f
     -exec chmod {{ _paperless_ngx_srv_media_perms_file.raw }} {};
-      chown {{ _paperless_ngx_srv_user.parsed }}:{{ _paperless_ngx_srv_group.parsed }} {} \;
+      chown {{ _paperless_ngx_srv_user.role_uid }}:{{ _paperless_ngx_srv_group.role_gid }} {} \;
   changed_when: false
   loop: '{{ _paperless_ngx_srv_media_folders.raw }}'
 # yamllint enable rule:line-length
@@ -74,10 +72,10 @@
 - name: 'Config | set certs'
   when: _paperless_ngx_srv_certs_path.raw | length > 0
   ansible.builtin.copy:
-    src: '{{ _paperless_ngx_srv_certs_path.parsed }}'
-    dest: '{{ paperless_ngx_role_repo_extract_dir }}/certs'
-    owner: '{{ _paperless_ngx_srv_user.parsed }}'
-    group: '{{ _paperless_ngx_srv_group.parsed }}'
+    src: '{{ _paperless_ngx_srv_certs_path.role_src }}'
+    dest: '{{ _paperless_ngx_srv_certs_path.role_dest }}'
+    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
+    group: '{{ _paperless_ngx_srv_group.role_gid }}'
     mode: '0600'
     directory_mode: '0750'
     force: true
@@ -85,19 +83,19 @@
 - name: 'Config | set paperless config'
   ansible.builtin.template:
     src: 'paperless.conf.j2'
-    dest: '{{ _paperless_ngx.symlink }}/paperless.conf'
-    owner: '{{ _paperless_ngx_srv_user.parsed }}'
-    group: '{{ _paperless_ngx_srv_group.parsed }}'
+    dest: '{{ _paperless_ngx.symlink ~ "/paperless.conf" }}'
+    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
+    group: '{{ _paperless_ngx_srv_group.role_gid }}'
     mode: '0640'
 
 - name: 'Config | migrate database schema'
   ansible.builtin.shell: >-
-      {{ _paperless_ngx.dir }}/bin/python3
-      {{ _paperless_ngx.symlink }}/src/manage.py
+      {{ _paperless_ngx.venv_dir ~ "/bin/python3" }}
+      {{ _paperless_ngx.symlink ~ "/src/manage.py" }}
       migrate
   args:
     executable: '/bin/bash'
-    chdir: '{{ _paperless_ngx.symlink }}/src'
+    chdir: '{{ _paperless_ngx.symlink ~ "/src" }}'
   become: true
   become_user: '{{ _paperless_ngx_srv_user.raw }}'
   register: _paperless_ngx_db
@@ -107,12 +105,12 @@
 # run 'manage.py createsuperuser'.
 - name: 'Config | set admin user'
   ansible.builtin.shell: >-
-      {{ _paperless_ngx.dir }}/bin/python3
-      {{ _paperless_ngx.symlink }}/src/manage.py
+      {{ _paperless_ngx.venv_dir ~ "/bin/python3" }}
+      {{ _paperless_ngx.symlink ~ "/src/manage.py" }}
       manage_superuser
   args:
     executable: '/bin/bash'
-    chdir: '{{ _paperless_ngx.symlink }}/src'
+    chdir: '{{ _paperless_ngx.symlink ~ "/src" }}'
   environment:
     PAPERLESS_ADMIN_USER: "{{ _paperless_ngx_cfg_admin_user.raw }}"
     PAPERLESS_ADMIN_MAIL: "{{ _paperless_ngx_cfg_admin_mail.raw }}"
@@ -121,7 +119,8 @@
   become_user: '{{ _paperless_ngx_srv_user.raw }}'
   register: _paperless_ngx_admin
   changed_when: '"Created superuser" in _paperless_ngx_admin.stdout'
-  no_log: true  # Password.
+  # TODO(role): disabled until future ansible data tagging update.
+  # no_log: true  # Password.
 
 - name: 'Config | enable ImageMagick PDF processing'
   ansible.builtin.lineinfile:
@@ -145,7 +144,7 @@
         service:
           exec_start:
             - >-
-              {{ _paperless_ngx.dir }}/bin/python3
+              {{ _paperless_ngx.venv_dir ~ "/bin/python3" }}
               manage.py
               document_consumer
           runtime_max_sec: '{{
@@ -156,7 +155,7 @@
         exec:
           user: '{{ _paperless_ngx_srv_user.raw }}'
           group: '{{ _paperless_ngx_srv_group.raw }}'
-          working_directory: '{{ _paperless_ngx.symlink }}/src'
+          working_directory: '{{ _paperless_ngx.symlink ~ "/src" }}'
           protect_system: 'full'
           no_new_privileges: true
           private_users: true
@@ -172,7 +171,7 @@
         service:
           exec_start:
             - >-
-              {{ _paperless_ngx.dir }}/bin/celery
+              {{ _paperless_ngx.venv_dir ~ "/bin/celery" }}
               --app paperless beat
               --loglevel
               {{ _paperless_ngx_srv_log_level.raw }}
@@ -184,7 +183,7 @@
         exec:
           user: '{{ _paperless_ngx_srv_user.raw }}'
           group: '{{ _paperless_ngx_srv_group.raw }}'
-          working_directory: '{{ _paperless_ngx.symlink }}/src'
+          working_directory: '{{ _paperless_ngx.symlink ~ "/src" }}'
           protect_system: 'full'
           no_new_privileges: true
           private_users: true
@@ -200,7 +199,7 @@
         service:
           exec_start:
             - >-
-              {{ _paperless_ngx.dir }}/bin/celery
+              {{ _paperless_ngx.venv_dir ~ "/bin/celery" }}
               --app paperless worker
               --loglevel
               {{ _paperless_ngx_srv_log_level.raw }}
@@ -212,7 +211,7 @@
         exec:
           user: '{{ _paperless_ngx_srv_user.raw }}'
           group: '{{ _paperless_ngx_srv_group.raw }}'
-          working_directory: '{{ _paperless_ngx.symlink }}/src'
+          working_directory: '{{ _paperless_ngx.symlink ~ "/src" }}'
           protect_system: 'full'
           no_new_privileges: true
           private_users: true
@@ -231,7 +230,7 @@
           exec_start:
             - >-
               /bin/sh -c '
-              exec {{ _paperless_ngx.dir }}/bin/python3 -m granian
+              exec {{ _paperless_ngx.venv_dir }}/bin/python3 -m granian
               --interface asginl
               --ws "paperless.asgi:application"
               '
@@ -243,7 +242,7 @@
         exec:  # something in execute is not parsing right
           user: '{{ _paperless_ngx_srv_user.raw }}'
           group: '{{ _paperless_ngx_srv_group.raw }}'
-          working_directory: '{{ _paperless_ngx.symlink }}/src'
+          working_directory: '{{ _paperless_ngx.symlink ~ "/src" }}'
           environment:
             - var: 'GRANIAN_HOST'
               value: '{{ _paperless_ngx_srv_address.raw }}'
@@ -294,6 +293,6 @@
         timer:
           unit: 'paperless-cache.service'
           on_unit_active_sec:
-            '{{ _paperless_ngx_srv_cache_lifetime.parsed }}'
+            '{{ _paperless_ngx_srv_cache_lifetime.data }}'
         install:
           wanted_by: ['timers.target']

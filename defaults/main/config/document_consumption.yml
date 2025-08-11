@@ -29,7 +29,7 @@ paperless_ngx_cfg_consumer_recursive: false
 # Default: False.
 paperless_ngx_cfg_consumer_subdirs_as_tags: false
 
-# Files to ignore in paperless_ngx_cfg_consumption_dir.
+# List of files to ignore in paperless_ngx_cfg_consumption_dir.
 #
 # Default:
 #   - '.DS_Store/*'
@@ -161,6 +161,7 @@ paperless_ngx_cfg_ignore_dates: []
 #
 # Special Case:
 #   [DMY][DMY][DMY]: Any combination of D (day), M (month), Y (year).
+#                '': Disabled.
 #
 # Default: 'DMY'.
 paperless_ngx_cfg_date_order: 'DMY'
