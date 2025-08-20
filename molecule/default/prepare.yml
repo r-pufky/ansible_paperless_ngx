@@ -11,17 +11,17 @@
       vars:
         test_name: 'Prepare cache'
 
-    - name: 'Prepare | check paperless ngx v2.17.1'
+    - name: 'Prepare | check paperless ngx v2.18.1'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache paperless ngx v2.17.1'
-        test_dest: 'paperless-ngx-v2.17.1.tar.xz'
+        test_name: 'Prepare | cache paperless ngx v2.18.1'
+        test_dest: 'paperless-ngx-v2.18.1.tar.xz'
         test_url: '{{
             "https://github.com/paperless-ngx/paperless-ngx/releases/" ~
-            "download/v2.17.1/" ~
-            "paperless-ngx-v2.17.1.tar.xz"
+            "download/v2.18.1/" ~
+            "paperless-ngx-v2.18.1.tar.xz"
           }}'
         test_mode: '0640'
 

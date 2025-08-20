@@ -91,3 +91,57 @@ paperless_ngx_cfg_dbsslkey: ''
 #
 # Default: -1 (default).
 paperless_ngx_cfg_db_timeout: -1
+
+# Maximum number of database connections to keep in the pool.
+#
+# Requires paperless_ngx_cfg_dbengine=PostgreSQL.
+#
+# A small pool is typically sufficient. Set PostgreSQL max_connections to:
+#
+#   (paperless_ngx_srv_webserver_workers + paperless_ngx_cfg_task_workers) *
+#   paperless_ngx_cfg_db_poolsize + safety margin
+#
+# Example:
+#   paperless_ngx_srv_webserver_workers: 4
+#   paperless_ngx_cfg_task_workers: 2
+#   paperless_ngx_cfg_db_poolsize: 4
+#   safety: 10
+#
+#   Requires 34 connections.
+#
+# Values:
+#   0: disabled (default).
+#     The value must be greater than or equal to 1 to be used.
+#
+# Default: 0 (disabled).
+paperless_ngx_cfg_db_poolsize: 0
+
+# Enable caching database read query results into Redis.
+#
+# This can significantly improve application response times by caching database
+# queries, at the cost of slightly increased memory usage. May lead to
+# inconsistency issues if read cache is enabled and external changes are made
+# while service is running.
+#
+# Default: False.
+paperless_ngx_cfg_db_read_cache_enabled: false
+
+# Read cache lifetime (seconds).
+#
+# A high TTL increases memory usage over time. In case of out-of-memory (OOM),
+# Redis may stop accepting new data — including cache entries, scheduled
+# tasks, and documents to consume.
+#
+# Values:
+#   1-3153600: Allowed range.
+#
+# Default: 3600 (one hour).
+paperless_ngx_cfg_read_cache_ttl: 3600
+
+# Redis instance used for the read cache.
+#
+# Values:
+#   '': Autodetect redis instance for scheduled tasks (default).
+#
+# Default: '' (autodetect).
+paperless_ngx_cfg_read_cache_redis_url: ''

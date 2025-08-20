@@ -544,6 +544,52 @@
       deprecated: false,
       order: 13,
     }
+    _paperless_ngx_cfg_db_poolsize: {
+      section: 'Required Services',
+      key: 'PAPERLESS_DB_POOLSIZE',
+      raw: '{{ paperless_ngx_cfg_db_poolsize }}',
+      default: 0,
+      role_unset:
+        '{{ true if paperless_ngx_cfg_db_poolsize == 0 else false }}',
+      hint: 'int',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 14,
+    }
+    _paperless_ngx_cfg_db_read_cache_enabled: {
+      section: 'Required Services',
+      key: 'PAPERLESS_DB_READ_CACHE_ENABLED',
+      raw: '{{ paperless_ngx_cfg_db_read_cache_enabled }}',
+      default: false,
+      hint: 'bool',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 15,
+    }
+    _paperless_ngx_cfg_read_cache_ttl: {
+      section: 'Required Services',
+      key: 'PAPERLESS_READ_CACHE_TTL',
+      raw: '{{ paperless_ngx_cfg_read_cache_ttl }}',
+      default: 3600,
+      hint: 'int',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 16,
+    }
+    _paperless_ngx_cfg_read_cache_redis_url: {
+      section: 'Required Services',
+      key: 'PAPERLESS_READ_CACHE_REDIS_URL',
+      raw: '{{ paperless_ngx_cfg_read_cache_redis_url }}',
+      default: '',
+      hint: 'str',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 17,
+    }
     _paperless_ngx_cfg_tika_enabled: {
       section: 'Optional Services (Tika settings)',
       key: 'PAPERLESS_TIKA_ENABLED',
@@ -1379,6 +1425,18 @@
       deprecated: false,
       order: 5,
     }
+    _paperless_ngx_cfg_date_parser_languages: {
+      section: 'Software Tweaks',
+      key: 'PAPERLESS_DATE_PARSER_LANGUAGES',
+      raw: '{{ paperless_ngx_cfg_date_parser_languages }}',
+      data: '{{ paperless_ngx_cfg_date_parser_languages | join("+") }}',
+      default: [],
+      hint: 'list of str',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 6,
+    }
     _paperless_ngx_cfg_email_task_cron: {
       section: 'Software Tweaks',
       key: 'PAPERLESS_EMAIL_TASK_CRON',
@@ -1388,7 +1446,7 @@
       added: '1.12.0',
       sensitive: false,
       deprecated: false,
-      order: 6,
+      order: 7,
     }
     _paperless_ngx_cfg_train_task_cron: {
       section: 'Software Tweaks',
@@ -1399,7 +1457,7 @@
       added: '1.12.0',
       sensitive: false,
       deprecated: false,
-      order: 7,
+      order: 8,
     }
     _paperless_ngx_cfg_index_task_cron: {
       section: 'Software Tweaks',
@@ -1410,7 +1468,7 @@
       added: '1.12.0',
       sensitive: false,
       deprecated: false,
-      order: 8,
+      order: 9,
     }
     _paperless_ngx_cfg_sanity_task_cron: {
       section: 'Software Tweaks',
@@ -1421,7 +1479,7 @@
       added: '1.12.0',
       sensitive: false,
       deprecated: false,
-      order: 9,
+      order: 10,
     }
     _paperless_ngx_cfg_enable_compression: {
       section: 'Software Tweaks',
@@ -1432,7 +1490,7 @@
       added: '1.13.0',
       sensitive: false,
       deprecated: false,
-      order: 10,
+      order: 11,
     }
     _paperless_ngx_cfg_convert_memory_limit: {
       section: 'Software Tweaks',
@@ -1443,7 +1501,7 @@
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
-      order: 11,
+      order: 12,
     }
     _paperless_ngx_cfg_convert_tmpdir: {
       section: 'Software Tweaks',
@@ -1456,7 +1514,7 @@
       added: '0.0.0',
       sensitive: false,
       deprecated: false,
-      order: 12,
+      order: 13,
     }
     _paperless_ngx_cfg_paperless_apps: {
       section: 'Software Tweaks',
@@ -1470,7 +1528,7 @@
       added: '2.5.0',
       sensitive: false,
       deprecated: false,
-      order: 13,
+      order: 14,
     }
     _paperless_ngx_cfg_max_image_pixels: {
       section: 'Software Tweaks',
@@ -1484,7 +1542,7 @@
       added: '2.6.0',
       sensitive: false,
       deprecated: false,
-      order: 14,
+      order: 15,
     }
     # PAPERLESS_CONSUMER_DISABLE is docker-only option. Ignore.
     _paperless_ngx_cfg_consumer_delete_duplicates: {
@@ -1639,6 +1697,41 @@
       sensitive: false,
       deprecated: false,
       order: 13,
+    }
+    _paperless_ngx_cfg_webhooks_allowed_schemes: {
+      section: 'Workflow Webhooks',
+      key: 'PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES',
+      raw: '{{ paperless_ngx_cfg_webhooks_allowed_schemes }}',
+      data: '{{ paperless_ngx_cfg_webhooks_allowed_schemes | join(",") }}',
+      default: ['http', 'https'],
+      hint: 'list of str',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 1,
+    }
+    _paperless_ngx_cfg_webhooks_allowed_ports: {
+      section: 'Workflow Webhooks',
+      key: 'PAPERLESS_WEBHOOKS_ALLOWED_PORTS',
+      raw: '{{ paperless_ngx_cfg_webhooks_allowed_ports }}',
+      data: '{{ paperless_ngx_cfg_webhooks_allowed_ports | join(",") }}',
+      default: [],
+      hint: 'list of int',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 2,
+    }
+    _paperless_webhooks_allow_internal_requests: {
+      section: 'Workflow Webhooks',
+      key: 'PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS',
+      raw: '{{ paperless_webhooks_allow_internal_requests }}',
+      default: true,
+      hint: 'bool',
+      added: '2.18.0',
+      sensitive: false,
+      deprecated: false,
+      order: 3,
     }
     _paperless_ngx_cfg_consumer_polling: {
       section: 'Polling',
@@ -2136,6 +2229,7 @@
       - 'OCR Settings'
       - 'Software Tweaks'
       - 'Document Consumption'
+      - 'Workflow Webhooks'
       - 'Polling'
       - 'Inotify'
       - 'Incoming Mail'

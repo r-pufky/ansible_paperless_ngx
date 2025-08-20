@@ -64,6 +64,20 @@ paperless_ngx_cfg_time_zone: 'UTC'
 # Default: True.
 paperless_ngx_cfg_enable_nltk: true
 
+# List of languages used when parsing dates from documents.
+#
+# Special Case:
+#   * Languages (en) and locales (en-AU) are supported.
+#
+# Values:
+#   []: Infer language from paperless_ngx_cfg_ocr_language (default).
+#
+# Default: [] (infer from paperless_ngx_cfg_ocr_language).
+#
+# Reference:
+# * https://dateparser.readthedocs.io/en/latest/supported_locales.html
+paperless_ngx_cfg_date_parser_languages: []
+
 # Scheduled email fetch frequency.
 #
 # Values:
