@@ -16,8 +16,11 @@
 #   ?: PAPERLESS_MEDIA_ROOT is set but doesn't exist.
 #   HINT: Create a directory at /opt/paperless/paperless-ngx-X.X.X/media
 #
-# This will very likely never be fixed given shitty attitude and response of
-# the developers.
+# Not resolved until Paperless migrates entirely pathlib.
+#
+# ImageMagick-7 now provides read/write examples which cause regex replacement
+# to fail. Instead count read/write PDF lines and append at end of policy if
+# not found.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -122,12 +125,23 @@
   # TODO(role): disabled until future ansible data tagging update.
   # no_log: true  # Password.
 
+- name: 'Config | query ImageMagick PDF processing'
+  ansible.builtin.shell: >-
+    set -o pipefail &&
+    grep -c 'rights="read|write" pattern="PDF"'
+    /etc/ImageMagick-7/policy.xml
+  changed_when: false
+  failed_when: _paperless_ngx_policy.rc > 1
+  register: _paperless_ngx_policy
+
+# yamllint disable rule:line-length
 - name: 'Config | enable ImageMagick PDF processing'
+  when: _paperless_ngx_policy.stdout == '0'
   ansible.builtin.lineinfile:
-    path: '/etc/ImageMagick-6/policy.xml'
-    regexp: '(\s+)<policy domain="coder" rights=".*" pattern="PDF" />'
-    line: '\1<policy domain="coder" rights="read|write" pattern="PDF" />'
-    backrefs: true
+    path: /etc/ImageMagick-7/policy.xml
+    search_string: '</policymap>'
+    line: "  <policy domain=\"coder\" rights=\"read|write\" pattern=\"PDF\" />\n</policymap>"
+# yamllint enable rule:line-length
 
 - name: 'Config | set service definitions'
   ansible.builtin.include_role:

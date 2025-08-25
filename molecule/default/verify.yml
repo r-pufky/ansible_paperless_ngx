@@ -45,17 +45,17 @@
         test_state: 'file'
         test_diff: true
 
-    - name: 'Verify | /etc/ImageMagick-6/policy.xml'
+    - name: 'Verify | /etc/ImageMagick-7/policy.xml'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | /etc/ImageMagick-6/policy.xml'
+        test_name: 'Verify | /etc/ImageMagick-7/policy.xml'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/policy.xml"
           }}'
-        test_file: '/etc/ImageMagick-6/policy.xml'
+        test_file: '/etc/ImageMagick-7/policy.xml'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'

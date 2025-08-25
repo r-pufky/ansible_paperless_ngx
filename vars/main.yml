@@ -22,9 +22,9 @@
 # * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
 # Last time Paperless-NGS options were validated against default configuration.
-paperless_ngx_role_validate_date: '2025-05-29'
-paperless_ngx_role_validate_release: 'bookworm'
-paperless_ngx_role_validate_version: 'v2.18.1'
+paperless_ngx_role_validate_date: '2025-08-25'
+paperless_ngx_role_validate_release: 'trixie'
+paperless_ngx_role_validate_version: 'v2.18.2'
 
 paperless_ngx_role_major_version:
   '{{ paperless_ngx_role_validate_version[1:].split(".")[:2] | join(".") }}'
@@ -54,7 +54,7 @@ paperless_ngx_role_ocr_my_pdf:
   # - 'ghostscript'  # See security warning; use a custom build.
   - 'icc-profiles-free'
   - 'qpdf'
-  - 'liblept5'
+  - 'libleptonica6'  # Package name changed from liblept5.
   - 'libxml2'
   - 'pngquant'
   - 'zlib1g'
@@ -159,7 +159,7 @@ paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
 #   * https://nvd.nist.gov/vuln/detail/CVE-2025-27834
 #   * https://nvd.nist.gov/vuln/detail/CVE-2025-46646
 #  Decision: do not use package - multiple vulnerabilities with PDF corruption
-#      for existing files, bookworm package (and backport) affected.
+#      for existing files, packages (and backports) affected.
 #  Mitigation: use source release. Default gs binary to custom binary
 #      /usr/local/bin/gs instead of /usr/bin/gs.
 #  Reference:

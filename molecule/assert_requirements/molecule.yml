@@ -24,8 +24,8 @@ provisioner:
       all:
         repo_testing_enable: true
 platforms:
-  - name: 'paperless_ngx-debian-12-assert_requirements'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'paperless_ngx-debian-13-assert_requirements'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'

@@ -63,30 +63,18 @@
 # * https://github.com/ansible/ansible/issues/77159
 # yamllint enable rule:line-length
 
-# TODO(2.17): Remove variable renaming check on next major paperless release.
-- name: 'Annotate | check deprecated variable usage'
-  when: >
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "paperless_ngx_config_*") | length > 0 or
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "paperless_ngx_service_*") | length > 0
-  ansible.builtin.fail:
-    msg: |
-      ✘ Role variables have migrated. Read defaults and update.
-
-      paperless_ngx_config_* -> paperless_ngx_cfg_*
-      paperless_ngx_service_* -> paperless_ngx_srv_*
-      paperless_ngx_* -> paperless_ngx_srv_*
-
 - name: 'Annotate | DEPRECATED VARIABLES IN USE ⚠'
   when: paperless_ngx_cfg_trash_dir is defined
   ansible.builtin.fail:
     msg: |
-      ⚠ DEPRECATED VARIABLES IN USE.
-
-      Refer to defaults and update variables:
-
-      paperless_ngx_cfg_trash_dir -> paperless_ngx_cfg_empty_trash_dir
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                   DEPRECATED VARIABLES IN USE.                    │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Refer to defaults and update variables:
+      │
+      │ paperless_ngx_cfg_trash_dir -> paperless_ngx_cfg_empty_trash_dir
 
 - name: 'Annotate | sanitize & annotate service defaults'
   ansible.builtin.set_fact:

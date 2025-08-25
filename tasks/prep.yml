@@ -25,14 +25,17 @@
       - not _paperless_ngx_cfg_logging_dir.raw.startswith(
         paperless_ngx_role_repo_extract_dir)
     fail_msg: |
-      ✘ Data storage should not be in the same location as install.
-
-      Installs: '{{ paperless_ngx_role_repo_extract_dir }}'
-
-      paperless_ngx_cfg_consumption_dir: '{{ _paperless_ngx_cfg_consumption_dir.raw }}'
-             paperless_ngx_cfg_data_dir: '{{ _paperless_ngx_cfg_data_dir.raw }}'
-      paperless_ngx_cfg_empty_trash_dir: '{{ _paperless_ngx_cfg_empty_trash_dir.raw }}'
-           paperless_ngx_cfg_media_root: '{{ _paperless_ngx_cfg_media_root.raw }}'
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │    Data storage should not be in the same location as install.    │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Install: {{ paperless_ngx_role_repo_extract_dir }}
+      │
+      │ paperless_ngx_cfg_consumption_dir: {{ _paperless_ngx_cfg_consumption_dir.raw }}
+      │ paperless_ngx_cfg_data_dir: {{ _paperless_ngx_cfg_data_dir.raw }}
+      │ paperless_ngx_cfg_empty_trash_dir: {{ _paperless_ngx_cfg_empty_trash_dir.raw }}
+      │ paperless_ngx_cfg_media_root: {{ _paperless_ngx_cfg_media_root.raw }}
 # yamllint enable rule:line-length
 
 # Don't use ansible.builtin.version as we ignore patch differences.
@@ -42,9 +45,14 @@
     paperless_ngx_role_major_version
   ansible.builtin.debug:
     msg: |
-      ⓘ {{ paperless_ngx_role_major_version }}.x releases supported.
-
-      paperless_ngx_srv_version: {{ _paperless_ngx_srv_version.raw }}
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │               Officially supported release versions               │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ {{ paperless_ngx_role_major_version }}.x releases supported.
+      │
+      │ paperless_ngx_srv_version: {{ _paperless_ngx_srv_version.raw }}
 
 - name: 'Prep | fatal version mis-match'
   when: >
@@ -54,9 +62,12 @@
     _paperless_ngx_srv_fatal_version_enable.raw
   ansible.builtin.fail:
     msg: |
-      ✘ Fatal version mis-match.
-
-      Set paperless_ngx_srv_fatal_version_enable=false to ignore.
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                     Fatal version mis-match.                      │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Set paperless_ngx_srv_fatal_version_enable=false to ignore.
 
 - name: 'Prep | manage users'
   when: _paperless_ngx_srv_create_user.raw

@@ -106,8 +106,7 @@
     msg: |
       ╭───────────────────────────────────────────────────────────────────╮
       │                                                                   │
-      │                  Building JBIG2enc from source.                   │
-      │                   This will take a few minutes.                   │
+      │   Building JBIG2enc from source. This will take a few minutes.    │
       │                                                                   │
       ╰───────────────────────────────────────────────────────────────────╯
 
@@ -149,8 +148,7 @@
     msg: |
       ╭───────────────────────────────────────────────────────────────────╮
       │                                                                   │
-      │                 Building Ghostscript from source.                 │
-      │                   This will take a few minutes.                   │
+      │  Building Ghostscript from source. This will take a few minutes.  │
       │                                                                   │
       ╰───────────────────────────────────────────────────────────────────╯
 
@@ -187,8 +185,7 @@
     msg: |
       ╭───────────────────────────────────────────────────────────────────╮
       │                                                                   │
-      │                  NTLK data is being downloaded.                   │
-      │                   This will take a few minutes.                   │
+      │   NTLK data is being downloaded. This will take a few minutes.    │
       │                                                                   │
       ╰───────────────────────────────────────────────────────────────────╯
 

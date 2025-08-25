@@ -29,11 +29,11 @@
 #   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v2.18.1').
+#   {VERSION}: Tagged release to use ('v2.18.2').
 #      latest: Use latest stable release.
 #
-# Default: 'v2.18.1'.
-paperless_ngx_srv_version: 'v2.18.1'
+# Default: 'v2.18.2'.
+paperless_ngx_srv_version: 'v2.18.2'
 
 # Enable fatal version mis-matches?
 #
@@ -143,6 +143,8 @@ paperless_ngx_srv_restart_daily_enable: false
 #
 # Cache lifetime should be longer than the expected processing time for
 # documents.
+#
+# Debian Trixie now automatically cleans /tmp after 10 days.
 #
 # Default: 30 (minutes).
 paperless_ngx_srv_cache_lifetime: 30
