@@ -30,10 +30,10 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
-            version: 'v2.18.2'
+            version: 'v2.18.4'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.18.2.tar.xz"
+                "/molecule/cache/paperless-ngx-v2.18.4.tar.xz"
               }}'
           - comment: 'JBIG2enc'
             version: '0.30'
@@ -62,7 +62,7 @@ platforms:
     command: '/lib/systemd/systemd'
     pre_build_image: true
     published_ports:
-      - '8000/tcp'
+      - '8000:8000/tcp'
   - name: 'paperless_ngx-debian-13-user_data'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'

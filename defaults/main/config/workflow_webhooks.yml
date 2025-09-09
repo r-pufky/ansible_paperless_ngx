@@ -21,4 +21,4 @@ paperless_ngx_cfg_webhooks_allowed_schemes:
 paperless_ngx_cfg_webhooks_allowed_ports: []
 
 # Allow internal webhook requests (e.g. localhost)? Default: True.
-paperless_webhooks_allow_internal_requests: true
+paperless_srv_webhooks_allow_internal_requests: true
