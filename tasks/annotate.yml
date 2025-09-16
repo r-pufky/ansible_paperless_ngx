@@ -61,7 +61,6 @@
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec
 # * https://github.com/ansible/ansible/issues/77159
-# yamllint enable rule:line-length
 
 - name: 'Annotate | DEPRECATED VARIABLES IN USE ⚠'
   when: >

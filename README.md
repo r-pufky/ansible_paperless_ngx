@@ -54,6 +54,7 @@ paperless_ngx_allowed_hosts: 'paperless.example.com'
 paperless_ngx_cors_allowed_hosts: 'https://paperless.example.com'
 ```
 See linked bugs detailing reasons for change:
+
 * https://github.com/paperless-ngx/paperless-ngx/pull/674
 * https://github.com/paperless-ngx/paperless-ngx/issues/817
 * https://github.com/paperless-ngx/paperless-ngx/issues/712
