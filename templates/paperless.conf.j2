@@ -10,8 +10,8 @@
 {% for header in _paperless_ngx_order %}
 # {{ header }}
 {%   for section in _paperless_ngx_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
-{%     if not section.value.deprecated and not section.value.role_unset | default(false) %}
-{%       if section.value.hint in ['list of str', 'list of int'] and section.value.data | length > 0 %}
+{%     if not section.value.deprecated and section.value.keep %}
+{%       if section.value.hint in ['list of str', 'list of int'] %}
 {{ section.value.key }}={{ section.value.data }}
 {%       elif section.value.hint == 'json' and section.value.raw | length > 0 %}
 {{ section.value.key }}={{ section.value.data }}
@@ -19,7 +19,7 @@
 {{ section.value.key }}={{ section.value.raw | lower }}
 {%       elif section.value.hint == 'bool as int' %}
 {{ section.value.key }}={{ section.value.raw | int }}
-{%       elif section.value.data is defined %}
+{%       elif section.value.data | length > 0 %}
 {{ section.value.key }}={{ section.value.data }}
 {%       else %}
 {{ section.value.key }}={{ section.value.raw }}

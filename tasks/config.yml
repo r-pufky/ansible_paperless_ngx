@@ -31,8 +31,8 @@
 - name: 'Config | manage media directories'
   ansible.builtin.file:
     path: '{{ item }}'
-    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
-    group: '{{ _paperless_ngx_srv_group.role_gid }}'
+    owner: '{{ _paperless_ngx_srv_user._uid }}'
+    group: '{{ _paperless_ngx_srv_group._gid }}'
     mode: '{{ _paperless_ngx_srv_media_perms_folder.raw }}'
     state: 'directory'
   become: true
@@ -47,10 +47,10 @@
   when: _paperless_ngx_cfg_consumer_enable_collate_double_sided.raw
   ansible.builtin.file:
     path: '{{
-        _paperless_ngx_cfg_consumer_collate_double_sided_subdir_name.role_dest
+        _paperless_ngx_cfg_consumer_collate_double_sided_subdir_name._dest
       }}'
-    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
-    group: '{{ _paperless_ngx_srv_group.role_gid }}'
+    owner: '{{ _paperless_ngx_srv_user._uid }}'
+    group: '{{ _paperless_ngx_srv_group._gid }}'
     mode: '{{ _paperless_ngx_srv_media_perms_folder.raw }}'
     state: 'directory'
   become: true
@@ -67,7 +67,7 @@
     find '{{ item }}'
     -type f
     -exec chmod {{ _paperless_ngx_srv_media_perms_file.raw }} {};
-      chown {{ _paperless_ngx_srv_user.role_uid }}:{{ _paperless_ngx_srv_group.role_gid }} {} \;
+      chown {{ _paperless_ngx_srv_user._uid }}:{{ _paperless_ngx_srv_group._gid }} {} \;
   changed_when: false
   loop: '{{ _paperless_ngx_srv_media_folders.raw }}'
 # yamllint enable rule:line-length
@@ -75,10 +75,10 @@
 - name: 'Config | set certs'
   when: _paperless_ngx_srv_certs_path.raw | length > 0
   ansible.builtin.copy:
-    src: '{{ _paperless_ngx_srv_certs_path.role_src }}'
-    dest: '{{ _paperless_ngx_srv_certs_path.role_dest }}'
-    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
-    group: '{{ _paperless_ngx_srv_group.role_gid }}'
+    src: '{{ _paperless_ngx_srv_certs_path._src }}'
+    dest: '{{ _paperless_ngx_srv_certs_path._dest }}'
+    owner: '{{ _paperless_ngx_srv_user._uid }}'
+    group: '{{ _paperless_ngx_srv_group._gid }}'
     mode: '0600'
     directory_mode: '0750'
     force: true
@@ -87,8 +87,8 @@
   ansible.builtin.template:
     src: 'paperless.conf.j2'
     dest: '{{ _paperless_ngx.symlink ~ "/paperless.conf" }}'
-    owner: '{{ _paperless_ngx_srv_user.role_uid }}'
-    group: '{{ _paperless_ngx_srv_group.role_gid }}'
+    owner: '{{ _paperless_ngx_srv_user._uid }}'
+    group: '{{ _paperless_ngx_srv_group._gid }}'
     mode: '0640'
 
 - name: 'Config | migrate database schema'

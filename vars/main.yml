@@ -189,6 +189,14 @@ paperless_ngx_role_repo_release_specifier: 'v'
 paperless_ngx_role_repo_release_asset: 'paperless-ngx-{VERSION}.tar.xz'
 
 ###############################################################################
+# Unsafe Templates
+###############################################################################
+# Paperless uses jinja syntax for template formatting. Unsafe cannot be used in
+# a filter assignment and must be done transitively via variable assignment.
+
+paperless_ngx_role_unsafe_empty: !unsafe ''
+
+###############################################################################
 # Default Paperless-NGX  User/Group
 ###############################################################################
 

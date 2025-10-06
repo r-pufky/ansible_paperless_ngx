@@ -36,12 +36,11 @@
       │ paperless_ngx_cfg_data_dir: {{ _paperless_ngx_cfg_data_dir.raw }}
       │ paperless_ngx_cfg_empty_trash_dir: {{ _paperless_ngx_cfg_empty_trash_dir.raw }}
       │ paperless_ngx_cfg_media_root: {{ _paperless_ngx_cfg_media_root.raw }}
-# yamllint enable rule:line-length
 
 # Don't use ansible.builtin.version as we ignore patch differences.
 - name: 'Prep | officially supported release version ⓘ'
   when:
-    _paperless_ngx_srv_version.role_major_version !=
+    _paperless_ngx_srv_version._major_version !=
     paperless_ngx_role_major_version
   ansible.builtin.debug:
     msg: |
@@ -53,10 +52,12 @@
       │ {{ paperless_ngx_role_major_version }}.x releases supported.
       │
       │ paperless_ngx_srv_version: {{ _paperless_ngx_srv_version.raw }}
+      │ paperless_ngx_srv_version (major): {{ _paperless_ngx_srv_version._major_version }}
+# yamllint enable rule:line-length
 
 - name: 'Prep | fatal version mis-match'
   when: >
-    _paperless_ngx_srv_version.role_major_version !=
+    _paperless_ngx_srv_version._major_version !=
     paperless_ngx_role_major_version
     and
     _paperless_ngx_srv_fatal_version_enable.raw
@@ -89,11 +90,11 @@
   ansible.builtin.set_fact:
     _paperless_ngx_srv_user: '{{
         _paperless_ngx_srv_user |
-        combine({"role_uid": _paperless_ngx_srv_user_query.uid})
+        combine({"_uid": _paperless_ngx_srv_user_query.uid})
       }}'
     _paperless_ngx_srv_group: '{{
         _paperless_ngx_srv_group |
-        combine({"role_gid": _paperless_ngx_srv_user_query.group})
+        combine({"_gid": _paperless_ngx_srv_user_query.group})
       }}'
 
 - name: 'Prep | stop services'
