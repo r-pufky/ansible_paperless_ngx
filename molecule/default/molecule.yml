@@ -30,10 +30,10 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
-            version: 'v2.18.4'
+            version: 'v2.19.0'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.18.4.tar.xz"
+                "/molecule/cache/paperless-ngx-v2.19.0.tar.xz"
               }}'
           - comment: 'JBIG2enc'
             version: '0.30'
@@ -42,10 +42,10 @@ provisioner:
                 "/molecule/cache/0.30.tar.gz"
               }}'
           - comment: 'Ghostscript'
-            version: 'gs10051'
+            version: 'gs10060'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/ghostpdl-10.05.1.tar.xz"
+                "/molecule/cache/ghostpdl-10.06.0.tar.xz"
               }}'
         paperless_ngx_srv_nltk_data: []
         paperless_ngx_cfg_dbengine: 'sqlite'
@@ -78,15 +78,10 @@ lint: |
   ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
     - 'prepare'
     - 'converge'
-    # - 'idempotence'  # Files created, extracted, created, deleted.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

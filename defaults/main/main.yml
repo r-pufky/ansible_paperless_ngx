@@ -29,11 +29,11 @@
 #   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v2.18.4').
+#   {VERSION}: Tagged release to use ('v2.19.0').
 #      latest: Use latest stable release.
 #
-# Default: 'v2.18.4'.
-paperless_ngx_srv_version: 'v2.18.4'
+# Default: 'v2.19.0'.
+paperless_ngx_srv_version: 'v2.19.0'
 
 # Enable fatal version mis-matches?
 #
@@ -100,8 +100,8 @@ paperless_ngx_srv_jbig2enc_version: '0.30'
 #  Reference:
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
 #
-# Default: '10.05.1'.
-paperless_ngx_srv_ghostscript_version: '10.05.1'
+# Default: '10.06.0'.
+paperless_ngx_srv_ghostscript_version: '10.06.0'
 
 # Path to custom certificates.
 #

@@ -5,8 +5,7 @@
 # Default required packages for Paperless-NGX install.
 #
 # Updates:
-# * New MAJOR, MINOR releases should hard branch at version before starting
-#   (e.g. 2.14.x branch).
+# * Branch for new Debian releases.
 # * Keep a separate change log as changes are made, you will not remember all
 #   of them.
 # * Use bare-metal docs to validate package/process changes.
@@ -15,7 +14,7 @@
 #   * Use defaults/ to remove any changed/deprecated variables.
 # * Update tests for any changes.
 # * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
-# * Tag with MAJOR.MINOR version, with PATCH representing role change.
+# * Tag with OS-APP-ROLE version.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
@@ -24,7 +23,7 @@
 # Last time Paperless-NGS options were validated against default configuration.
 paperless_ngx_role_validate_date: '2025-09-08'
 paperless_ngx_role_validate_release: 'trixie'
-paperless_ngx_role_validate_version: 'v2.18.4'
+paperless_ngx_role_validate_version: 'v2.19.0'
 
 paperless_ngx_role_major_version:
   '{{ paperless_ngx_role_validate_version[1:].split(".")[:2] | join(".") }}'
@@ -166,7 +165,7 @@ paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
 #  * https://github.com/tteck/Proxmox/discussions/3265
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
 
-paperless_ngx_role_ghostscript_version: '10.05.1'
+paperless_ngx_role_ghostscript_version: '10.06.0'
 paperless_ngx_role_ghostscript_owner: 'ArtifexSoftware'
 paperless_ngx_role_ghostscript_repo: 'ghostpdl-downloads'
 paperless_ngx_role_ghostscript_extract_dir: '/opt/ghostscript'

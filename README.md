@@ -182,7 +182,7 @@ following conditions are met:
 3. Role variables are migrated and updated from `paperlessng_` or `pngx_` to
    `paperless_ngx_`. Many variables have been added, removed, or changed. The
    easiest way is to start fresh using values from `defaults` and add your
-   existing values into it for your host. Specifically watch out for:
+   existing values into it for your host.
 4. See [proxy instructions below](#reverse-proxy-migration-changes) for reverse
    proxy changes.
 4. Database backend changes are **not** supported. Database upgrades to NGX are

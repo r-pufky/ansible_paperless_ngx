@@ -11,17 +11,17 @@
       vars:
         test_name: 'Prepare cache'
 
-    - name: 'Prepare | check paperless ngx v2.18.4'
+    - name: 'Prepare | check paperless ngx v2.19.0'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache paperless ngx v2.18.4'
-        test_dest: 'paperless-ngx-v2.18.4.tar.xz'
+        test_name: 'Prepare | cache paperless ngx v2.19.0'
+        test_dest: 'paperless-ngx-v2.19.0.tar.xz'
         test_url: '{{
             "https://github.com/paperless-ngx/paperless-ngx/releases/" ~
-            "download/v2.18.4/" ~
-            "paperless-ngx-v2.18.4.tar.xz"
+            "download/v2.19.0/" ~
+            "paperless-ngx-v2.19.0.tar.xz"
           }}'
         test_mode: '0640'
 
@@ -36,17 +36,17 @@
           'https://github.com/agl/jbig2enc/archive/refs/tags/0.30.tar.gz'
         test_mode: '0640'
 
-    - name: 'Prepare | check Ghostscript 10.05.1'
+    - name: 'Prepare | check Ghostscript 10.06.0'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache Ghostscript 10.05.1'
-        test_dest: 'ghostpdl-10.05.1.tar.xz'
+        test_name: 'Prepare | cache Ghostscript 10.06.0'
+        test_dest: 'ghostpdl-10.06.0.tar.xz'
         test_url: '{{
             "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/" ~
-            "download/gs10051/" ~
-            "ghostpdl-10.05.1.tar.xz"
+            "download/gs10060/" ~
+            "ghostpdl-10.06.0.tar.xz"
           }}'
         test_mode: '0640'
 
