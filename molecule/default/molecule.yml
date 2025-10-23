@@ -30,10 +30,10 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
-            version: 'v2.19.1'
+            version: 'v2.19.2'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.19.1.tar.xz"
+                "/molecule/cache/paperless-ngx-v2.19.2.tar.xz"
               }}'
           - comment: 'JBIG2enc'
             version: '0.30'
@@ -42,7 +42,7 @@ provisioner:
                 "/molecule/cache/0.30.tar.gz"
               }}'
           - comment: 'Ghostscript'
-            version: 'gs10060'  # Update when updating version.
+            version: 'gs10060'  # Update here/prepare when updating version.
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
                 "/molecule/cache/ghostpdl-10.06.0.tar.xz"
