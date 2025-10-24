@@ -5,8 +5,19 @@
 # Start Paperless-NGX services and confirm they are active and running.
 
 - name: 'Validate | start services'
-  notify: 'Handlers | reload paperless_ngx'
-  ansible.builtin.meta: 'flush_handlers'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    state: 'started'
+  failed_when: false
+  loop: '{{
+      ["redis-server.service" if _paperless_ngx_srv_redis_enable.raw else "",
+       "paperless-consumer.service",
+       "paperless-scheduler.service",
+       "paperless-task-queue.service",
+       "paperless-webserver.service",
+       "paperless-cache.service",
+       "paperless-cache.timer"] | select()
+    }}'
 
 - name: 'Validate | query service status'
   ansible.builtin.service_facts:

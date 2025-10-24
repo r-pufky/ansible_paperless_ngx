@@ -102,10 +102,12 @@
     name: '{{ item }}'
     state: 'stopped'
   failed_when: false
-  loop:
-    - 'paperless-consumer.service'
-    - 'paperless-scheduler.service'
-    - 'paperless-task-queue.service'
-    - 'paperless-webserver.service'
-    - 'paperless-cache.service'
-    - 'paperless-cache.timer'
+  loop: '{{
+      ["redis-server.service" if _paperless_ngx_srv_redis_enable.raw else "",
+       "paperless-consumer.service",
+       "paperless-scheduler.service",
+       "paperless-task-queue.service",
+       "paperless-webserver.service",
+       "paperless-cache.service",
+       "paperless-cache.timer"] | select()
+    }}'
