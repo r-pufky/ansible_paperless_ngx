@@ -425,8 +425,13 @@
         key='PAPERLESS_READ_CACHE_REDIS_URL',
         raw=paperless_ngx_cfg_read_cache_redis_url,
         default='',
+        keep=false,
         hint='str',
         added='2.18.0',
+        comment=(
+          'Discard default setting.' ~
+          'https://github.com/paperless-ngx/paperless-ngx/discussions/11178'
+        ),
         order=17
         )
       }}"
