@@ -161,7 +161,7 @@ paperless_ngx_srv_cache_lifetime: 30
 #
 #   ansible-playbook site.yml
 #       --tags Paperless-NGX
-#       -e 'paperless_ngx_srv_force_config_only_enable=true
+#       -e '{"paperless_ngx_srv_force_config_only_enable": true}'
 #
 # Default: False.
 paperless_ngx_srv_force_config_only_enable: false
@@ -259,7 +259,7 @@ paperless_ngx_srv_media_perms_folder: '0750'
 #
 #   ansible-playbook site.yml
 #       --tags Paperless-NGX
-#       -e 'paperless_ngx_srv_media_set_perms_file_enable=true'
+#       -e '{"paperless_ngx_srv_media_set_perms_file_enable": true}'
 #
 # Default: False.
 paperless_ngx_srv_media_set_perms_file_enable: false

@@ -37,7 +37,8 @@ is highly customizable and you should fully read through defaults before using.
 
 Changes updating the configuration only can be done to speed role application:
 ``` bash
-ansible-playbook site.yml --tags Paperless-NGX -e 'paperless_ngx_srv_force_config_only_enable=true'
+ansible-playbook site.yml --tags Paperless-NGX \
+  -e '{"paperless_ngx_srv_force_config_only_enable": true}'
 ```
 
 ### Reverse Proxy
