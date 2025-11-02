@@ -122,7 +122,7 @@
   become_user: '{{ _paperless_ngx_srv_user.raw }}'
   register: _paperless_ngx_admin
   changed_when: '"Created superuser" in _paperless_ngx_admin.stdout'
-  # TODO(role): disabled until future ansible data tagging update.
+  # TODO(role): Disabled until future ansible data tagging update.
   # no_log: true  # Password.
 
 - name: 'Config | query ImageMagick PDF processing'

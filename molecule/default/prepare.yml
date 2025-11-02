@@ -11,42 +11,50 @@
       vars:
         test_name: 'Prepare cache'
 
-    - name: 'Prepare | check paperless ngx v2.19.3'
+    - name: 'Prepare | parse test versions'
+      ansible.builtin.set_fact:
+        test_version: '2.19.3'
+        test_jbig_version: '0.30'
+        test_gs_version: '10.06.0'
+
+    - name: '{{ "Prepare | cache Paperless-NGX " ~ test_version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache paperless ngx v2.19.3'
-        test_dest: 'paperless-ngx-v2.19.3.tar.xz'
+        test_name: '{{ "Prepare | cache Paperless-NGX " ~ test_version }}'
+        test_dest: '{{ "paperless-ngx-v" ~ test_version ~ ".tar.xz" }}'
         test_url: '{{
             "https://github.com/paperless-ngx/paperless-ngx/releases/" ~
-            "download/v2.19.3/" ~
-            "paperless-ngx-v2.19.3.tar.xz"
+            "download/v" ~ test_version ~ "/" ~
+            "paperless-ngx-v" ~ test_version ~ ".tar.xz"
           }}'
         test_mode: '0640'
 
-    - name: 'Prepare | check JBIG2enc 0.30'
+    - name: '{{ "Prepare | cache JBIG2enc " ~ test_jbig_version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache JBIG2enc 0.30'
-        test_dest: '0.30.tar.gz'
-        test_url:
-          'https://github.com/agl/jbig2enc/archive/refs/tags/0.30.tar.gz'
+        test_name: '{{ "Prepare | cache JBIG2enc " ~ test_jbig_version }}'
+        test_dest: '{{ test_jbig_version ~ ".tar.gz" }}'
+        test_url: '{{
+            "https://github.com/agl/jbig2enc/archive/refs/tags/" ~
+            test_jbig_version ~ ".tar.gz"
+          }}'
         test_mode: '0640'
 
-    - name: 'Prepare | check Ghostscript 10.06.0'
+    - name: '{{ "Prepare | cache Ghostscript " ~ test_gs_version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache Ghostscript 10.06.0'
-        test_dest: 'ghostpdl-10.06.0.tar.xz'
+        test_name: '{{ "Prepare | cache Ghostscript " ~ test_gs_version }}'
+        test_dest: '{{ "ghostpdl-" ~ test_gs_version ~ ".tar.xz" }}'
         test_url: '{{
             "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/" ~
-            "download/gs10060/" ~
-            "ghostpdl-10.06.0.tar.xz"
+            "download/gs" ~ test_gs_version | replace(".", "") ~ "/" ~
+            "ghostpdl-" ~ test_gs_version ~ ".tar.xz"
           }}'
         test_mode: '0640'
 

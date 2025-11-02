@@ -13,7 +13,9 @@
 #   * Use configuration docs to add new variables.
 #   * Use defaults/ to remove any changed/deprecated variables.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+#   * Use BARE VERSION for find and replace to set new version.
+#   * Use ghostscript SHORT VERSION for find and replace (10.06.0 ➔ 10060).
+# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
 # * Tag with OS-APP-ROLE version.
 #
 # Reference:
