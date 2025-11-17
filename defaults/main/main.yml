@@ -29,11 +29,11 @@
 #   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v2.19.5').
+#   {VERSION}: Tagged release to use ('v2.19.6').
 #      latest: Use latest stable release.
 #
-# Default: 'v2.19.5'.
-paperless_ngx_srv_version: 'v2.19.5'
+# Default: 'v2.19.6'.
+paperless_ngx_srv_version: 'v2.19.6'
 
 # Enable fatal version mis-matches?
 #
