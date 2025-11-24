@@ -13,7 +13,7 @@
 
     - name: 'Prepare | parse test versions'
       ansible.builtin.set_fact:
-        test_version: '2.19.6'
+        test_version: '2.20.0'
         test_jbig_version: '0.30'
         test_gs_version: '10.06.0'
 
