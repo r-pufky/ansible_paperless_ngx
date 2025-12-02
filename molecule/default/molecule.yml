@@ -30,10 +30,10 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'paperless'
-            version: 'v2.20.0'
+            version: 'v2.20.1'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.20.0.tar.xz"
+                "/molecule/cache/paperless-ngx-v2.20.1.tar.xz"
               }}'
           - comment: 'JBIG2enc'
             version: '0.30'
