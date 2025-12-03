@@ -214,11 +214,3 @@
     chdir: '{{ _paperless_ngx.symlink ~ "/src" }}'
   register: _paperless_ngx_nltk
   changed_when: '"already up-to-date" not in _paperless_ngx_nltk.stderr'
-
-- name: 'Install | reload redis memcache'
-  when: _paperless_ngx_srv_redis_enable.raw
-  ansible.builtin.systemd:
-    name: 'redis-server'
-    enabled: true
-    daemon_reload: true
-    state: 'started'

@@ -28,6 +28,14 @@
 # * https://github.com/paperless-ngx/paperless-ngx/issues/2433
 # * https://github.com/paperless-ngx/paperless-ngx/issues/9483
 
+- name: 'Config | reload redis memcache'
+  when: _paperless_ngx_srv_redis_enable.raw
+  ansible.builtin.systemd:
+    name: 'redis-server'
+    enabled: true
+    daemon_reload: true
+    state: 'started'
+
 - name: 'Config | manage media directories'
   ansible.builtin.file:
     path: '{{ item }}'
