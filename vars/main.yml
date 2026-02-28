@@ -6,35 +6,31 @@
 #
 # Updates:
 # * Branch for new Debian releases.
-# * Keep a separate change log as changes are made, you will not remember all
-#   of them.
+# * You will not remember all changes. Keep a separate change log.
 # * Use bare-metal docs to validate package/process changes.
-# * Update role defaults (includes updating defaults, tasks):
-#   * Use configuration docs to add new variables.
-#   * Use defaults/ to remove any changed/deprecated variables.
+# * Update role defaults (includes updating vars, defaults, tasks):
 # * Update tests for any changes.
-#   * Use BARE VERSION for find and replace to set new version.
-#   * Use ghostscript SHORT VERSION for find and replace (10.06.0 ➔ 10060).
 # * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
-# * Tag with OS-APP-ROLE version.
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
-# Last time Paperless-NGS options were validated against default configuration.
-paperless_ngx_role_validate_date: '2026-01-14'
-paperless_ngx_role_validate_release: 'trixie'
-paperless_ngx_role_validate_version: 'v2.20.4'
+paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
-paperless_ngx_role_major_version:
-  '{{ paperless_ngx_role_validate_version[1:].split(".")[:2] | join(".") }}'
+    _date='2026-02-27',
+    _debian='trixie',
+    _app='v2.20.8',
+    _jb2e='0.30',
+    _gs='10.06.0',
+  ) }}"
 
 ###############################################################################
 # APT Packages
 ###############################################################################
 
-paperless_ngx_role_packages:
+paperless_ngx___packages:
+  # Standard Paperless-NGX packages.
   - 'python3'
   - 'python3-pip'
   - 'python3-dev'
@@ -50,7 +46,7 @@ paperless_ngx_role_packages:
   - 'poppler-utils'
   - 'python3-zxing-cpp'  # ZXING paperless_ngx_cfg_consumer_barcode_scanner.
 
-paperless_ngx_role_ocr_my_pdf:
+  # OCRmyPDF.
   - 'unpaper'
   # - 'ghostscript'  # See security warning; use a custom build.
   - 'icc-profiles-free'
@@ -61,48 +57,65 @@ paperless_ngx_role_ocr_my_pdf:
   - 'zlib1g'
   - 'tesseract-ocr'  # tesseract-ocr-{LANG} packages automatically installed.
 
-paperless_ngx_role_python_deps:  # Explicit. Auto-included with other packages.
+  # Python3 dependencies (Explicit. Auto-included with other packages).
   - 'build-essential'
   - 'python3-setuptools'
   - 'python3-wheel'
 
-paperless_ngx_role_redis:  # includes redis-server, redis-tools.
-  - 'redis'
-
-paperless_ngx_role_sqlite:
+  # SQLite support.
   - 'sqlite3'
 
-paperless_ngx_role_jbig2enc:  # JBIG2enc build support.
+  # JBIG2enc build support.
   - 'autotools-dev'
   - 'automake'
   - 'libtool'
   - 'libleptonica-dev'
   - 'zlib1g-dev'
 
-paperless_ngx_role_custom_packages:
-  - 'img2pdf'  # Provide loseless image import to PDF via CLI.
+  # Custom packages for CLI PDF handling.
+  - 'img2pdf'  # Provide lossless image import to PDF via CLI.
   - 'optipng'  # Lossless PNG compression.
 
+  # Ansible.
+  - 'ca-certificates'  # SSL support for ansible.builtin.get_url.
+  - 'xz-utils'  # xz archives.
+  - 'tox-uv'  # python3 uv support.
+  - 'curl'
+
+paperless_ngx___redis:  # includes redis-server, redis-tools.
+  - 'redis'
+
 ###############################################################################
-# NLTK Support
+# Paperless-NGX
 ###############################################################################
-# Machine learning language processor.
+# User defined version is overlayed in prep.yml.
 #
 # Reference:
-# * https://www.nltk.org/nltk_data/
-# * https://www.nltk.org/data.html
-# * https://www.nltk.org/install.html
+# * https://github.com/paperless-ngx/paperless-ngx/releases
 
-paperless_ngx_role_nltk_pip:
-  - name:
-      - 'nltk'
-      - 'numpy'
+paperless_ngx___repo_url:
+  'https://github.com/paperless-ngx/paperless-ngx/releases/download/'
+paperless_ngx___package:
+  '{{ "paperless-ngx-" ~ paperless_ngx___release._app ~ ".tar.xz" }}'
 
-paperless_ngx_role_nltk_data:
-  - 'snowball_data'
-  - 'rslp'
-  - 'stopwords'
-  - 'punkt'
+paperless_ngx___app: "{{ {} | r_pufky.data.v3(
+
+    _version=paperless_ngx___release._app,
+    _package=paperless_ngx___package,
+    _etc_dir='/etc/opt/paperless',
+    _cfg='/etc/opt/paperless/paperless.conf',
+    _var_dir='/var/opt/paperless',
+    _opt_dir='/opt/paperless',
+    _src_dir='/opt/paperless/src',
+    _live_dir='/opt/paperless/src/' ~ paperless_ngx___release._app,
+    _work_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/src',
+    _venv_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/.venv',
+    _base_url=paperless_ngx___repo_url,
+    _url=(
+      paperless_ngx___repo_url ~ paperless_ngx___release._app ~ '/' ~
+      paperless_ngx___package
+    ),
+  ) }}"
 
 ###############################################################################
 # JBIG2 Encoder Support
@@ -113,12 +126,19 @@ paperless_ngx_role_nltk_data:
 # Reference:
 # * https://github.com/agl/jbig2enc/releases
 
-paperless_ngx_role_jbig2enc_version: '0.30'
-paperless_ngx_role_jbig2enc_owner: 'agl'
-paperless_ngx_role_jbig2enc_repo: 'jbig2enc'
-paperless_ngx_role_jbig2enc_asset: '{VERSION}.tar.gz'
-paperless_ngx_role_jbig2enc_extract_dir: '/opt/jbig2enc'
-paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
+paperless_ngx___jb2e_repo_url:
+  'https://github.com/agl/jbig2enc/archive/refs/tags/'
+paperless_ngx___jb2e_package: '{{ paperless_ngx___release._jb2e ~ ".tar.gz" }}'
+
+paperless_ngx___jb2e: "{{ {} | r_pufky.data.v3(
+
+    _version=paperless_ngx___release._jb2e,
+    _package=paperless_ngx___jb2e_package,
+    _opt_dir='/opt/jbig2enc',
+    _src_dir='/opt/jbig2enc/src',
+    _live_dir='/opt/jbig2enc/src/' ~ paperless_ngx___release._jb2e,
+    _url=paperless_ngx___jb2e_repo_url ~ paperless_ngx___jb2e_package,
+  ) }}"
 
 ###############################################################################
 # Ghostscript Support
@@ -167,50 +187,58 @@ paperless_ngx_role_jbig2enc_extract_symlink_target: '/opt/jbig2enc/jbig2enc'
 #  * https://github.com/tteck/Proxmox/discussions/3265
 #  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
 
-paperless_ngx_role_ghostscript_version: '10.06.0'
-paperless_ngx_role_ghostscript_owner: 'ArtifexSoftware'
-paperless_ngx_role_ghostscript_repo: 'ghostpdl-downloads'
-paperless_ngx_role_ghostscript_extract_dir: '/opt/ghostscript'
-paperless_ngx_role_ghostscript_extract_symlink_target:
-  '/opt/ghostscript/ghostscript'
+paperless_ngx___gs_repo_url:
+  'https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/'
+paperless_ngx___gs_package:
+  '{{ "ghostpdl-" ~ paperless_ngx___release._gs ~ ".tar.xz" }}'
+paperless_ngx___gs_release: "{{
+    'gs' ~ paperless_ngx___release._gs | replace('.', '') | replace('-', '')
+  }}"
+
+paperless_ngx___gs: "{{ {} | r_pufky.data.v3(
+
+    _version=paperless_ngx___release._gs,
+    _package=paperless_ngx___gs_package,
+    _opt_dir='/opt/ghostscript',
+    _src_dir='/opt/ghostscript/src',
+    _live_dir='/opt/ghostscript/src/' ~ paperless_ngx___release._gs,
+    _url=(
+      paperless_ngx___gs_repo_url ~ paperless_ngx___gs_release ~ '/' ~
+      paperless_ngx___gs_package
+    ),
+  ) }}"
 
 ###############################################################################
-# Paperless-NGX GitHub Options
+# NLTK Support
 ###############################################################################
-# Paperless releases source and separate binary downloads.
+# Machine learning language processor. Store in /opt as it is a third-party
+# install.
 #
 # Reference:
-# * https://github.com/paperless-ngx/paperless-ngx/releases
+# * https://www.nltk.org/nltk_data/
+# * https://www.nltk.org/data.html
+# * https://www.nltk.org/install.html
 
-paperless_ngx_role_repo_release_owner: 'paperless-ngx'
-paperless_ngx_role_repo_release_repo: 'paperless-ngx'
-paperless_ngx_role_repo_extract_dir: '/opt/paperless'
-paperless_ngx_role_repo_extract_symlink: '/opt/paperless/paperless'
-paperless_ngx_role_repo_release_specifier: 'v'
-paperless_ngx_role_repo_release_asset: 'paperless-ngx-{VERSION}.tar.xz'
+paperless_ngx___nltk: "{{ {} | r_pufky.data.v3(
 
-###############################################################################
-# Unsafe Templates
-###############################################################################
-# Paperless uses jinja syntax for template formatting. Unsafe cannot be used in
-# a filter assignment and must be done transitively via variable assignment.
-
-paperless_ngx_role_unsafe_empty: !unsafe ''
+    _opt_dir='/usr/share/nltk_data',
+    _packages=('nltk', 'numpy'))
+  }}"
 
 ###############################################################################
-# Default Paperless-NGX  User/Group
+# Default Paperless-NGX User/Group
 ###############################################################################
 
-paperless_ngx_role_group:
+paperless_ngx___group:
   name: 'paperless'
   gid: 950
 
-paperless_ngx_role_user:
+paperless_ngx___user:
   name: 'paperless'
   group: 'paperless'
   uid: 950
   shell: '/usr/sbin/nologin'
-  home: '/opt/paperless'
+  home: '/var/opt/paperless'
   comment: 'paperless system account,,,'
   create_home: true
   password: '!'

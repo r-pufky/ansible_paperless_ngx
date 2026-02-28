@@ -1,268 +1,242 @@
 ---
 ###############################################################################
-# Paperless-NGX Service Configuration
+# Feature Flags
 ###############################################################################
-# Existing databases are migrated automatically when new versions are
-# installed. Migration between database platforms is not supported and must be
-# done manually.
-#
-# Install size: ~2GB
-#     Paperless: ~450MB.
-#      Packages: ~103MB.
-#          venv: ~650MB.
-#   Ghostscript: ~750MB.
-#      jbig2enc: ~13MB.
-#     NTLK data: ~25MB.
-#
-# Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
 
-# Paperless-NGX Release.
+# 1. Backup SQLite, paperless.conf to paperless_ngx_cfg_backup_dir?
 #
-# Versions (Schematic):
-#       MAJOR: Unsafe - requires major role changes; only default MAJOR version
-#              is supported. See other branches if they exist.
-#       MINOR: Unsafe - Paperless has a history of introducing breaking changes
-#              on minor updates (see 2.14, 2.15, 2.16). These should be
-#              considered MAJOR versions. See other branches if they exist.
-#       PATCH: Safe - Usually requires no role updates. Some have included
-#              breaking changes (2.16.0 - 2.16.3).
-#   RECOMMEND: Only increment PATCH. Never use 'latest'.
-#
-# Values:
-#   {VERSION}: Tagged release to use ('v2.20.4').
-#      latest: Use latest stable release.
-#
-# Default: 'v2.20.4'.
-paperless_ngx_srv_version: 'v2.20.4'
-
-# Enable fatal version mis-matches?
-#
-# Stop role execution if requested version does not match role supported
-# MAJOR.MINOR version. 'latest' will always trigger version mismatch.
-#
-# Default: True.
-paperless_ngx_srv_fatal_version_enable: true
-
-# Enable installation of Redis memcache server?
-#
-# A local Redis server will be configured automatically with default options as
-# it is required for Paperless-NGX. Disable if managing Redis externally.
-#
-# Default: True.
-paperless_ngx_srv_redis_enable: true
-
-# Install additional NLTK machine learning data (~25MB)?
-#
-# NLTK improves automatically text processing and classification. Downloaded to
-# paperless_ngx_cfg_nltk_dir.
-#
-# Values:
-#    *: NLTK data package name.
-#   []: Disables additional data download.
-#
-# Default:
-#   - 'snowball_data' # 6.7MB
-#   - 'rslp' # 3805B
-#   - 'stopwords' # 34276B
-#   - 'punkt' # 13.9MB
-#   - 'punkt_tab' # 4.3MB
-#
-# Reference:
-# * https://www.nltk.org/nltk_data/
-paperless_ngx_srv_nltk_data:
-  - 'snowball_data'
-  - 'rslp'
-  - 'stopwords'
-  - 'punkt'
-  - 'punkt_tab'  # 2.17.1 added dependency without documentation.
-
-# JBIG2 version.
-#
-# JBIG2 is automatically built from source and installed. It provides Lossless
-# high-compression used in pdf/a formats. Debian provided package is 0.19;
-# Paperless requires 0.29+.
-#
-# Reference:
-# * https://github.com/agl/jbig2enc/releases
-paperless_ngx_srv_jbig2enc_version: '0.30'
-
-# Ghostscript version.
-#
-# Ghostscript is automatically built from source and installed. It is used to
-# manipulate and transform documents. Debian provided package is 10.0.0 which
-# has multiple vulnerabilities as well as PDF corruption issues. See
-# vars/main.yml for list of CVE's addressed.
-#
-# Special Case:
-#   *: Use the version listed for the 'ghostscript-{VERSION}.tar.xz', not the
-#      release tag.
-#
-#  Reference:
-#  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
-#
-# Default: '10.06.0'.
-paperless_ngx_srv_ghostscript_version: '10.06.0'
-
-# Path to custom certificates.
-#
-# Sourced from ansible controller; automatically placed in
-# /opt/paperless/certs with correct permissions. Be sure to set appropriate
-# paths for Paperless-NGX configuration settings.
-#
-# paperless_ngx_srv_certs_path: 'host_vars/ngx.example.com/data/certs'
-#
-# Default: '' (disabled).
-paperless_ngx_srv_certs_path: ''
-
-# Remove old installs on upgrade success? Default: True.
-paperless_ngx_srv_delete_old_versions_enable: true
-
-# Force overwrite existing install?
-#
-# Removes existing cached downloaded archives and existing same-version install
-# directories (if any). Any user data in these directories are DESTROYED.
+# Backup existing config, DB, and exit role. Only applies to SQLite databases
+# configured in PAPERLESS_DATA_DIR. paperless_ngx_cfg_backup_dir created if
+# non-existent. Services stopped for backup and restarted.
 #
 # Default: False.
-paperless_ngx_srv_force_overwrite: false
+paperless_ngx_flg_backup: false
 
-# Automatically restart Paperless-NGX daily (unsafe)?
+# 2. Run maintenance tasks?
 #
-# Set RuntimeMaxSec for systemd units; which may result in unclean restarts.
+# Preform role maintenance tasks including removal of old role versions. Does
+# not affect running services.
+#
+# Default: True.
+paperless_ngx_flg_maintenance: true
+
+# 3. Install application?
+#
+# Creates required default directories, users, install packages, download and
+# build software, update services, and set minimal paperless.conf if not
+# specified. Services stopped.
+#
+# Default user runtime data is stored /var/opt/paperless. Alternative user
+# defined locations for this data must be managed outside of the role.
+#
+# Default: True.
+paperless_ngx_flg_install: true
+
+# 4. Set paperless.conf?
+#
+# File set using paperless_ngx_cfg_file. Stops service and deploys user
+# configuration, updates services. Services stopped.
 #
 # Default: False.
-paperless_ngx_srv_restart_daily_enable: false
+paperless_ngx_flg_config: false
+
+# 5. Apply database migrations?
+#
+# New paperless releases require applying database migrations. These are safe
+# to apply every execution. Services stopped.
+#
+# Default: True.
+paperless_ngx_flg_migrate: true
+
+# 6. Verify service running?
+#
+# Start services after role application and verify running or fail.
+#
+# Default: True.
+paperless_ngx_flg_start: true
+
+###############################################################################
+# Service
+###############################################################################
+
+# Paperless release.
+#
+# Submit an issue if future versions break role deployment.
+#
+# Default: 'v2.20.8'.
+paperless_ngx_srv_version: 'v2.20.8'
+
+# Github access token.
+#
+# Unauthenticated (anonymous) API requests are heavily restricted to the sum
+# total of requests to github from a given IP. Use an access token if
+# receiving 403's.
+#
+# Classic Tokens:
+# * settings > developer settings > personal access tokens (classic)
+#   * notes: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * scopes: NONE
+#
+# Fine-grained Tokens:
+# * settings > developer settings > personal access tokens (fine-grained)
+#   * token name: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * description: {DESCRIPTIVE TEXT}
+#   * resource owner: {YOUR ACCOUNT}
+#   * repository access: Public Repositories (read-only)
+#
+# Default: '' (unauthenticated).
+#
+# Reference:
+# * https://docs.github.com/en/authentication
+paperless_ngx_srv_token: ''
+
+# Install local Redis server?
+#
+# Redis is required. Disable if managing externally. Available at:
+#
+#   redis://localhost:6379
+#
+# Default: True.
+paperless_ngx_srv_redis: true
 
 # Max lifetime of Paperless cache files (minutes).
 #
-# Requires paperless_ngx_cfg_convert_tmpdir.
-#
-# Paperless does not clean cache aggressively and TMPFS is typically cleared
-# only on boot. Setting this to a lower value will aggressively clear the cache
-# and remove files have have not been modified for this period of time,
-# preventing 'out of space' errors during mass processing.
+# Paperless does not clean cache aggressively and PAPERLESS_CONVERT_TMPDIR is
+# typically cleared only on boot. Setting this to a lower value will
+# aggressively clear the cache and remove files have have not been modified for
+# this period of time, preventing 'out of space' errors during mass processing.
 #
 # Cache lifetime should be longer than the expected processing time for
 # documents.
 #
-# Debian Trixie now automatically cleans /tmp after 10 days.
+# PAPERLESS_CONVERT_TMPDIR:
+# It is better to use disk for mass processing and switch to /tmp (TMPFS) for
+# normal use to prevent confusing error messages that do not reflect actual
+# causes. HIGHLY recommended to use disk backed if memory constrained. Both are
+# preferable to disabling entirely. Debian auto cleans /tmp after 10 days.
 #
 # Default: 30 (minutes).
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#PAPERLESS_CONVERT_TMPDIR
 paperless_ngx_srv_cache_lifetime: 30
 
-# Only apply configuration?
-#
-# Reduces role application time by ONLY applying configuration changes. Does
-# NOT affect paperless_ngx_srv_media_set_perms_file_enable.
-#
-# This should ONLY be used after the role has been fully run once.
-#
-# Useful when adding a change without reconfiguring the whole system or
-# checking and installing a new version. Suggest applying with extra options:
-#
-#   ansible-playbook site.yml
-#       --tags Paperless-NGX
-#       -e '{"paperless_ngx_srv_force_config_only_enable": true}'
-#
-# Default: False.
-paperless_ngx_srv_force_config_only_enable: false
+# Service listen interface (IPv4, IPv6). Default: '0.0.0.0' (all interfaces).
+paperless_ngx_srv_granian_host: '0.0.0.0'
 
-# Systemd service logging levels (separate from application). Default: 'info'.
-paperless_ngx_srv_log_level: 'info'
+# Service listen port. Default: 8000.
+paperless_ngx_srv_granian_port: 8000
 
-# WebUI listen interface (IPv4, IPv6). Default: '0.0.0.0' (all interfaces).
-paperless_ngx_srv_address: '0.0.0.0'
-
-# WebUI listen port. Default: 8000.
-paperless_ngx_srv_port: 8000
-
-# WebUI worker threads.
+# Service worker threads.
 #
 # More worker processes result in faster data loads at the cost of loading the
-# entire application into memory separately.
+# entire application into memory separately. Affects PAPERLESS_DB_POOLSIZE.
 #
 # Default: 1.
-paperless_ngx_srv_webserver_workers: 1
-
-###############################################################################
-# Paperless-NGX User
-###############################################################################
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration/#PAPERLESS_DB_POOLSIZE
+paperless_ngx_srv_granian_workers: 1
 
 # User that Paperless-NGX will run under.
 #
-# Enable paperless_ngx_srv_create_user if account is not externally managed.
+# 'paperless' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
 #
 # Default: 'paperless'.
 paperless_ngx_srv_user: 'paperless'
 
 # Group that Paperless-NGX will run under.
 #
-# Enable paperless_ngx_srv_create_user if group is not externally managed.
+# 'paperless' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
 #
 # Default: 'paperless'.
 paperless_ngx_srv_group: 'paperless'
 
-# Enable user management of data/media files?
-#
-# Use paperless_ngx_srv_user to execute data/media management commands. Role
-# applies media permissions using 'root' by default. For mounted data locations
-# (NFS with squashed mounts, mapped container mounts, etc) the local root user
-# will not have sufficient privileges to modify these files.
-#
-# Applies to:
-# * paperless_ngx_srv_media_folders
-# * paperless_ngx_cfg_consumer_enable_collate_double_sided
-#
-# Default: False.
-paperless_ngx_srv_user_data_manage_enable: false
-
-# Create paperless_ngx_srv_user, paperless_ngx_srv_group if not detected?
-#
-# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
-#
-# Default: True.
-paperless_ngx_srv_create_user: true
-
 ###############################################################################
-# Media Permissions
+# Config
 ###############################################################################
 
-# Media storage folders.
+# paperless.conf to set.
 #
-# Recommend using folders listed in paths_and_folders.
+# Ansible controller path to source paperless.conf (treated as a jinja2
+# template allowing for ansible variable interpretation). Overwrites existing
+# /etc/opt/paperless.conf.
+#
+# A minimally configured template that works with the role will be deployed if
+# no config file is specified (see templates/paperless.conf.j2):
+#   PAPERLESS_CONVERT_TMPDIR=/tmp
+#   PAPERLESS_CONSUMPTION_DIR=/var/opt/paperless/consume
+#   PAPERLESS_DATA_DIR=/var/opt/paperless/data
+#   PAPERLESS_EMPTY_TRASH_DIR=/var/opt/paperless/trash
+#   PAPERLESS_MEDIA_ROOT=/var/opt/paperless/media
+#   PAPERLESS_ADMIN_USER=admin
+#   PAPERLESS_ADMIN_MAIL=root@localhost
+#   PAPERLESS_ADMIN_PASSWORD=admin
+#   # Use role built ghostscript which addresses vulnerabilities.
+#   PAPERLESS_GS_BINARY=/usr/local/bin/gs
+#
+# Manage additional files and directories (such as DB root certificates, custom
+# user data storage locations, etc.) outside of the role. Must be accessible to
+# paperless_ngx__srv._user account.
+#
+# paperless_ngx_cfg_file: 'host_vars/pngx.example.com/paperless.conf'
+#
+# Default: '' (use minimally configured role template).
+#
+# Reference:
+# * https://docs.paperless-ngx.com/configuration
+paperless_ngx_cfg_file: ''
+
+# Role backup location.
+#
+# All backup operations (SQLite, config) for a given role execution are stored
+# locally on ansible controller with the format 'YYYY-MM-DDTHHMMSS_{FILE}'.
+#
+# paperless_ngx_cfg_backup_dir: 'data/pngx'
+#
+# Default: ''
+paperless_ngx_cfg_backup_dir: ''
+
+# List of languages used for OCR processing.
+#
+# Required Debian OCR packages will automatically be installed.
+#
+# Values:
+#   {LANG}: 3-letter language code (see reference). Must use
+#           lower_with_under. Multiple languages specified will use best match.
 #
 # Default:
-#   - '/data/consume'
-#   - '/data/data'
-#   - '/data/media'
-paperless_ngx_srv_media_folders:
-  - '/data/consume'
-  - '/data/data'
-  - '/data/media'
+#   - 'eng'
+#
+# Reference:
+# * https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions
+paperless_ngx_cfg_ocr_languages:
+  - 'eng'
 
-# Media folder permissions octal.
+# Additional NLTK machine learning data (~25MB).
 #
-# Media folders specified by paperless_ngx_srv_media_folders will always be
-# recursively set using paperless_ngx_srv_media_perms_folder,
-# paperless_ngx_srv_user, and paperless_ngx_srv_group.
+# NLTK improves automatic text processing and classification. NLTK data is
+# stored in /usr/share/nltk_data.
 #
-# Default: '0750'.
-paperless_ngx_srv_media_perms_folder: '0750'
-
-# Enable setting of media file permissions?
+# Special Case:
+#   []: Disables additional data download.
 #
-# Set file permissions within paperless_ngx_srv_media_folders using
-# paperless_ngx_srv_media_perms_file, paperless_ngx_srv_user, and
-# paperless_ngx_srv_group. Large sets of files may be slow to set permissions.
+# Default:
+#   - 'snowball_data'
+#   - 'rslp'
+#   - 'stopwords'
+#   - 'punkt'
+#   - 'punkt_tab'
 #
-# Useful when first configuring to ensure service has access to all specified
-# media locations. Suggest applying with extra options:
-#
-#   ansible-playbook site.yml
-#       --tags Paperless-NGX
-#       -e '{"paperless_ngx_srv_media_set_perms_file_enable": true}'
-#
-# Default: False.
-paperless_ngx_srv_media_set_perms_file_enable: false
-
-# Media file permissions octal. Default: '0640'.
-paperless_ngx_srv_media_perms_file: '0640'
+# Reference:
+# * https://www.nltk.org/nltk_data/
+paperless_ngx_cfg_nltk_data:
+  - 'snowball_data'
+  - 'rslp'
+  - 'stopwords'
+  - 'punkt'
+  - 'punkt_tab'

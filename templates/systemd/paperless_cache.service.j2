@@ -1,0 +1,15 @@
+[Unit]
+Description=Paperless cache management.
+Requires=paperless_cache.timer
+After=network.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find "{{ paperless_ngx__cfg._convert_tmpdir }}" -cmin +{{ paperless_ngx__srv._cache_lifetime }} -type f -delete
+WorkingDirectory={{ paperless_ngx__cfg._convert_tmpdir }}
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

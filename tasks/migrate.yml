@@ -1,0 +1,63 @@
+---
+###############################################################################
+# Migrate Databases
+###############################################################################
+# Migrate / update database schemas.
+#
+# Paperless-NGX 2.19.0+ requires redis servers available before migration.
+#
+# Executing python3 command directly requires first moving into the src/
+# directory (due to incorrect Python path use within Paperless) or path finding
+# for the config file breaks, resulting in the config consumption_dir,
+# media_dir looking in default locations and mis-leading error messages:
+#
+#   ?: PAPERLESS_CONSUMPTION_DIR is set but doesn't exist.
+#   HINT: Create a directory at /opt/paperless/src/X.X.X/consume
+#   ?: PAPERLESS_MEDIA_ROOT is set but doesn't exist.
+#   HINT: Create a directory at /opt/paperless/src/X.X.X/media
+#
+# Not resolved until Paperless migrates entirely pathlib.
+#
+# Reference:
+# * https://docs.paperless-ngx.com/setup/#bare_metal
+# * https://github.com/paperless-ngx/ansible
+# * https://github.com/paperless-ngx/paperless-ngx/issues/2433
+# * https://github.com/paperless-ngx/paperless-ngx/issues/9483
+
+- name: 'Migrate | systemd | start redis-server'
+  when: paperless_ngx__srv._redis
+  ansible.builtin.systemd:
+    name: 'redis-server.service'
+    state: 'started'
+
+- name: 'Migrate | uv | migrate database schema (~1 minute) 🗘'
+  ansible.builtin.shell:
+    '{{ paperless_ngx__cfg._uv ~ " run -- python3 manage.py migrate" }}'
+  args:
+    executable: '/bin/bash'
+    chdir: '{{ paperless_ngx___app._work_dir }}'
+  environment:
+    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx___app._cfg }}'
+  become: true
+  become_user: '{{ paperless_ngx__srv._user }}'
+  register: paperless_ngx__cmd
+  changed_when: '"No migrations to apply." not in paperless_ngx__cmd.stdout'
+
+# manage_superuser will create the root user if it does not exist; no need to
+# run 'manage.py createsuperuser'.
+- name: 'Migrate | uv | update admin user'
+  ansible.builtin.shell: '{{
+      paperless_ngx__cfg._uv ~ " run -- python3 manage.py manage_superuser"
+    }}'
+  args:
+    executable: '/bin/bash'
+    chdir: '{{ paperless_ngx___app._work_dir }}'
+  environment:
+    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx___app._cfg }}'
+    PAPERLESS_ADMIN_USER: '{{ paperless_ngx__cfg._admin_user }}'
+    PAPERLESS_ADMIN_MAIL: '{{ paperless_ngx__cfg._admin_mail }}'
+    PAPERLESS_ADMIN_PASSWORD: '{{ paperless_ngx__cfg._admin_pass }}'
+  become: true
+  become_user: '{{ paperless_ngx__srv._user }}'
+  register: paperless_ngx__cmd
+  changed_when: '"Created superuser" in paperless_ngx__cmd.stdout'

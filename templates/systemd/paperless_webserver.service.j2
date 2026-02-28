@@ -1,0 +1,26 @@
+[Unit]
+Description=Paperless webserver.
+{% if paperless_ngx__srv._redis %}
+Requires=redis.service
+{% endif %}
+After=network.target
+Wants=network.target
+
+[Service]
+ExecStart=/bin/sh -c 'exec {{ paperless_ngx__cfg._uv }} run -- python3 -m granian --interface asginl --ws "paperless.asgi:application"'
+WorkingDirectory={{ paperless_ngx___app._work_dir }}
+Environment="PAPERLESS_CONFIGURATION_PATH={{ paperless_ngx___app._cfg }}"
+Environment="GRANIAN_HOST={{ paperless_ngx__srv._granian_host }}"
+Environment="GRANIAN_PORT={{ paperless_ngx__srv._granian_port }}"
+Environment="GRANIAN_WORKERS={{ paperless_ngx__srv._granian_workers }}"
+Environment="GRANIAN_URL_PATH_PREFIX={{ paperless_ngx__cfg._force_script_name }}"
+User={{ paperless_ngx__srv._user }}
+Group={{ paperless_ngx__srv._group }}
+RuntimeMaxSec=infinity
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateUsers=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target

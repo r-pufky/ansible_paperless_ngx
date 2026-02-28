@@ -1,246 +1,106 @@
 # Paperless-NGX
 Paperless-NGX installation from public release tarball.
 
-## Requirements
-[supported platforms](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/meta/main.yml)
+## [Requirements](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/meta/main.yml)
+**galaxy-ng** roles cannot be used independently. Part of
+[r_pufky.media](https://github.com/r-pufky/ansible_collection_media)
+collection.
+
+Install size: ~2GB
+
+Database backend changes are **not** supported.
 
 ## Role Variables
-[defaults](https://github.com/r-pufky/ansible_paperless_ngx/tree/main/defaults/main)
+Detailed variable use documented in defaults. See usage for role operation.
 
-### Ports
-All ports and protocols have been defined for the role.
+* [defaults](https://github.com/r-pufky/ansible_paperless_ngx/tree/main/defaults/main/main.yml) -
+  User configurable options.
 
-[defaults/ports.yml](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/defaults/main/ports.yml)
+* [vars](https://github.com/r-pufky/ansible_paperless_ngx/tree/main/vars/main.yml) -
+  Role default options (may be referenced in defaults).
 
-## Dependencies
-**galaxy-ng** roles cannot be used independently. Part of
-[r_pufky.media](https://github.com/r-pufky/ansible_collection_media) collection.
+* [ports](https://github.com/r-pufky/ansible_paperless_ngx/blob/main/defaults/main/ports.yml) -
+  Ports are **not** managed (defined for external use).
 
-## Example Playbook
-Read defaults documentation.
+## Usage
 
-The following example will get an instance quickly up and running. Paperless
-is highly customizable and you should fully read through defaults before using.
+### Feature Flags
+Tasks are gated by feature flags and executed in the following order.
+
+  Step | Flag                          | Notes
+ ------|-------------------------------|-------
+  1    | paperless_ngx_flg_backup      | Backup existing config. Exits role.
+  2    | paperless_ngx_flg_maintenance | Preform role maintenance tasks.
+  3    | paperless_ngx_flg_install     | Install required packages, users, etc.
+  4    | paperless_ngx_flg_config      | Install user-defined config.
+  5    | paperless_ngx_flg_migrate     | Apply database migrations.
+  6    | paperless_ngx_flg_start       | Start service and validate install.
+
+## Example Playbooks
+
+### New Deployments
+A minimal config will be deployed if no configuration is specified. This will
+deploy a working Paperless-NGX install using **/var/opt/paperless** for user
+data/SQLite and **/etc/opt/paperless** for configuration, with
+**admin**/**admin** as the default administrator.
+
 ``` yaml
-- name: 'Paperless-NGX server'
-  hosts: 'ngx.example.com'
-  become: true
-  roles:
-     - 'r_pufky.media.paperless_ngx'
+- name: 'Paperless-NGX'
+  ansible.builtin.include_role:
+    name: 'r_pufky.media.paperless_ngx'
+```
+
+Once configured take a backup of configuration.
+
+``` yaml
+- name: 'Backup Paperless-NGX'
+  ansible.builtin.include_role:
+    name: 'r_pufky.media.paperless_ngx'
   vars:
-    paperless_ngx_cfg_dbengine: 'sqlite'
-    paperless_ngx_cfg_admin_user: 'example_user'
-    paperless_ngx_cfg_admin_mail: 'user@example.com'
-    paperless_ngx_cfg_admin_password: '{{ vault_paperless_ngx_admin_password }}'
-    paperless_ngx_cfg_filename_format: !unsafe '{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]'
+    paperless_ngx_flg_backup: true
+    paperless_ngx_cfg_backup_dir: 'host_vars/pgnx/data'
 ```
 
-Changes updating the configuration only can be done to speed role application:
-``` bash
-ansible-playbook site.yml --tags Paperless-NGX \
-  -e '{"paperless_ngx_srv_force_config_only_enable": true}'
+See [Existing Deployments](#existing-deployments) for reproducible
+deployments and configuring a deployment with a different database backend.
+
+### Existing Deployments
+Manage additional files and directories (data storage locations, certificates,
+etc.) outside of role if used **within** the config. Must be accessible to
+**paperless_ngx_srv_user** account.
+
+Non-SQLite databases must be configured and accessible before executing.
+
+host_vars/pngx.example.com/paperless.conf
+``` ini
+# Create a basic customized config.
+#
+# Have a look at the docs for documentation:
+# https://docs.paperless-ngx.com/configuration/
+#
+# Template:
+# https://github.com/paperless-ngx/paperless-ngx/blob/dev/paperless.conf.example
+
+PAPERLESS_CONVERT_TMPDIR=/tmp
+PAPERLESS_CONSUMPTION_DIR=/d/consume
+PAPERLESS_DATA_DIR=/d/data
+PAPERLESS_EMPTY_TRASH_DIR=/d/trash
+PAPERLESS_MEDIA_ROOT=/d/media
+# Use role built ghostscript which addresses vulnerabilities.
+PAPERLESS_GS_BINARY=/usr/local/bin/gs
+PAPERLESS_ADMIN_USER=my_custom_admin_user
+PAPERLESS_ADMIN_MAIL=admin@example.com
+PAPERLESS_ADMIN_PASSWORD={{ vault_pgnx_admin_password }}
 ```
 
-### Reverse Proxy
-Reverse proxy configuration has drastically **changed**. Be sure to set the
-following configuration variables:
-
-host_vars/paperless.example.com/vars/paperless.yml
 ``` yaml
-paperless_ngx_use_x_forward_host: true
-paperless_ngx_use_x_forward_port: true
-paperless_ngx_url: 'https://paperless.example.com'
-paperless_ngx_csrf_trusted_origins: 'https://paperless.example.com'
-paperless_ngx_allowed_hosts: 'paperless.example.com'
-paperless_ngx_cors_allowed_hosts: 'https://paperless.example.com'
-```
-See linked bugs detailing reasons for change:
-
-* https://github.com/paperless-ngx/paperless-ngx/pull/674
-* https://github.com/paperless-ngx/paperless-ngx/issues/817
-* https://github.com/paperless-ngx/paperless-ngx/issues/712
-
-Receiving a 403 after logging in explicitly after upgrading with:
-```
-Forbidden (403) CSRF verification failed. Request aborted.
-```
-See the [Proxy Rule Changes](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx)
-and be sure to add referrer-policy to allow requests through:
-
-```
-add_header Referrer-Policy 'strict-origin-when-cross-origin';
+- name: 'New Paperless Deployment'
+  ansible.builtin.include_role:
+    name: 'r_pufky.media.paperless_ngx'
+  vars:
+    paperless_ngx_cfg_file: 'host_vars/pngx.example.com/paperless.conf'
 ```
 
-Restart both NGINX and Paperless and try again.
-
-## Suggested Archival Use
-Suggested Use (based on archivst recommendations):
-
-1. **Document Types** refer to the broad type of document in question. Is it
-  a letter? Receipt? Bill? Every instance will be different, but this should
-  be your broadest field. You just want to more of less get it in the
-  ballpark. For example, my Receipts doctype holds receipts that I scan in,
-  but it will also hold confirmations from my debtors that I paid a bill, or
-  an email from Cash app that I sold Bitcoin.
-2. **Correspondent** refers to the person/organization you are communicating
-  with in the document. A bill from your credit card would have Capital One
-  as correspondent for example, while a copy of your W2 might go under IRS.
-  Again, you can be broad here, as trying to narrow it down is going to
-  drive you crazy.
-3. **Tags** are used to answer the below basic concepts:
-  * **Who** is it referring to? In my case, I have tags for myself, my wife,
-    the kids, and the dogs. They are all the same color to easily denote
-    that. Note that this is NOT the same as correspondent.
-  * **What** is it referring to? Is it related to your car loan? Is it
-    related to your homes maintenance? Mark these tags in a different color
-    to easily notice them.
-  * **When** is the information in this document relevant? Was it a bill from
-    2 years ago? Does it relate to your taxes for 2022? Personally, I make
-    tags for the year it was received, as it makes it easier to sort. You can
-    further break this down by month if needed.
-4. I also make tags for special categories that I need to track. For example,
-  I have a tag for any documents that we'll need for our taxes in the coming
-  year, or critical documents (birth certs, etc). This helps to further
-  break it down.
-[Reference](https://old.reddit.com/r/selfhosted/comments/sdv0rr/paperless_ng_which_tags_document_types/hugenfp/)
-
-## Using Management Utilities
-Login and switch to `paperless_ngx_srv_user` to run management utilities.
-
-```bash
-su - -s /bin/bash {{ paperless_ngx_srv_user }}
-. /var/venv/paperless/bin/activate
-cd /opt/paperless/paperless/src
-python3 manage.py document_renamer
-```
-
-[Reference](https://docs.paperless-ngx.com/administration/)
-
-### img2pdf
-`img2pdf` has been included to provide increased functionality for import
-scripts. This will enable lossless conversion of images to pdf's, enabling
-import into paperless. The following example will strip alpha channel data from
-png's and convert to a lossless pdf for import.
-
-```bash
-convert test.png -background white -alpha remove -alpha off out.png
-img2pdf out.png -o import.pdf
-```
-[Reference](https://github.com/josch/img2pdf)
-
-### ghostscript
-`ghostscript` is included with paperless.
-
-#### Reduce PDF size
-This will enable you to reduce pdf size if needed. Use the following settings
-for specific resolutions:
-* `/screen` 72dpi
-* `/ebook` 150dpi
-* `/prepress` 300dpi
-* `/printer` 300dpi
-* `/default` no change
-
-```bash
-gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS={SETTING} -dNOPAUSE
--dQUIET -dBATCH -sOutputFile={OUTPUT}.pdf {INPUT}.pdf
-```
-[Reference](https://askubuntu.com/questions/113544/how-can-i-reduce-the-file-size-of-a-scanned-pdf-file)
-
-#### Merge PDF's
-This is now supported directly in the UI: select both documents and
- `actions > merge`.
-
-```bash
-gs -dNOPAUSE -sDEVICE=pdfwrite -dBATCH -sOutputFile={OUTPUT}.pdf {INPUT}1.pdf
-{INPUT}2.pdf
-```
-
-[Reference](https://www.fosslinux.com/49661/merge-pdf-files-on-linux.htm)
-
-#### Split PDF's
-This is now supported directly in the UI: select both documents and
- `actions > split`.
-
-For documents that failed consumption, manually split before re-adding to the
-consumption directory.
-
-```bash
-gs -dBATCH -dPDFINFO {INPUT}.pdf
-gs -dNOPAUSE -sDEVICE=pdfwrite -dBATCH -sOutputFile={OUTPUT}.pdf -dFirstPage=1
--dLastPage=3 {INPUT}.pdf
-```
-* Repeat for each chunk of the PDF document.
-
-[Reference](https://stackoverflow.com/questions/10228592/splitting-a-pdf-with-ghostscript)
-
-## Migration
-In place migrations from NG to NGX can be done using this role if the
-following conditions are met:
-1. Ensure the last release of paperless-ng is already deployed (1.5.0) and
-   successfully launched. Shutdown.
-2. Backup your data, and your databases. Recommend cloning your paperless
-   instance as well.
-3. Role variables are migrated and updated from `paperlessng_` or `pngx_` to
-   `paperless_ngx_`. Many variables have been added, removed, or changed. The
-   easiest way is to start fresh using values from `defaults` and add your
-   existing values into it for your host.
-4. See [proxy instructions below](#reverse-proxy-migration-changes) for reverse
-   proxy changes.
-4. Database backend changes are **not** supported. Database upgrades to NGX are
-   done automatically during role application.
-
-[Reference](https://docs.paperless-ngx.com/setup/#migrating-from-paperless-ng)
-
-## Troubleshooting
-https://docs.paperless-ngx.com/troubleshooting/
-
-### HTTP 500 Error During Import
-Uploading a document produces a HTTP 500 error. Check logs - typically this is
-due to Paperless updating classification models and not rebuilding the
-`classification_model.pickle` object:
-
-``` log
-[ERROR] [paperless.classifier] Unknown error while loading document classification model
-```
-
-Remove the classification model and restart all services:
-``` bash
-rm paperless_ngx_cfg_data_dir/classification_model.pickle
-systemctl restart paperless-*
-```
-
-### PDF's fail to ingest with older ICC profiles.
-Some PDF's with older ICC profiles may fail to be injested. Though rare, these
-can be manually pre-processed to fix the ICC profiles:
-
-``` bash
-gs -o output.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress input.pdf
-```
-
-[Reference](https://kcore.org/2021/05/08/paperless-ng/)
-
-### PDF failed import from consumption directory.
-Paperless does not clean cache aggressively and TMPFS is typically cleared only
-on boot. In cases where there are mass processing of documents it is better to
-use disk. Some paperless subprocesses will always use `/tmp`.
-
-Check logs for specific errors. Increase `paperless_ngx_cfg_convert_tmpdir`
-backing space if necessary and restart the machine or the consumption service:
-
-``` bash
-systemctl restart paperless-consumer.service
-```
-* Tasks may also be restarted in the django admin interface
-  `settings > Open Django Admin > Paperless tasks`.
-
-The service may also be stopped and `paperless_ngx_cfg_convert_tmpdir` and
-`/tmp` cleared:
-``` bash
-systemctl stop paperless-*
-rm -rf /tmp/paperless*
-rm -rf {{ paperless_ngx_cfg_convert_tmpdir }}
-systemctl start paperless-*
-```
 
 ## Development
 Configure [environment](https://r-pufky.github.io/ansible_collection_docs/ansible/environment)
@@ -250,22 +110,31 @@ Run all unit tests:
 molecule test --all
 ```
 
+Testing variables:
+ Variable          | type | Description
+-------------------|------|-------------
+ url_inject_enable | bool | Disable **get_url** to inject files locally.
+
 ### Releases
-Release format: **{OS}-{SERVICE}-{ROLE}**
+[Semantic versioning](https://semver.org/spec/v2.0.0) focused on service
+deployment with templated configuration to minimize role churn due to
+inconsistent and rapid rolling release cycle.
 
-Each type inherits the versioning system used; defaulting to schematic
-versioning.
-
-`12-2.0.3-1.0.0`
-
-* 12 - Debian 12 (bookworm).
-* 2.0.3 - Service/app version.
-* 1.0.0 - Role version.
-
-Releases are branched on Debian releases:
-
-* **[13.x.x](https://github.com/r-pufky/ansible_paperless_ngx)**: 13 Trixie.
-* **[12.x.x](https://github.com/r-pufky/ansible_paperless_ngx/tree/12.x)**: 12 Bookworm.
+ Release | Debian | Ansible | Paperless-NGX | Notes
+---------|--------|---------|---------------|-------
+ 13.x.x  | 13     | 2.20    | 2.20.8        | Ansible 2.20, feature flags, and semantic versioning.
+ 12.x.x  | 13     | 2.18    | 2.20.1        | Last 'fully managed' config.
+ 11.x.x  | 13     | 2.18    | 2.19.3        | Migrate to r_pufky.media.
+ 10.x.x  | 13     | 2.18    | 2.19.2        | Redis server required for DB migrations.
+ 9.x.x   | 13     | 2.18    | 2.18.4        | Data annotations V3.
+ 8.x.x   | 13     | 2.18    | 2.18.4        | Breaking Paperless changes.
+ 7.x.x   | 13     | 2.18    | 2.18.2        | Migrate to Debian Trixie.
+ 6.x.x   | 12     | 2.18    | 2.18.1        | Breaking Paperless changes.
+ 5.x.x   | 12     | 2.18    | 2.17.3        | Data annotations V2.
+ 4.x.x   | 12     | 2.18    | 2.16.1        | Data annotations.
+ 3.x.x   | 12     | 2.18    | 2.16.2        | Use source release for JBIG2enc.
+ 2.x.x   | 12     | 2.18    | 2.14.7        | Ansible 2.18 support.
+ 1.x.x   | 12     | 2.11    | 1.15.1        | Migration from private repository.
 
 ## Issues
 Create a bug and provide as much information as possible.

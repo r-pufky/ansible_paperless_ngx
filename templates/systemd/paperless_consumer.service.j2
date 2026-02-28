@@ -1,0 +1,20 @@
+[Unit]
+Description=Paperless consumer (ingestion monitor).
+{% if paperless_ngx__srv._redis %}
+Requires=redis.service
+{% endif %}
+
+[Service]
+ExecStart={{ paperless_ngx__cfg._uv }} run -- python3 manage.py document_consumer
+WorkingDirectory={{ paperless_ngx___app._work_dir }}
+Environment="PAPERLESS_CONFIGURATION_PATH={{ paperless_ngx___app._cfg }}"
+User={{ paperless_ngx__srv._user }}
+Group={{ paperless_ngx__srv._group }}
+RuntimeMaxSec=infinity
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateUsers=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target

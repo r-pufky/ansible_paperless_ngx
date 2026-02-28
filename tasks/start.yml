@@ -1,0 +1,63 @@
+---
+###############################################################################
+# Start
+###############################################################################
+# Start Paperless-NGX services and confirm they are active and running.
+
+- name: 'Start | systemd | start services'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    state: 'started'
+  failed_when: false
+  loop: '{{
+      ["redis-server.service" if paperless_ngx__srv._redis else "",
+       "paperless_consumer.service",
+       "paperless_scheduler.service",
+       "paperless_task_queue.service",
+       "paperless_webserver.service",
+       "paperless_cache.service",
+       "paperless_cache.timer"] | select()
+    }}'
+
+- name: 'Start | fact | query services'
+  ansible.builtin.service_facts:
+
+- name: 'Start | assert | services running'
+  ansible.builtin.assert:
+    quiet: true
+    that: ansible_facts.services[item].state == 'running'
+    fail_msg: |
+
+      ✘ Service failed to start.
+      {{ item }}
+  loop:
+    - 'paperless_consumer.service'
+    - 'paperless_scheduler.service'
+    - 'paperless_task_queue.service'
+    - 'paperless_webserver.service'
+
+- name: 'Start | assert | paperless_cache.service enabled'
+  ansible.builtin.assert:
+    quiet: true
+    that: ansible_facts.services[item].status == 'enabled'
+    fail_msg: |
+
+      ✘ Service should be enabled.
+      {{ item }}
+  loop:
+    - 'paperless_cache.service'
+
+- name: 'Start | systemd | query paperless_cache.timer'
+  ansible.builtin.command: 'systemctl status paperless_cache.timer'
+  register: paperless_ngx__cmd
+  changed_when: false
+
+- name: 'Start | assert | paperless_cache.timer active'
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - paperless_ngx__cmd.rc == 0
+      - '"Active: active" in paperless_ngx__cmd.stdout'
+    fail_msg: |
+
+      ✘ paperless_cache.timer should be active.

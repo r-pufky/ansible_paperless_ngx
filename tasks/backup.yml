@@ -1,0 +1,71 @@
+---
+###############################################################################
+# Backup
+###############################################################################
+# Only backup SQLite databases and configuration file.
+#
+# Reference:
+# * https://github.com/paperless-ngx/paperless-ngx/discussions/5591
+
+- name: 'Backup | filesystem | set backup location'
+  when: >
+    paperless_ngx__cfg._backup_dir | length > 0 and
+    paperless_ngx__cfg._backup_dir != '/tmp'
+  delegate_to: 'localhost'
+  run_once: true
+  ansible.builtin.file:
+    path: '{{ paperless_ngx__cfg._backup_dir }}'
+    mode: '0750'
+    state: directory
+
+- name: 'Backup | fetch | paperless.conf'
+  ansible.builtin.fetch:
+    src: '{{ paperless_ngx___app._cfg }}'
+    dest: '{{
+        paperless_ngx__cfg._backup_dir ~ "/" ~
+        paperless_ngx__cfg._start ~ "_paperless.conf"
+      }}'
+    fail_on_missing: false
+    flat: true
+
+# See services.yml for awk explanation.
+- name: 'Backup | awk | PAPERLESS_DATA_DIR'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_data
+
+- name: 'Backup | fetch | databases'
+  ansible.builtin.fetch:
+    src: '{{ paperless_ngx__awk_data ~ "/" ~ item }}'
+    dest: '{{
+        paperless_ngx__cfg._backup_dir ~ "/" ~
+        paperless_ngx__cfg._start ~ "_" ~ item
+      }}'
+    fail_on_missing: false
+    flat: true
+  loop:
+    - 'db.sqlite3'
+    - 'db.sqlite3-shm'
+    - 'db.sqlite3-wal'
+
+- name: 'Backup | systemd | start services'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    state: 'started'
+  failed_when: false
+  loop: '{{
+      ["redis-server.service" if paperless_ngx__srv._redis else "",
+       "paperless_consumer.service",
+       "paperless_scheduler.service",
+       "paperless_task_queue.service",
+       "paperless_webserver.service",
+       "paperless_cache.service",
+       "paperless_cache.timer"] | select()
+    }}'
+
+- name: 'Backup | success ✔'
+  ansible.builtin.meta: 'end_host'

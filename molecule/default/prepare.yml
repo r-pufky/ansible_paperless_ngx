@@ -4,6 +4,12 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
     - name: 'Prepare | create cache'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
@@ -11,61 +17,38 @@
       vars:
         test_name: 'Prepare cache'
 
-    - name: 'Prepare | parse test versions'
-      ansible.builtin.set_fact:
-        test_version: '2.20.4'
-        test_jbig_version: '0.30'
-        test_gs_version: '10.06.0'
-
-    - name: '{{ "Prepare | cache Paperless-NGX " ~ test_version }}'
+    - name: '{{
+          "Prepare | cache Paperless-NGX " ~ paperless_ngx___app._version
+        }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: '{{ "Prepare | cache Paperless-NGX " ~ test_version }}'
-        test_dest: '{{ "paperless-ngx-v" ~ test_version ~ ".tar.xz" }}'
-        test_url: '{{
-            "https://github.com/paperless-ngx/paperless-ngx/releases/" ~
-            "download/v" ~ test_version ~ "/" ~
-            "paperless-ngx-v" ~ test_version ~ ".tar.xz"
+        test_name: '{{
+            "Prepare | cache Paperless-NGX " ~ paperless_ngx___app._version
           }}'
+        test_dest: '{{ paperless_ngx___app._package }}'
+        test_url: '{{ paperless_ngx___app._url }}'
         test_mode: '0640'
 
-    - name: '{{ "Prepare | cache JBIG2enc " ~ test_jbig_version }}'
+    - name: '{{ "Prepare | cache JBIG2enc " ~ paperless_ngx___jb2e._version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: '{{ "Prepare | cache JBIG2enc " ~ test_jbig_version }}'
-        test_dest: '{{ test_jbig_version ~ ".tar.gz" }}'
-        test_url: '{{
-            "https://github.com/agl/jbig2enc/archive/refs/tags/" ~
-            test_jbig_version ~ ".tar.gz"
-          }}'
+        test_name:
+          '{{ "Prepare | cache JBIG2enc " ~ paperless_ngx___jb2e._version }}'
+        test_dest: '{{ paperless_ngx___jb2e._package }}'
+        test_url: '{{ paperless_ngx___jb2e._url }}'
         test_mode: '0640'
 
-    - name: '{{ "Prepare | cache Ghostscript " ~ test_gs_version }}'
+    - name: '{{ "Prepare | cache Ghostscript " ~ paperless_ngx___gs._version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: '{{ "Prepare | cache Ghostscript " ~ test_gs_version }}'
-        test_dest: '{{ "ghostpdl-" ~ test_gs_version ~ ".tar.xz" }}'
-        test_url: '{{
-            "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/" ~
-            "download/gs" ~ test_gs_version | replace(".", "") ~ "/" ~
-            "ghostpdl-" ~ test_gs_version ~ ".tar.xz"
-          }}'
+        test_name:
+          '{{ "Prepare | cache Ghostscript " ~ paperless_ngx___gs._version }}'
+        test_dest: '{{ paperless_ngx___gs._package }}'
+        test_url: '{{ paperless_ngx___gs._url }}'
         test_mode: '0640'
-
-- name: 'Prepare'
-  hosts: 'paperless_ngx-debian-13-user_data'
-  gather_facts: false
-  tasks:
-    - name: 'Prepare | simulate user media restriction'
-      ansible.builtin.file:
-        path: '/data'
-        owner: 950
-        group: 950
-        mode: '0755'
-        state: 'directory'

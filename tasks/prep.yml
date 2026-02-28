@@ -1,113 +1,134 @@
 ---
 ###############################################################################
-# Prep
+# Pre Execution Tasks
 ###############################################################################
-# Assert user data is not stored in install location, create user if needed and
-# determine UID/GID for potential remote filesystems. Stop services if they
-# exist.
-#
-# Reference:
-# * https://docs.paperless-ngx.com/setup/#bare_metal
+# Stop services if existing. UID/GID required for multiple tags. Parse _cfg_
+# defaults to generate runtime data and store in data annotations.
 
-# yamllint disable rule:line-length
-- name: 'Prep | assert data locations are not in install paths'
+- name: 'Prep | fact | record start time'
+  ansible.builtin.set_fact:
+    paperless_ngx__srv: "{{ {} | r_pufky.data.v3(
+
+        _version=paperless_ngx_srv_version,
+        _token=paperless_ngx_srv_token,
+        _redis=paperless_ngx_srv_redis,
+        _cache_lifetime=paperless_ngx_srv_cache_lifetime,
+        _granian_host=paperless_ngx_srv_granian_host,
+        _granian_port=paperless_ngx_srv_granian_port,
+        _granian_workers=paperless_ngx_srv_granian_workers,
+        _user=paperless_ngx_srv_user,
+        _group=paperless_ngx_srv_group,
+      ) }}"
+    paperless_ngx__cfg: "{{ {} | r_pufky.data.v3(
+
+        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
+        _file=paperless_ngx_cfg_file,
+        _backup_dir=paperless_ngx_cfg_backup_dir | regex_replace('\\/$', ''),
+        _ocr_languages=(
+          paperless_ngx_cfg_ocr_languages | default('eng') |
+          map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | list
+        ),
+        _nltk_data=paperless_ngx_cfg_nltk_data,
+        _live_dir=(
+          paperless_ngx___app._src_dir ~ '/' ~ paperless_ngx_srv_version
+        ),
+        _package='paperless-ngx-' ~ paperless_ngx_srv_version ~ '.tar.xz',
+        _url=(
+          paperless_ngx___app._base_url ~ paperless_ngx_srv_version ~ '/' ~
+          'paperless-ngx-' ~ paperless_ngx_srv_version ~ '.tar.xz'
+        ),
+      ) }}"
+
+- name: 'Prep | assert | backup enabled and location defined'
+  when: paperless_ngx_flg_backup
   ansible.builtin.assert:
     quiet: true
     that:
-      - not _paperless_ngx_cfg_consumption_dir.raw.startswith(
-        paperless_ngx_role_repo_extract_dir)
-      - not _paperless_ngx_cfg_data_dir.raw.startswith(
-        paperless_ngx_role_repo_extract_dir)
-      - not _paperless_ngx_cfg_empty_trash_dir.raw.startswith(
-        paperless_ngx_role_repo_extract_dir)
-      - not _paperless_ngx_cfg_media_root.raw.startswith(
-        paperless_ngx_role_repo_extract_dir)
-      - not _paperless_ngx_cfg_logging_dir.raw.startswith(
-        paperless_ngx_role_repo_extract_dir)
+      - paperless_ngx__cfg._backup_dir | length > 0
     fail_msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │    Data storage should not be in the same location as install.    │
-      │                                                                   │
-      ├───────────────────────────────────────────────────────────────────╯
-      │ Install: {{ paperless_ngx_role_repo_extract_dir }}
-      │
-      │ paperless_ngx_cfg_consumption_dir: {{ _paperless_ngx_cfg_consumption_dir.raw }}
-      │ paperless_ngx_cfg_data_dir: {{ _paperless_ngx_cfg_data_dir.raw }}
-      │ paperless_ngx_cfg_empty_trash_dir: {{ _paperless_ngx_cfg_empty_trash_dir.raw }}
-      │ paperless_ngx_cfg_media_root: {{ _paperless_ngx_cfg_media_root.raw }}
 
-# Don't use ansible.builtin.version as we ignore patch differences.
-- name: 'Prep | officially supported release version ⓘ'
-  when:
-    _paperless_ngx_srv_version._major_version !=
-    paperless_ngx_role_major_version
-  ansible.builtin.debug:
-    msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │               Officially supported release versions               │
-      │                                                                   │
-      ├───────────────────────────────────────────────────────────────────╯
-      │ {{ paperless_ngx_role_major_version }}.x releases supported.
-      │
-      │ paperless_ngx_srv_version: {{ _paperless_ngx_srv_version.raw }}
-      │ paperless_ngx_srv_version (major): {{ _paperless_ngx_srv_version._major_version }}
-# yamllint enable rule:line-length
+      ✘ Backup location not set.
+      Backups enabled but no backup location defined.
 
-- name: 'Prep | fatal version mis-match'
-  when: >
-    _paperless_ngx_srv_version._major_version !=
-    paperless_ngx_role_major_version
-    and
-    _paperless_ngx_srv_fatal_version_enable.raw
-  ansible.builtin.fail:
-    msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │                     Fatal version mis-match.                      │
-      │                                                                   │
-      ├───────────────────────────────────────────────────────────────────╯
-      │ Set paperless_ngx_srv_fatal_version_enable=false to ignore.
+      paperless_ngx_flg_backup: {{ paperless_ngx_flg_backup }}
+      paperless_ngx_cfg_backup_dir: {{ paperless_ngx__cfg._backup_dir }}
 
-- name: 'Prep | manage users'
-  when: _paperless_ngx_srv_create_user.raw
-  ansible.builtin.include_role:
-    name: 'r_pufky.deb.users'
-    tasks_from: 'role_account_add.yml'
-  vars:
-    users_role_user: '{{ paperless_ngx_role_user }}'
-    users_role_group: '{{ paperless_ngx_role_group }}'
+- name: 'Config | assert | config enabled and source defined'
+  when: paperless_ngx_flg_config
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - paperless_ngx__cfg._file | length > 0
+    fail_msg: |
 
-- name: 'Prep | enumerate system user {{ _paperless_ngx_srv_user.raw }}'
-  ansible.builtin.user:
-    name: '{{ _paperless_ngx_srv_user.raw }}'
-  check_mode: true
-  changed_when: false
-  register: _paperless_ngx_srv_user_query
+      ✘ Config source not set.
+      Config source enabled but no config source defined.
 
-- name: 'Prep | parse system user UID/GID'
-  ansible.builtin.set_fact:
-    _paperless_ngx_srv_user: '{{
-        _paperless_ngx_srv_user |
-        combine({"_uid": _paperless_ngx_srv_user_query.uid})
-      }}'
-    _paperless_ngx_srv_group: '{{
-        _paperless_ngx_srv_group |
-        combine({"_gid": _paperless_ngx_srv_user_query.group})
-      }}'
+      paperless_ngx_flg_config: {{ paperless_ngx_flg_config }}
+      paperless_ngx_cfg_file: {{ paperless_ngx__cfg._file }}
 
-- name: 'Prep | stop services'
+- name: 'Prep | systemd | stop services'
   ansible.builtin.systemd:
     name: '{{ item }}'
     state: 'stopped'
   failed_when: false
   loop: '{{
-      ["redis-server.service" if _paperless_ngx_srv_redis_enable.raw else "",
-       "paperless-consumer.service",
-       "paperless-scheduler.service",
-       "paperless-task-queue.service",
-       "paperless-webserver.service",
-       "paperless-cache.service",
-       "paperless-cache.timer"] | select()
+      ["redis-server.service" if paperless_ngx__srv._redis else "",
+       "paperless_consumer.service",
+       "paperless_scheduler.service",
+       "paperless_task_queue.service",
+       "paperless_webserver.service",
+       "paperless_cache.service",
+       "paperless_cache.timer"] | select()
     }}'
+
+- name: '{{ "Prep | account | query user " ~ paperless_ngx__srv._user }}'
+  ansible.builtin.command: '{{ "id " ~ paperless_ngx__srv._user }}'
+  register: paperless_ngx__cfg_check
+  changed_when: paperless_ngx__cfg_check.rc > 0
+  failed_when: false
+
+- name: '{{ "Prep | account | query group " ~ paperless_ngx__srv._group }}'
+  ansible.builtin.command: '{{ "groups " ~ paperless_ngx__srv._group }}'
+  register: paperless_ngx__group_check
+  changed_when: paperless_ngx__group_check.rc > 0
+  failed_when: false
+
+- name: '{{ "Prep | account | create group " ~ paperless_ngx__srv._group }}'
+  when: paperless_ngx__group_check.rc != 0
+  ansible.builtin.group:
+    gid: '{{ paperless_ngx___group.gid }}'
+    name: '{{ paperless_ngx___group.name }}'
+    state: 'present'
+
+- name: '{{ "Prep | account | create user " ~ paperless_ngx__srv._user }}'
+  when: paperless_ngx__cfg_check.rc != 0
+  ansible.builtin.user:
+    name: '{{ paperless_ngx___user.name }}'
+    group: '{{ paperless_ngx___user.group }}'
+    uid: '{{ paperless_ngx___user.uid }}'
+    shell: '{{ paperless_ngx___user.shell }}'
+    home: '{{ paperless_ngx___user.home }}'
+    create_home: '{{ paperless_ngx___user.create_home }}'
+    password: '{{ paperless_ngx___user.password }}'
+    password_lock: '{{ paperless_ngx___user.password_lock }}'
+    update_password: '{{ paperless_ngx___user.update_password }}'
+    expires: '{{ paperless_ngx___user.expires }}'
+    system: '{{ paperless_ngx___user.system }}'
+
+# Pre-existing users may have a different UID/GID/Home.
+- name: '{{ "Prep | account | enumerate " ~ paperless_ngx__srv._user }}'
+  ansible.builtin.user:
+    name: '{{ paperless_ngx__srv._user }}'
+  check_mode: true
+  changed_when: false
+  register: paperless_ngx__cfg_query
+
+- name: 'Prep | fact | parse service UID/GID'
+  ansible.builtin.set_fact:
+    paperless_ngx__cfg: "{{ paperless_ngx__cfg | r_pufky.data.v3(
+
+        _uid=paperless_ngx__cfg_query.uid,
+        _gid=paperless_ngx__cfg_query.group,
+        _uv=paperless_ngx__cfg_query.home ~ '/.local/bin/uv',
+      ) }}"

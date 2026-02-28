@@ -1,0 +1,9 @@
+[Unit]
+Description=paperless_cache.service timer.
+Requires=paperless_cache.service
+
+[Timer]
+OnUnitActiveSec={{ paperless_ngx__srv._cache_lifetime }}m
+
+[Install]
+WantedBy=timers.target

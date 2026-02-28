@@ -1,0 +1,25 @@
+---
+###############################################################################
+# Maintenance
+###############################################################################
+# Prune any old files from previous role versions. This is executed before any
+# operations with the new role version.
+#
+# Use shell command to increase execution speed for multiple directories.
+
+# 13.0.0 changed role structure:
+# * Services moved to paperless_*.
+# * Paperless moved to /opt/paperless/src.
+# * Ghostscript moved to /opt/ghostscript/src.
+# * JBIG2enc moved to /opt/jbig2enc/src.
+# * venv moved to /var/opt/paperless/{VERSION}.
+- name: 'Maintenance | 13.0.0 | remove old versions'
+  ansible.builtin.shell: >-
+    rm -rf /usr/systemd/system/paperless-* &&
+    rm -rf /opt/paperless/paperless-ngx-* &&
+    rm -rf /opt/ghostscript/ghostpdl-downloads* &&
+    rm -rf /opt/jbig2enc/jbig2enc-* &&
+    rm -rf /var/venv/paperless-*
+  args:
+    executable: '/bin/bash'
+    removes: '/usr/systemd/system/paperless-webserver.service'

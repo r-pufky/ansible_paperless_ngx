@@ -1,15 +1,15 @@
 ---
 ###############################################################################
-# Default
+# Default ()
 ###############################################################################
 # Default configuration is deployed successfully.
 #
 # Tests:
-# * paperless.conf set.
+# * Minimal paperless.conf set (tested in converge).
+# * User provided paperless.conf set.
 # * Paperless-NGX services are active and running.
 # * Granian overrides are set correctly.
 # * ImageMaick has PDF processing enabled.
-# * install directory locations are removed.
 # * sqlite database exists in data directory.
 
 dependency:
@@ -27,34 +27,9 @@ provisioner:
   inventory:
     group_vars:
       all:
-        repo_testing_enable: true
-        repo_testing_versions:
-          - comment: 'paperless'
-            version: 'v2.20.4'
-            asset: '{{
-                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/paperless-ngx-v2.20.4.tar.xz"
-              }}'
-          - comment: 'JBIG2enc'
-            version: '0.30'
-            asset: '{{
-                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/0.30.tar.gz"
-              }}'
-          - comment: 'Ghostscript'
-            version: 'gs10060'  # Update here/prepare when updating version.
-            asset: '{{
-                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/ghostpdl-10.06.0.tar.xz"
-              }}'
-        paperless_ngx_srv_nltk_data: []
-        paperless_ngx_cfg_dbengine: 'sqlite'
-        paperless_ngx_cfg_secret_key: 'test'
-    host_vars:
-      paperless_ngx-debian-13-user_data:
-        paperless_ngx_srv_user_data_manage_enable: true
+        url_inject_enable: true
 platforms:
-  - name: 'paperless_ngx-debian-13-default'
+  - name: 'paperless_ngx_default'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -63,13 +38,6 @@ platforms:
     pre_build_image: true
     published_ports:
       - '8000:8000/tcp'
-  - name: 'paperless_ngx-debian-13-user_data'
-    image: 'ghcr.io/hifis-net/debian-systemd:13'
-    systemd: 'always'
-    volumes:
-      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
-    command: '/lib/systemd/systemd'
-    pre_build_image: true
 verifier:
   name: 'ansible'
 lint: |

@@ -1,0 +1,101 @@
+---
+###############################################################################
+# Services
+###############################################################################
+# Services and migrations require dynamic values from paperless.conf. Pull
+# configured values from remote node and update services.
+#
+# Rejected Methods:
+# * community.general.from_ini cannot be used as there are no sections.
+# * community.general.ini_file and lookup requires fetching remote file after
+#   deploying and storing locally (potentially with secrets).
+# * slurp with heavy jinja2 post-processing is overly complicated and unclear.
+# * lineinfile forces either a changed or deleted line but cannot read only.
+#
+# Just use awk.
+#
+# Reference:
+# * https://github.com/ansible-collections/community.general/issues/7889
+
+- name: 'Services | awk | PAPERLESS_FORCE_SCRIPT_NAME'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_FORCE_SCRIPT_NAME=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_script
+
+- name: 'Services | awk | PAPERLESS_CONVERT_TMPDIR'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_CONVERT_TMPDIR=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_tmpdir
+
+- name: 'Services | awk | PAPERLESS_ADMIN_USER'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_ADMIN_USER=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_user
+
+- name: 'Services | awk | PAPERLESS_ADMIN_MAIL'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_ADMIN_MAIL=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_mail
+
+- name: 'Services | awk | PAPERLESS_ADMIN_PASSWORD'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_ADMIN_PASSWORD=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_pass
+
+- name: 'Services | fact | parse required values'
+  ansible.builtin.set_fact:
+    paperless_ngx__cfg: "{{ paperless_ngx__cfg | r_pufky.data.v3(
+
+        _force_script_name=paperless_ngx__awk_script.stdout | default(''),
+        _convert_tmpdir=paperless_ngx__awk_tmpdir.stdout | default('/tmp'),
+        _admin_user=paperless_ngx__awk_user.stdout | default('admin'),
+        _admin_mail=paperless_ngx__awk_mail.stdout | default('root@localhost'),
+        _admin_pass=paperless_ngx__awk_pass.stdout | default('admin'),
+      ) }}"
+
+- name: 'Services | systemd | update services'
+  ansible.builtin.template:
+    src: '{{ "systemd/" ~ item ~ ".j2" }}'
+    dest: '{{ "/etc/systemd/system/" ~ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  loop:
+    - 'paperless_cache.service'
+    - 'paperless_webserver.service'
+
+- name: 'Services | systemd | daemon reload'
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: 'Services | systemd | enable'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    enabled: true
+  loop:
+    - 'paperless_consumer.service'
+    - 'paperless_scheduler.service'
+    - 'paperless_task_queue.service'
+    - 'paperless_webserver.service'
+    - 'paperless_cache.service'
+    - 'paperless_cache.timer'

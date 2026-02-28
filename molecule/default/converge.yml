@@ -3,6 +3,60 @@
   hosts: 'all'
   gather_facts: false
   tasks:
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Converge | inject cached packages'
+      when: (url_inject_enable | default(false))
+      ansible.builtin.copy:
+        src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/molecule/cache/" ~
+            item
+          }}'
+        dest: '{{ "/tmp/" ~ item }}'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      loop:
+        - '{{ paperless_ngx___app._package }}'
+        - '{{ paperless_ngx___jb2e._package }}'
+        - '{{ paperless_ngx___gs._package }}'
+
     - name: 'Converge | apply r_pufky.media.paperless_ngx'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
+
+    - name: 'Verify | minimal /etc/opt/paperless/paperless.conf'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Verify | paperless.conf'
+        test_src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/paperless.conf.role_defaults"
+          }}'
+        test_file: '/etc/opt/paperless/paperless.conf'
+        test_owner: 'paperless'
+        test_group: 'paperless'
+        test_mode: '0640'
+        test_diff: true
+
+    # Re-run with user test paperless.conf.
+    - name: 'Converge | apply r_pufky.media.paperless_ngx'
+      ansible.builtin.include_role:
+        name: 'r_pufky.media.paperless_ngx'
+      vars:
+        paperless_ngx_cfg_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/paperless.conf"
+          }}'
+        paperless_ngx_flg_backup: false
+        paperless_ngx_flg_maintenance: false
+        paperless_ngx_flg_install: false
+        paperless_ngx_flg_config: true
+        paperless_ngx_flg_migrate: false
+        paperless_ngx_flg_start: true
