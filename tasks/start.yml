@@ -49,8 +49,8 @@
 
 - name: 'Start | systemd | query paperless_cache.timer'
   ansible.builtin.command: 'systemctl status paperless_cache.timer'
-  register: paperless_ngx__cmd
   changed_when: false
+  register: paperless_ngx__cmd
 
 - name: 'Start | assert | paperless_cache.timer active'
   ansible.builtin.assert:

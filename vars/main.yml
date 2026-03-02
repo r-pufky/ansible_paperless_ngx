@@ -1,16 +1,16 @@
 ---
 ###############################################################################
-# Default Paperless-NGX Package Dependencies
+# Paperless-NGX Role Options
 ###############################################################################
 # Default required packages for Paperless-NGX install.
 #
 # Updates:
 # * Branch for new Debian releases.
-# * You will not remember all changes. Keep a separate change log.
+# * KEEP a separate change log as changes are made.
 # * Use bare-metal docs to validate package/process changes.
-# * Update role defaults (includes updating vars, defaults, tasks):
+# * Update defaults.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
+# * Standard validation testing (yamllint, ansible-lint, to-do, no-qa).
 #
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal

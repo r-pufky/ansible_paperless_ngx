@@ -84,15 +84,15 @@
 
 - name: '{{ "Prep | account | query user " ~ paperless_ngx__srv._user }}'
   ansible.builtin.command: '{{ "id " ~ paperless_ngx__srv._user }}'
+  failed_when: false
   register: paperless_ngx__cfg_check
   changed_when: paperless_ngx__cfg_check.rc > 0
-  failed_when: false
 
 - name: '{{ "Prep | account | query group " ~ paperless_ngx__srv._group }}'
   ansible.builtin.command: '{{ "groups " ~ paperless_ngx__srv._group }}'
+  failed_when: false
   register: paperless_ngx__group_check
   changed_when: paperless_ngx__group_check.rc > 0
-  failed_when: false
 
 - name: '{{ "Prep | account | create group " ~ paperless_ngx__srv._group }}'
   when: paperless_ngx__group_check.rc != 0
