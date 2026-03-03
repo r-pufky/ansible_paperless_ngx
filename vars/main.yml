@@ -20,7 +20,7 @@ paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-02-27',
     _debian='trixie',
-    _app='v2.20.8',
+    _app='v2.20.9',
     _jb2e='0.30',
     _gs='10.06.0',
   ) }}"
