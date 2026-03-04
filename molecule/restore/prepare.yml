@@ -79,9 +79,12 @@
         - '{{ paperless_ngx___jb2e._package }}'
         - '{{ paperless_ngx___gs._package }}'
 
-    # Base install moving source builds to a 1-time process rather than
-    # requiring 6-8 minute rebuilds on re-tests. Re-running the same process
-    # in converge should result in no change.
-    - name: 'Prepare | apply r_pufky.media.paperless_ngx (build all packages)'
+    - name: 'Prepare | apply r_pufky.media.paperless_ngx (install base)'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
+
+    - name: 'Prepare | apply r_pufky.media.paperless_ngx (create db backup)'
+      ansible.builtin.include_role:
+        name: 'r_pufky.media.paperless_ngx'
+      vars:
+        paperless_ngx_flg_backup: true

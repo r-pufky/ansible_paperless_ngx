@@ -12,7 +12,26 @@
 # Default: False.
 paperless_ngx_flg_backup: false
 
-# 2. Run maintenance tasks?
+# 2. Restore SQLite, paperless.conf?
+#
+# Restore existing config, DB, and exit role.
+#
+# paperless.conf:
+# Configuration is applied via paperless_ngx_cfg_file.
+#
+# Database (SQLite only):
+# Restored from latest backup in paperless_ngx_cfg_backup_dir to
+# PAPERLESS_DATA_DIR in restored configuration file. Custom PAPERLESS_DATA_DIR
+# paths are **not** created. These must be created before executing restore (as
+# with all custom user data directories).
+#
+# Services are stopped, files restored, services updated, services restarted,
+# then validated.
+#
+# Default: False.
+paperless_ngx_flg_restore: false
+
+# 3. Run maintenance tasks?
 #
 # Preform role maintenance tasks including removal of old role versions. Does
 # not affect running services.
@@ -20,7 +39,7 @@ paperless_ngx_flg_backup: false
 # Default: True.
 paperless_ngx_flg_maintenance: true
 
-# 3. Install application?
+# 4. Install application?
 #
 # Creates required default directories, users, install packages, download and
 # build software, update services, and set minimal paperless.conf if not
@@ -32,7 +51,7 @@ paperless_ngx_flg_maintenance: true
 # Default: True.
 paperless_ngx_flg_install: true
 
-# 4. Set paperless.conf?
+# 5. Set paperless.conf?
 #
 # File set using paperless_ngx_cfg_file. Stops service and deploys user
 # configuration, updates services. Services stopped.
@@ -40,7 +59,7 @@ paperless_ngx_flg_install: true
 # Default: False.
 paperless_ngx_flg_config: false
 
-# 5. Apply database migrations?
+# 6. Apply database migrations?
 #
 # New paperless releases require applying database migrations. These are safe
 # to apply every execution. Services stopped.
@@ -48,7 +67,7 @@ paperless_ngx_flg_config: false
 # Default: True.
 paperless_ngx_flg_migrate: true
 
-# 6. Verify service running?
+# 7. Verify service running?
 #
 # Start services after role application and verify running or fail.
 #
@@ -64,6 +83,9 @@ paperless_ngx_flg_start: true
 # Submit an issue if future versions break role deployment.
 #
 # Default: 'v2.20.9'.
+#
+# Reference:
+# * https://github.com/paperless-ngx/paperless-ngx/releases
 paperless_ngx_srv_version: 'v2.20.9'
 
 # Github access token.
@@ -181,7 +203,7 @@ paperless_ngx_srv_group: 'paperless'
 #
 # Manage additional files and directories (such as DB root certificates, custom
 # user data storage locations, etc.) outside of the role. Must be accessible to
-# paperless_ngx__srv._user account.
+# paperless_ngx_srv_user account.
 #
 # paperless_ngx_cfg_file: 'host_vars/pngx.example.com/paperless.conf'
 #

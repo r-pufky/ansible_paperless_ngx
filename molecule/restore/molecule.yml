@@ -1,16 +1,14 @@
 ---
 ###############################################################################
-# Default
+# Restore
 ###############################################################################
-# Default configuration is deployed successfully.
+# Test a restore operation works correctly.
 #
 # Tests:
-# * Minimal paperless.conf set (tested in converge).
-# * User provided paperless.conf set.
-# * Paperless-NGX services are active and running.
-# * Granian overrides are set correctly.
-# * ImageMaick has PDF processing enabled.
-# * sqlite database exists in data directory.
+# * Backup tasks is successful (DB backed up locally).
+# * DB restored from backup successfully.
+# * Service is validated.
+# * Test only required when backup or restore is modified.
 
 dependency:
   name: 'galaxy'
@@ -28,16 +26,15 @@ provisioner:
     group_vars:
       all:
         url_inject_enable: true
+        paperless_ngx_cfg_backup_dir: '/tmp'
 platforms:
-  - name: 'paperless_ngx_default'
+  - name: 'paperless_ngx_restore'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
     command: '/lib/systemd/systemd'
     pre_build_image: true
-    published_ports:
-      - '8000:8000/tcp'
 verifier:
   name: 'ansible'
 lint: |

@@ -6,6 +6,10 @@
   when: paperless_ngx_flg_backup
   ansible.builtin.import_tasks: 'backup.yml'
 
+- name: 'Restore'
+  when: paperless_ngx_flg_restore
+  ansible.builtin.import_tasks: 'restore.yml'
+
 - name: 'Maintenance'
   when: paperless_ngx_flg_maintenance
   ansible.builtin.import_tasks: 'maintenance.yml'

@@ -1,0 +1,79 @@
+---
+###############################################################################
+# Restore
+###############################################################################
+# Apply configuration as normal from role. Find the latest set of SQLite DB
+# backups and copy to remote using PAPERLESS_DATA_DIR. Restart services and
+# validate they are running from role.
+#
+# Database:
+#   db.sqlite3'
+#   db.sqlite3-shm'
+#   db.sqlite3-wal'
+
+# Requires paperless_ngx_cfg_file set.
+- name: 'Restore | include | config.yml'
+  ansible.builtin.import_tasks: 'config.yml'
+
+# See services.yml for awk explanation.
+- name: 'Restore | awk | PAPERLESS_DATA_DIR'
+  ansible.builtin.shell: >-
+    awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
+    {{ paperless_ngx___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: paperless_ngx__awk_data
+
+- name: 'Restore | filesystem | enumerate all backups'
+  delegate_to: 'localhost'
+  ansible.builtin.find:
+    paths: '{{ paperless_ngx__cfg._backup_dir }}'
+    patterns: '*.sqlite3'
+    file_type: 'file'
+    recurse: false
+  register: paperless_ngx__dbs
+
+# Grab datestamp from expected 'YYYY-MM-DDTHHMMSS_{FILE}' format.
+- name: 'Restore | fact | parse latest backup'
+  when: paperless_ngx__dbs.files | length > 0
+  ansible.builtin.set_fact:
+    paperless_ngx__restore_base: '{{
+
+        (
+          paperless_ngx__dbs.files |
+          sort(attribute="mtime", reverse=true) |
+          first
+        ).path | basename | split(".sqlite3") | first
+      }}'
+
+- name: 'Restore | filesystem | enumerate latest backup'
+  delegate_to: 'localhost'
+  ansible.builtin.find:
+    paths: '{{ paperless_ngx__cfg._backup_dir }}'
+    patterns: '{{ paperless_ngx__restore_base ~ ".*" }}'
+    file_type: 'file'
+    recurse: false
+  register: paperless_ngx__dbs
+
+- name: 'Restore | copy | SQLite DB'
+  when: paperless_ngx__dbs.matched > 0
+  ansible.builtin.copy:
+    src: '{{ item.path }}'
+    dest: '{{
+        paperless_ngx__awk_data.stdout ~ "/db" ~ item.path | splitext | last
+      }}'
+    owner: '{{ paperless_ngx__cfg._uid }}'
+    group: '{{ paperless_ngx__cfg._gid }}'
+    mode: '0640'
+    force: true
+  loop: '{{ paperless_ngx__dbs.files }}'
+
+- name: 'Restore | include | services.yml'
+  ansible.builtin.import_tasks: 'services.yml'
+
+- name: 'Restore | include | start.yml'
+  ansible.builtin.import_tasks: 'start.yml'
+
+- name: 'Restore | success ✔'
+  ansible.builtin.meta: 'end_host'

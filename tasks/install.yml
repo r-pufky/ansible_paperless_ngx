@@ -395,7 +395,7 @@
         <policy domain="coder" rights="read|write" pattern="PDF" />
       </policymap>
 
-# Services requiring paperless.conf settings are updated in systemd.yml.
+# Services requiring paperless.conf settings are updated in services.yml.
 - name: 'Install | systemd | set services'
   ansible.builtin.template:
     src: '{{ "systemd/" ~ item ~ ".j2" }}'

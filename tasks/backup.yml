@@ -40,7 +40,7 @@
 
 - name: 'Backup | fetch | databases'
   ansible.builtin.fetch:
-    src: '{{ paperless_ngx__awk_data ~ "/" ~ item }}'
+    src: '{{ paperless_ngx__awk_data.stdout ~ "/" ~ item }}'
     dest: '{{
         paperless_ngx__cfg._backup_dir ~ "/" ~
         paperless_ngx__cfg._start ~ "_" ~ item
@@ -52,20 +52,8 @@
     - 'db.sqlite3-shm'
     - 'db.sqlite3-wal'
 
-- name: 'Backup | systemd | start services'
-  ansible.builtin.systemd:
-    name: '{{ item }}'
-    state: 'started'
-  failed_when: false
-  loop: '{{
-      ["redis-server.service" if paperless_ngx__srv._redis else "",
-       "paperless_consumer.service",
-       "paperless_scheduler.service",
-       "paperless_task_queue.service",
-       "paperless_webserver.service",
-       "paperless_cache.service",
-       "paperless_cache.timer"] | select()
-    }}'
+- name: 'Backup | include | start.yml'
+  ansible.builtin.import_tasks: 'start.yml'
 
 - name: 'Backup | success ✔'
   ansible.builtin.meta: 'end_host'

@@ -30,11 +30,12 @@ Tasks are gated by feature flags and executed in the following order.
   Step | Flag                          | Notes
  ------|-------------------------------|-------
   1    | paperless_ngx_flg_backup      | Backup existing config. Exits role.
-  2    | paperless_ngx_flg_maintenance | Preform role maintenance tasks.
-  3    | paperless_ngx_flg_install     | Install required packages, users, etc.
-  4    | paperless_ngx_flg_config      | Install user-defined config.
-  5    | paperless_ngx_flg_migrate     | Apply database migrations.
-  6    | paperless_ngx_flg_start       | Start service and validate install.
+  2    | paperless_ngx_flg_restore     | Restore config, SQLite DB. Exits role.
+  3    | paperless_ngx_flg_maintenance | Preform role maintenance tasks.
+  4    | paperless_ngx_flg_install     | Install required packages, users, etc.
+  5    | paperless_ngx_flg_config      | Install user-defined config.
+  6    | paperless_ngx_flg_migrate     | Apply database migrations.
+  7    | paperless_ngx_flg_start       | Start service and validate install.
 
 ## Example Playbooks
 
@@ -122,19 +123,19 @@ inconsistent and rapid rolling release cycle.
 
  Release | Debian | Ansible | Paperless-NGX | Notes
 ---------|--------|---------|---------------|-------
- 13.x.x  | 13     | 2.20    | 2.20.8        | Ansible 2.20, feature flags, and semantic versioning.
- 12.x.x  | 13     | 2.18    | 2.20.1        | Last 'fully managed' config.
- 11.x.x  | 13     | 2.18    | 2.19.3        | Migrate to r_pufky.media.
- 10.x.x  | 13     | 2.18    | 2.19.2        | Redis server required for DB migrations.
- 9.x.x   | 13     | 2.18    | 2.18.4        | Data annotations V3.
- 8.x.x   | 13     | 2.18    | 2.18.4        | Breaking Paperless changes.
- 7.x.x   | 13     | 2.18    | 2.18.2        | Migrate to Debian Trixie.
- 6.x.x   | 12     | 2.18    | 2.18.1        | Breaking Paperless changes.
- 5.x.x   | 12     | 2.18    | 2.17.3        | Data annotations V2.
- 4.x.x   | 12     | 2.18    | 2.16.1        | Data annotations.
- 3.x.x   | 12     | 2.18    | 2.16.2        | Use source release for JBIG2enc.
- 2.x.x   | 12     | 2.18    | 2.14.7        | Ansible 2.18 support.
- 1.x.x   | 12     | 2.11    | 1.15.1        | Migration from private repository.
+ 13.x.x  | 13     | 2.20    | v2.20.8       | Ansible 2.20, feature flags, and semantic versioning.
+ 12.x.x  | 13     | 2.18    | v2.20.1       | Last 'fully managed' config.
+ 11.x.x  | 13     | 2.18    | v2.19.3       | Migrate to r_pufky.media.
+ 10.x.x  | 13     | 2.18    | v2.19.2       | Redis server required for DB migrations.
+ 9.x.x   | 13     | 2.18    | v2.18.4       | Data annotations V3.
+ 8.x.x   | 13     | 2.18    | v2.18.4       | Breaking Paperless changes.
+ 7.x.x   | 13     | 2.18    | v2.18.2       | Migrate to Debian Trixie.
+ 6.x.x   | 12     | 2.18    | v2.18.1       | Breaking Paperless changes.
+ 5.x.x   | 12     | 2.18    | v2.17.3       | Data annotations V2.
+ 4.x.x   | 12     | 2.18    | v2.16.1       | Data annotations.
+ 3.x.x   | 12     | 2.18    | v2.16.2       | Use source release for JBIG2enc.
+ 2.x.x   | 12     | 2.18    | v2.14.7       | Ansible 2.18 support.
+ 1.x.x   | 12     | 2.11    | v1.15.1       | Migration from private repository.
 
 ## Issues
 Create a bug and provide as much information as possible.

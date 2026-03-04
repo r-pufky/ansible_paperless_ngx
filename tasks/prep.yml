@@ -53,7 +53,7 @@
       paperless_ngx_flg_backup: {{ paperless_ngx_flg_backup }}
       paperless_ngx_cfg_backup_dir: {{ paperless_ngx__cfg._backup_dir }}
 
-- name: 'Config | assert | config enabled and source defined'
+- name: 'Prep | assert | config enabled and source defined'
   when: paperless_ngx_flg_config
   ansible.builtin.assert:
     quiet: true
@@ -65,6 +65,20 @@
       Config source enabled but no config source defined.
 
       paperless_ngx_flg_config: {{ paperless_ngx_flg_config }}
+      paperless_ngx_cfg_file: {{ paperless_ngx__cfg._file }}
+
+- name: 'Prep | assert | restore enabled and source defined'
+  when: paperless_ngx_flg_restore
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - paperless_ngx__cfg._file | length > 0
+    fail_msg: |
+
+      ✘ Config source not set.
+      Restore enabled but no config source defined.
+
+      paperless_ngx_flg_restore: {{ paperless_ngx_flg_restore }}
       paperless_ngx_cfg_file: {{ paperless_ngx__cfg._file }}
 
 - name: 'Prep | systemd | stop services'
