@@ -3,12 +3,6 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Verify | import role variables'
-      ansible.builtin.include_vars:
-        file: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
-          }}'
-
     - name: 'Verify | user /etc/opt/paperless/paperless.conf'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'

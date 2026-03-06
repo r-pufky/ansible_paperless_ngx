@@ -48,6 +48,7 @@
       }}'
 
 - name: 'Restore | filesystem | enumerate latest backup'
+  when: paperless_ngx__dbs.files | length > 0
   delegate_to: 'localhost'
   ansible.builtin.find:
     paths: '{{ paperless_ngx__cfg._backup_dir }}'
