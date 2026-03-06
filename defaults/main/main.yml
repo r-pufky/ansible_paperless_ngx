@@ -82,11 +82,11 @@ paperless_ngx_flg_start: true
 #
 # Submit an issue if future versions break role deployment.
 #
-# Default: 'v2.20.9'.
+# Default: 'v2.20.10'.
 #
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
-paperless_ngx_srv_version: 'v2.20.9'
+paperless_ngx_srv_version: 'v2.20.10'
 
 # Github access token.
 #
