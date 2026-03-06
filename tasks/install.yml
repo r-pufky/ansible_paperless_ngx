@@ -103,9 +103,11 @@
   register: paperless_ngx__cmd
   until: paperless_ngx__cmd is succeeded
 
-- name: '{{ "Install | filesystem | set " ~ paperless_ngx___app._live_dir }}'
+# TODO - this should be the CONFIG live dir, not the app.
+#     check for navidrome as well.
+- name: '{{ "Install | filesystem | set " ~ paperless_ngx__cfg._live_dir }}'
   ansible.builtin.file:
-    path: '{{ paperless_ngx___app._live_dir }}'
+    path: '{{ paperless_ngx__cfg._live_dir }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
@@ -116,7 +118,7 @@
     creates: '{{ paperless_ngx___app._work_dir ~ "/manage.py" }}'
     src: '{{ "/tmp/" ~ paperless_ngx__cfg._package }}'
     remote_src: true
-    dest: '{{ paperless_ngx___app._live_dir }}'
+    dest: '{{ paperless_ngx__cfg._live_dir }}'
     owner: 'root'
     group: 'root'
     mode: 'a-st'
@@ -139,9 +141,9 @@
   ansible.builtin.command:
     argv:
       - 'mv'
-      - '{{ paperless_ngx___app._live_dir ~ "/paperless.conf" }}'
-      - '{{ paperless_ngx___app._live_dir ~ "/paperless.conf.template" }}'
-    creates: '{{ paperless_ngx___app._live_dir ~ "/paperless.conf.template" }}'
+      - '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf" }}'
+      - '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf.template" }}'
+    creates: '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf.template" }}'
 
 - name:
     '{{ "Install | filesystem | set minimal " ~ paperless_ngx___app._cfg }}'
@@ -334,7 +336,7 @@
   ansible.builtin.shell: '{{ paperless_ngx__cfg._uv ~ " sync --all-extras" }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___app._live_dir }}'
+    chdir: '{{ paperless_ngx__cfg._live_dir }}'
     creates: '{{ paperless_ngx___app._venv_dir }}'
 
 ###############################################################################
@@ -348,8 +350,8 @@
     }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___app._live_dir }}'
-    creates: '{{ paperless_ngx___app._live_dir ~ "/bin/nltk" }}'
+    chdir: '{{ paperless_ngx__cfg._live_dir }}'
+    creates: '{{ paperless_ngx__cfg._live_dir ~ "/bin/nltk" }}'
 
 - name: 'Install | uv | download NLTK data (~1 minute) 🗘'
   when: paperless_ngx__cfg._nltk_data | length > 0
@@ -363,7 +365,7 @@
     }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___app._live_dir }}'
+    chdir: '{{ paperless_ngx__cfg._live_dir }}'
   register: paperless_ngx__cmd
   changed_when: '"already up-to-date" not in paperless_ngx__cmd.stderr'
 
