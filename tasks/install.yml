@@ -103,8 +103,6 @@
   register: paperless_ngx__cmd
   until: paperless_ngx__cmd is succeeded
 
-# TODO - this should be the CONFIG live dir, not the app.
-#     check for navidrome as well.
 - name: '{{ "Install | filesystem | set " ~ paperless_ngx__cfg._live_dir }}'
   ansible.builtin.file:
     path: '{{ paperless_ngx__cfg._live_dir }}'

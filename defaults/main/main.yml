@@ -186,7 +186,7 @@ paperless_ngx_srv_group: 'paperless'
 #
 # Ansible controller path to source paperless.conf (treated as a jinja2
 # template allowing for ansible variable interpretation). Overwrites existing
-# /etc/opt/paperless.conf.
+# /etc/opt/paperless/paperless.conf.
 #
 # A minimally configured template that works with the role will be deployed if
 # no config file is specified (see templates/paperless.conf.j2):
