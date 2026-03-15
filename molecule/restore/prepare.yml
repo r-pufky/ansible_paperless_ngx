@@ -10,45 +10,48 @@
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
           }}'
 
-    - name: 'Prepare | create cache'
+    - name: 'Prepare | cache'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'create_cache.yml'
       vars:
         test_name: 'Prepare cache'
 
     - name: '{{
-          "Prepare | cache Paperless-NGX " ~ paperless_ngx___app._version
+          "Prepare | cache | Paperless-NGX " ~ paperless_ngx___app._version
         }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'cache_url.yml'
       vars:
         test_name: '{{
-            "Prepare | cache Paperless-NGX " ~ paperless_ngx___app._version
+            "Prepare | cache | Paperless-NGX " ~ paperless_ngx___app._version
           }}'
         test_dest: '{{ paperless_ngx___app._package }}'
         test_url: '{{ paperless_ngx___app._url }}'
         test_mode: '0640'
 
-    - name: '{{ "Prepare | cache JBIG2enc " ~ paperless_ngx___jb2e._version }}'
+    - name:
+        '{{ "Prepare | cache | JBIG2enc " ~ paperless_ngx___jb2e._version }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'cache_url.yml'
       vars:
         test_name:
-          '{{ "Prepare | cache JBIG2enc " ~ paperless_ngx___jb2e._version }}'
+          '{{ "Prepare | cache | JBIG2enc " ~ paperless_ngx___jb2e._version }}'
         test_dest: '{{ paperless_ngx___jb2e._package }}'
         test_url: '{{ paperless_ngx___jb2e._url }}'
         test_mode: '0640'
 
-    - name: '{{ "Prepare | cache Ghostscript " ~ paperless_ngx___gs._version }}'
+    - name:
+        '{{ "Prepare | cache | Ghostscript " ~ paperless_ngx___gs._version }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name:
-          '{{ "Prepare | cache Ghostscript " ~ paperless_ngx___gs._version }}'
+        test_name: '{{
+            "Prepare | cache | Ghostscript " ~ paperless_ngx___gs._version
+          }}'
         test_dest: '{{ paperless_ngx___gs._package }}'
         test_url: '{{ paperless_ngx___gs._url }}'
         test_mode: '0640'
@@ -79,11 +82,14 @@
         - '{{ paperless_ngx___jb2e._package }}'
         - '{{ paperless_ngx___gs._package }}'
 
-    - name: 'Prepare | apply r_pufky.media.paperless_ngx (install base)'
+    # Base install moving source builds to a 1-time process rather than
+    # requiring 6-8 minute rebuilds on re-tests. Re-running the same process
+    # in converge should result in no change.
+    - name: 'Prepare | role | r_pufky.media.paperless_ngx (install base)'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
 
-    - name: 'Prepare | apply r_pufky.media.paperless_ngx (create db backup)'
+    - name: 'Prepare | role | r_pufky.media.paperless_ngx (create db backup)'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
       vars:

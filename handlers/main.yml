@@ -1,0 +1,22 @@
+---
+###############################################################################
+# Handlers
+###############################################################################
+
+- name: 'Handlers | load paperless_cache'
+  listen:
+    - 'Handlers | enable paperless_cache'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    enabled: true
+    daemon_reload: true
+  loop:
+    - 'paperless_cache.service'
+    - 'paperless_cache.timer'
+
+- name: 'Handlers | paperless_cache.timer (tick)'
+  listen:
+    - 'Handlers | enable paperless_cache'
+  ansible.builtin.systemd:
+    name: 'paperless_cache.timer'
+    state: 'started'

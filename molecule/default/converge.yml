@@ -3,29 +3,35 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Converge | apply r_pufky.media.paperless_ngx'
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Converge | role | r_pufky.media.paperless_ngx'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
 
-    - name: 'Converge | verify | minimal /etc/opt/paperless/paperless.conf'
+    - name: '{{ "Converge | test | minimal " ~ paperless_ngx___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
         test_name:
-          'Converge | verify | minimal /etc/opt/paperless/paperless.conf'
+          '{{ "Converge | test | minimal " ~ paperless_ngx___app._cfg }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/paperless.conf.role_defaults"
           }}'
-        test_file: '/etc/opt/paperless/paperless.conf'
+        test_file: '{{ paperless_ngx___app._cfg }}'
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0640'
         test_diff: true
 
     # Re-run with user test paperless.conf.
-    - name: 'Converge | apply r_pufky.media.paperless_ngx'
+    - name: 'Converge | role | r_pufky.media.paperless_ngx'
       ansible.builtin.include_role:
         name: 'r_pufky.media.paperless_ngx'
       vars:

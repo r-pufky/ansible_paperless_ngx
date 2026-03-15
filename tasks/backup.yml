@@ -18,12 +18,12 @@
     mode: '0750'
     state: directory
 
-- name: 'Backup | fetch | paperless.conf'
+- name: '{{ "Backup | fetch | " ~ paperless_ngx___app._cfg }}'
   ansible.builtin.fetch:
     src: '{{ paperless_ngx___app._cfg }}'
     dest: '{{
         paperless_ngx__cfg._backup_dir ~ "/" ~
-        paperless_ngx__cfg._start ~ "_paperless.conf"
+        paperless_ngx__srv._start ~ "_paperless.conf"
       }}'
     fail_on_missing: false
     flat: true
@@ -43,7 +43,7 @@
     src: '{{ paperless_ngx__awk_data.stdout ~ "/" ~ item }}'
     dest: '{{
         paperless_ngx__cfg._backup_dir ~ "/" ~
-        paperless_ngx__cfg._start ~ "_" ~ item
+        paperless_ngx__srv._start ~ "_" ~ item
       }}'
     fail_on_missing: false
     flat: true
@@ -52,7 +52,7 @@
     - 'db.sqlite3-shm'
     - 'db.sqlite3-wal'
 
-- name: 'Backup | include | start.yml'
+- name: 'Backup | start'
   ansible.builtin.import_tasks: 'start.yml'
 
 - name: 'Backup | success ✔'

@@ -15,8 +15,7 @@
        "paperless_scheduler.service",
        "paperless_task_queue.service",
        "paperless_webserver.service",
-       "paperless_cache.service",
-       "paperless_cache.timer"] | select()
+       "paperless_cache.service"] | select()
     }}'
 
 - name: 'Start | fact | query services'

@@ -12,7 +12,7 @@
 #   db.sqlite3-wal'
 
 # Requires paperless_ngx_cfg_file set.
-- name: 'Restore | include | config.yml'
+- name: 'Restore | config'
   ansible.builtin.import_tasks: 'config.yml'
 
 # See services.yml for awk explanation.
@@ -69,11 +69,13 @@
     mode: '0640'
     force: true
   loop: '{{ paperless_ngx__dbs.files }}'
+  loop_control:
+    label: '{{ item.path | basename }}'
 
-- name: 'Restore | include | services.yml'
+- name: 'Restore | services'
   ansible.builtin.import_tasks: 'services.yml'
 
-- name: 'Restore | include | start.yml'
+- name: 'Restore | start'
   ansible.builtin.import_tasks: 'start.yml'
 
 - name: 'Restore | success ✔'

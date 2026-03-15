@@ -7,7 +7,7 @@
 #
 # Backup existing config, DB, and exit role. Only applies to SQLite databases
 # configured in PAPERLESS_DATA_DIR. paperless_ngx_cfg_backup_dir created if
-# non-existent. Services stopped for backup and restarted.
+# non-existent. Services stopped, files backed up, services started.
 #
 # Default: False.
 paperless_ngx_flg_backup: false
@@ -25,16 +25,14 @@ paperless_ngx_flg_backup: false
 # paths are **not** created. These must be created before executing restore (as
 # with all custom user data directories).
 #
-# Services are stopped, files restored, services updated, services restarted,
-# then validated.
+# Services stopped, files restored, services updated and started.
 #
 # Default: False.
 paperless_ngx_flg_restore: false
 
 # 3. Run maintenance tasks?
 #
-# Preform role maintenance tasks including removal of old role versions. Does
-# not affect running services.
+# Preform role maintenance tasks including removal of old role versions.
 #
 # Default: True.
 paperless_ngx_flg_maintenance: true
@@ -42,8 +40,8 @@ paperless_ngx_flg_maintenance: true
 # 4. Install application?
 #
 # Creates required default directories, users, install packages, download and
-# build software, update services, and set minimal paperless.conf if not
-# specified. Services stopped.
+# build software, set minimal paperless.conf if not specified, update and start
+# services.
 #
 # Default user runtime data is stored /var/opt/paperless. Alternative user
 # defined locations for this data must be managed outside of the role.
@@ -54,7 +52,7 @@ paperless_ngx_flg_install: true
 # 5. Set paperless.conf?
 #
 # File set using paperless_ngx_cfg_file. Stops service and deploys user
-# configuration, updates services. Services stopped.
+# configuration, updates and starts services.
 #
 # Default: False.
 paperless_ngx_flg_config: false
@@ -62,17 +60,10 @@ paperless_ngx_flg_config: false
 # 6. Apply database migrations?
 #
 # New paperless releases require applying database migrations. These are safe
-# to apply every execution. Services stopped.
+# to apply every execution. Stops service, migration applied, starts services.
 #
 # Default: True.
 paperless_ngx_flg_migrate: true
-
-# 7. Verify service running?
-#
-# Start services after role application and verify running or fail.
-#
-# Default: True.
-paperless_ngx_flg_start: true
 
 ###############################################################################
 # Service

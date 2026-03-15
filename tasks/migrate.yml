@@ -30,7 +30,7 @@
     name: 'redis-server.service'
     state: 'started'
 
-- name: 'Migrate | uv | migrate database schema (~1 minute) 🗘'
+- name: 'Migrate | uv | 🗘 migrate database schema (~1 minute) 🗘'
   ansible.builtin.shell:
     '{{ paperless_ngx__cfg._uv ~ " run -- python3 manage.py migrate" }}'
   args:

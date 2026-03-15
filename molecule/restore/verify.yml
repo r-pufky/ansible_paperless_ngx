@@ -3,28 +3,34 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Verify | user /etc/opt/paperless/paperless.conf'
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: '{{ "Verify | test | " ~ paperless_ngx___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | paperless.conf'
+        test_name: '{{ "Verify | test | " ~ paperless_ngx___app._cfg }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/paperless.conf.role_defaults"
           }}'
-        test_file: '/etc/opt/paperless/paperless.conf'
+        test_file: '{{ paperless_ngx___app._cfg }}'
         test_owner: 'paperless'
         test_group: 'paperless'
         test_mode: '0640'
         test_diff: true
 
-    - name: 'Verify | /var/opt/paperless/data/db.sqlite3'
+    - name: 'Verify | test | /var/opt/paperless/data/db.sqlite3'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Verify | /var/opt/paperless/data/db.sqlite3'
+        test_name: 'Verify | test | /var/opt/paperless/data/db.sqlite3'
         test_file: '/var/opt/paperless/data/db.sqlite3'
         test_owner: 'paperless'
         test_group: 'paperless'

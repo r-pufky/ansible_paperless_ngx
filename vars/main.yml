@@ -18,7 +18,7 @@
 
 paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
-    _date='2026-02-27',
+    _date='2026-03-14',
     _debian='trixie',
     _app='v2.20.10',
     _jb2e='0.30',
@@ -110,6 +110,7 @@ paperless_ngx___app: "{{ {} | r_pufky.data.v3(
     _live_dir='/opt/paperless/src/' ~ paperless_ngx___release._app,
     _work_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/src',
     _venv_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/.venv',
+    _policy_file='/etc/ImageMagick-7/policy.xml',
     _base_url=paperless_ngx___repo_url,
     _url=(
       paperless_ngx___repo_url ~ paperless_ngx___release._app ~ '/' ~

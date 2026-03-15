@@ -60,7 +60,7 @@
       - '{{ paperless_ngx___packages }}'
       - '{{ paperless_ngx___redis if paperless_ngx__srv._redis else [] }}'
       - '{{ paperless_ngx__cfg._ocr_languages }}'
-    apt_package_update_cache: true
+    apt_srv_package_update_cache: true
 
 - name: 'Install | systemd | start redis-server'
   when: paperless_ngx__srv._redis
@@ -89,7 +89,7 @@
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
 
-- name: 'Install | filesystem | stage paperless-ngx'
+- name: 'Install | url | 🗘 paperless-ngx (~1 minute) 🗘'
   when: not (url_inject_enable | default(false))
   ansible.builtin.get_url:
     url: '{{ paperless_ngx__cfg._url }}'
@@ -153,12 +153,6 @@
     group: '{{ paperless_ngx__cfg._gid }}'
     mode: '0640'
 
-- name: 'Install | filesystem | unstage paperless-ngx'
-  when: not (url_inject_enable | default(false))
-  ansible.builtin.file:
-    path: '{{ "/tmp/" ~ paperless_ngx__cfg._package }}'
-    state: 'absent'
-
 ###############################################################################
 # JBIG2enc
 ###############################################################################
@@ -178,7 +172,7 @@
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
 
-- name: 'Install | filesystem | stage JBIG2enc'
+- name: 'Install | url | 🗘 JBIG2enc (~1 minute) 🗘'
   when: not (url_inject_enable | default(false))
   ansible.builtin.get_url:
     url: '{{ paperless_ngx___jb2e._url }}'
@@ -212,13 +206,13 @@
     extra_opts: ['--strip-components=1']
   register: paperless_ngx__cmd
 
-- name: 'Install | build | JBIG2enc (~1 minute) 🗘'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate
+- name: 'Install | build | 🗘 JBIG2enc (~1 minute) 🗘'
+  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
   ansible.builtin.debug:
     msg: 'Building JBIG2enc (~1 minute).'
 
 - name: '{{ "Install | build | JBIG2enc " ~ paperless_ngx___jb2e._version }}'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate
+  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
   ansible.builtin.shell: >-
     set -o pipefail &&
     ./autogen.sh &&
@@ -229,12 +223,6 @@
     chdir: '{{ paperless_ngx___jb2e._live_dir }}'
   register: paperless_ngx__cmd
   changed_when: paperless_ngx__cmd.rc == 0
-
-- name: 'Install | filesystem | unstage JBIG2enc'
-  when: not (url_inject_enable | default(false))
-  ansible.builtin.file:
-    path: '{{ "/tmp/" ~ paperless_ngx___jb2e._package }}'
-    state: 'absent'
 
 ###############################################################################
 # Ghostscript
@@ -255,7 +243,7 @@
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
 
-- name: 'Install | filesystem | stage Ghostscript'
+- name: 'Install | url | 🗘 Ghostscript 🗘'
   when: not (url_inject_enable | default(false))
   ansible.builtin.get_url:
     url: '{{ paperless_ngx___gs._url }}'
@@ -289,13 +277,13 @@
     extra_opts: ['--strip-components=1']
   register: paperless_ngx__cmd
 
-- name: 'Install | build | Ghostscript (~4 minutes) 🗘'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate
+- name: 'Install | build | 🗘 Ghostscript (~4 minutes) 🗘'
+  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
   ansible.builtin.debug:
     msg: 'Building Ghostscript (~4 minutes).'
 
 - name: '{{ "Install | build | Ghostscript " ~ paperless_ngx___gs._version }}'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate
+  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
   ansible.builtin.shell: >-
     set -o pipefail &&
     ./configure &&
@@ -306,12 +294,6 @@
     chdir: '{{ paperless_ngx___gs._live_dir }}'
   register: paperless_ngx__cmd
   changed_when: paperless_ngx__cmd.rc == 0
-
-- name: 'Install | filesystem | unstage Ghostscript'
-  when: not (url_inject_enable | default(false))
-  ansible.builtin.file:
-    path: '{{ "/tmp/" ~ paperless_ngx___gs._package }}'
-    state: 'absent'
 
 ###############################################################################
 # Virtual Environment
@@ -330,7 +312,7 @@
   become: true
   become_user: '{{ paperless_ngx__srv._user }}'
 
-- name: 'Install | uv | init uv (~1 minute) 🗘'
+- name: 'Install | uv | 🗘 init uv (~1 minute) 🗘'
   ansible.builtin.shell: '{{ paperless_ngx__cfg._uv ~ " sync --all-extras" }}'
   args:
     executable: '/bin/bash'
@@ -341,7 +323,7 @@
 # NLTK Libraries
 ###############################################################################
 
-- name: 'Install | uv | install NLTK (~1 minute) 🗘'
+- name: 'Install | uv | 🗘 install NLTK (~1 minute) 🗘'
   ansible.builtin.shell: '{{
       paperless_ngx__cfg._uv ~ " add " ~
       paperless_ngx___nltk._packages | join(" ")
@@ -351,7 +333,7 @@
     chdir: '{{ paperless_ngx__cfg._live_dir }}'
     creates: '{{ paperless_ngx__cfg._live_dir ~ "/bin/nltk" }}'
 
-- name: 'Install | uv | download NLTK data (~1 minute) 🗘'
+- name: 'Install | uv | 🗘 download NLTK data (~1 minute) 🗘'
   when: paperless_ngx__cfg._nltk_data | length > 0
   ansible.builtin.shell: '{{
       paperless_ngx__cfg._uv ~ " run python " ~
@@ -377,11 +359,12 @@
 # not found.
 #
 
-- name: 'Install | filesystem | query /etc/ImageMagick-7/policy.xml'
+- name:
+    '{{ "Install | filesystem | query " ~ paperless_ngx___app._policy_file }}'
   ansible.builtin.shell: >-
     set -o pipefail &&
     grep -c 'rights="read|write" pattern="PDF"'
-    /etc/ImageMagick-7/policy.xml
+    {{ paperless_ngx___app._policy_file }}
   changed_when: false
   register: paperless_ngx__cmd
   failed_when: paperless_ngx__cmd.rc > 1
@@ -389,7 +372,7 @@
 - name: 'Install | filesystem | enable ImageMagick PDF processing'
   when: paperless_ngx__cmd.stdout == '0'
   ansible.builtin.lineinfile:
-    path: /etc/ImageMagick-7/policy.xml
+    path: '{{ paperless_ngx___app._policy_file }}'
     search_string: '</policymap>'
     line: |2
         <policy domain="coder" rights="read|write" pattern="PDF" />

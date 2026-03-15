@@ -34,5 +34,4 @@
   ansible.builtin.import_tasks: 'migrate.yml'
 
 - name: 'Start'
-  when: paperless_ngx_flg_start
   ansible.builtin.import_tasks: 'start.yml'

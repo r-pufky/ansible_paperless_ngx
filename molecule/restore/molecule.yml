@@ -28,7 +28,7 @@ provisioner:
         url_inject_enable: true
         paperless_ngx_cfg_backup_dir: '/tmp/ansible_paperless_ngx_test'
 platforms:
-  - name: 'paperless_ngx_restore'
+  - name: 'paperless-ngx-restore'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -37,10 +37,6 @@ platforms:
     pre_build_image: true
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
     - 'destroy'
