@@ -33,7 +33,7 @@
     mode: '0755'
     state: 'directory'
   loop:
-    - '{{ paperless_ngx___app._src_dir }}'  # src_dir includes opt_dir.
+    - '{{ paperless_ngx__cfg._src_dir }}'  # src_dir includes opt_dir.
     - '{{ paperless_ngx___jb2e._src_dir }}'
     - '{{ paperless_ngx___gs._src_dir }}'
     - '{{ paperless_ngx___nltk._opt_dir }}'
@@ -46,11 +46,11 @@
     mode: '0750'
     state: 'directory'
   loop:
-    - '{{ paperless_ngx___app._etc_dir }}'
-    - '{{ paperless_ngx___app._var_dir ~ "/consume" }}'
-    - '{{ paperless_ngx___app._var_dir ~ "/data" }}'
-    - '{{ paperless_ngx___app._var_dir ~ "/trash" }}'
-    - '{{ paperless_ngx___app._var_dir ~ "/media" }}'
+    - '{{ paperless_ngx__cfg._etc_dir }}'
+    - '{{ paperless_ngx__cfg._var_dir ~ "/consume" }}'
+    - '{{ paperless_ngx__cfg._var_dir ~ "/data" }}'
+    - '{{ paperless_ngx__cfg._var_dir ~ "/trash" }}'
+    - '{{ paperless_ngx__cfg._var_dir ~ "/media" }}'
 
 - name: 'Install | packages'
   ansible.builtin.include_role:
@@ -76,7 +76,7 @@
 
 - name: 'Install | filesystem | find previous installations'
   ansible.builtin.find:
-    paths: '{{ paperless_ngx___app._src_dir }}'
+    paths: '{{ paperless_ngx__cfg._src_dir }}'
     file_type: 'directory'
     recurse: false
     excludes:
@@ -103,9 +103,9 @@
   register: paperless_ngx__cmd
   until: paperless_ngx__cmd is succeeded
 
-- name: '{{ "Install | filesystem | set " ~ paperless_ngx__cfg._live_dir }}'
+- name: '{{ "Install | filesystem | set " ~ paperless_ngx__cfg._app }}'
   ansible.builtin.file:
-    path: '{{ paperless_ngx__cfg._live_dir }}'
+    path: '{{ paperless_ngx__cfg._app }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
@@ -113,10 +113,10 @@
 
 - name: 'Install | filesystem | unpack paperless-ngx'
   ansible.builtin.unarchive:
-    creates: '{{ paperless_ngx___app._work_dir ~ "/manage.py" }}'
+    creates: '{{ paperless_ngx__cfg._work_dir ~ "/manage.py" }}'
     src: '{{ "/tmp/" ~ paperless_ngx__cfg._package }}'
     remote_src: true
-    dest: '{{ paperless_ngx__cfg._live_dir }}'
+    dest: '{{ paperless_ngx__cfg._app }}'
     owner: 'root'
     group: 'root'
     mode: 'a-st'
@@ -139,16 +139,16 @@
   ansible.builtin.command:
     argv:
       - 'mv'
-      - '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf" }}'
-      - '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf.template" }}'
-    creates: '{{ paperless_ngx__cfg._live_dir ~ "/paperless.conf.template" }}'
+      - '{{ paperless_ngx__cfg._app ~ "/paperless.conf" }}'
+      - '{{ paperless_ngx__cfg._app ~ "/paperless.conf.template" }}'
+    creates: '{{ paperless_ngx__cfg._app ~ "/paperless.conf.template" }}'
 
 - name:
-    '{{ "Install | filesystem | set minimal " ~ paperless_ngx___app._cfg }}'
+    '{{ "Install | filesystem | set minimal " ~ paperless_ngx__cfg._cfg }}'
   when: paperless_ngx__cfg._file | length == 0
   ansible.builtin.template:
     src: 'paperless.conf.j2'
-    dest: '{{ paperless_ngx___app._cfg }}'
+    dest: '{{ paperless_ngx__cfg._cfg }}'
     owner: '{{ paperless_ngx__cfg._uid }}'
     group: '{{ paperless_ngx__cfg._gid }}'
     mode: '0640'
@@ -186,9 +186,9 @@
   register: paperless_ngx__cmd
   until: paperless_ngx__cmd is succeeded
 
-- name: '{{ "Install | filesystem | set " ~ paperless_ngx___jb2e._live_dir }}'
+- name: '{{ "Install | filesystem | set " ~ paperless_ngx___jb2e._app }}'
   ansible.builtin.file:
-    path: '{{ paperless_ngx___jb2e._live_dir }}'
+    path: '{{ paperless_ngx___jb2e._app }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
@@ -196,10 +196,10 @@
 
 - name: 'Install | filesystem | unpack JBIG2enc'
   ansible.builtin.unarchive:
-    creates: '{{ paperless_ngx___jb2e._live_dir ~ "/src/jbig2.cc" }}'
+    creates: '{{ paperless_ngx___jb2e._app ~ "/src/jbig2.cc" }}'
     src: '{{ "/tmp/" ~ paperless_ngx___jb2e._package }}'
     remote_src: true
-    dest: '{{ paperless_ngx___jb2e._live_dir }}'
+    dest: '{{ paperless_ngx___jb2e._app }}'
     owner: 'root'
     group: 'root'
     mode: 'a-st'
@@ -220,7 +220,7 @@
     make install
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___jb2e._live_dir }}'
+    chdir: '{{ paperless_ngx___jb2e._app }}'
   register: paperless_ngx__cmd
   changed_when: paperless_ngx__cmd.rc == 0
 
@@ -257,9 +257,9 @@
   register: paperless_ngx__cmd
   until: paperless_ngx__cmd is succeeded
 
-- name: '{{ "Install | filesystem | set " ~ paperless_ngx___gs._live_dir }}'
+- name: '{{ "Install | filesystem | set " ~ paperless_ngx___gs._app }}'
   ansible.builtin.file:
-    path: '{{ paperless_ngx___gs._live_dir }}'
+    path: '{{ paperless_ngx___gs._app }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
@@ -267,10 +267,10 @@
 
 - name: 'Install | filesystem | unpack Ghostscript'
   ansible.builtin.unarchive:
-    creates: '{{ paperless_ngx___gs._live_dir ~ "/base/gslib.c" }}'
+    creates: '{{ paperless_ngx___gs._app ~ "/base/gslib.c" }}'
     src: '{{ "/tmp/" ~ paperless_ngx___gs._package }}'
     remote_src: true
-    dest: '{{ paperless_ngx___gs._live_dir }}'
+    dest: '{{ paperless_ngx___gs._app }}'
     owner: 'root'
     group: 'root'
     mode: 'a-st'
@@ -291,7 +291,7 @@
     make install
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___gs._live_dir }}'
+    chdir: '{{ paperless_ngx___gs._app }}'
   register: paperless_ngx__cmd
   changed_when: paperless_ngx__cmd.rc == 0
 
@@ -316,8 +316,8 @@
   ansible.builtin.shell: '{{ paperless_ngx__cfg._uv ~ " sync --all-extras" }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx__cfg._live_dir }}'
-    creates: '{{ paperless_ngx___app._venv_dir }}'
+    chdir: '{{ paperless_ngx__cfg._app }}'
+    creates: '{{ paperless_ngx__cfg._venv_dir }}'
 
 ###############################################################################
 # NLTK Libraries
@@ -330,8 +330,8 @@
     }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx__cfg._live_dir }}'
-    creates: '{{ paperless_ngx__cfg._live_dir ~ "/bin/nltk" }}'
+    chdir: '{{ paperless_ngx__cfg._app }}'
+    creates: '{{ paperless_ngx__cfg._app ~ "/bin/nltk" }}'
 
 - name: 'Install | uv | 🗘 download NLTK data (~1 minute) 🗘'
   when: paperless_ngx__cfg._nltk_data | length > 0
@@ -345,7 +345,7 @@
     }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx__cfg._live_dir }}'
+    chdir: '{{ paperless_ngx__cfg._app }}'
   register: paperless_ngx__cmd
   changed_when: '"already up-to-date" not in paperless_ngx__cmd.stderr'
 
@@ -360,11 +360,11 @@
 #
 
 - name:
-    '{{ "Install | filesystem | query " ~ paperless_ngx___app._policy_file }}'
+    '{{ "Install | filesystem | query " ~ paperless_ngx__cfg._policy_file }}'
   ansible.builtin.shell: >-
     set -o pipefail &&
     grep -c 'rights="read|write" pattern="PDF"'
-    {{ paperless_ngx___app._policy_file }}
+    {{ paperless_ngx__cfg._policy_file }}
   changed_when: false
   register: paperless_ngx__cmd
   failed_when: paperless_ngx__cmd.rc > 1
@@ -372,7 +372,7 @@
 - name: 'Install | filesystem | enable ImageMagick PDF processing'
   when: paperless_ngx__cmd.stdout == '0'
   ansible.builtin.lineinfile:
-    path: '{{ paperless_ngx___app._policy_file }}'
+    path: '{{ paperless_ngx__cfg._policy_file }}'
     search_string: '</policymap>'
     line: |2
         <policy domain="coder" rights="read|write" pattern="PDF" />

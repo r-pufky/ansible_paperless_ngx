@@ -19,7 +19,7 @@
 - name: 'Restore | awk | PAPERLESS_DATA_DIR'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false

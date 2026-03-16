@@ -6,8 +6,8 @@ Requires=redis.service
 
 [Service]
 ExecStart={{ paperless_ngx__cfg._uv }} run -- python3 manage.py document_consumer
-WorkingDirectory={{ paperless_ngx___app._work_dir }}
-Environment="PAPERLESS_CONFIGURATION_PATH={{ paperless_ngx___app._cfg }}"
+WorkingDirectory={{ paperless_ngx__cfg._work_dir }}
+Environment="PAPERLESS_CONFIGURATION_PATH={{ paperless_ngx__cfg._cfg }}"
 User={{ paperless_ngx__srv._user }}
 Group={{ paperless_ngx__srv._group }}
 RuntimeMaxSec=infinity

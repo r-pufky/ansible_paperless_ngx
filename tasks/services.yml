@@ -20,7 +20,7 @@
 - name: 'Services | awk | PAPERLESS_FORCE_SCRIPT_NAME'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_FORCE_SCRIPT_NAME=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -29,7 +29,7 @@
 - name: 'Services | awk | PAPERLESS_CONVERT_TMPDIR'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_CONVERT_TMPDIR=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -38,7 +38,7 @@
 - name: 'Services | awk | PAPERLESS_ADMIN_USER'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_ADMIN_USER=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -47,7 +47,7 @@
 - name: 'Services | awk | PAPERLESS_ADMIN_MAIL'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_ADMIN_MAIL=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -56,7 +56,7 @@
 - name: 'Services | awk | PAPERLESS_ADMIN_PASSWORD'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_ADMIN_PASSWORD=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false

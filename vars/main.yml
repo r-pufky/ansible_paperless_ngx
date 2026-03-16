@@ -107,7 +107,7 @@ paperless_ngx___app: "{{ {} | r_pufky.data.v3(
     _var_dir='/var/opt/paperless',
     _opt_dir='/opt/paperless',
     _src_dir='/opt/paperless/src',
-    _live_dir='/opt/paperless/src/' ~ paperless_ngx___release._app,
+    _app='/opt/paperless/src/' ~ paperless_ngx___release._app,
     _work_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/src',
     _venv_dir='/opt/paperless/src/' ~ paperless_ngx___release._app ~ '/.venv',
     _policy_file='/etc/ImageMagick-7/policy.xml',
@@ -137,7 +137,7 @@ paperless_ngx___jb2e: "{{ {} | r_pufky.data.v3(
     _package=paperless_ngx___jb2e_package,
     _opt_dir='/opt/jbig2enc',
     _src_dir='/opt/jbig2enc/src',
-    _live_dir='/opt/jbig2enc/src/' ~ paperless_ngx___release._jb2e,
+    _app='/opt/jbig2enc/src/' ~ paperless_ngx___release._jb2e,
     _url=paperless_ngx___jb2e_repo_url ~ paperless_ngx___jb2e_package,
   ) }}"
 
@@ -202,7 +202,7 @@ paperless_ngx___gs: "{{ {} | r_pufky.data.v3(
     _package=paperless_ngx___gs_package,
     _opt_dir='/opt/ghostscript',
     _src_dir='/opt/ghostscript/src',
-    _live_dir='/opt/ghostscript/src/' ~ paperless_ngx___release._gs,
+    _app='/opt/ghostscript/src/' ~ paperless_ngx___release._gs,
     _url=(
       paperless_ngx___gs_repo_url ~ paperless_ngx___gs_release ~ '/' ~
       paperless_ngx___gs_package

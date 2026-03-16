@@ -20,7 +20,7 @@
         _user=paperless_ngx_srv_user,
         _group=paperless_ngx_srv_group,
       ) }}"
-    paperless_ngx__cfg: "{{ {} | r_pufky.data.v3(
+    paperless_ngx__cfg: "{{ paperless_ngx___app | r_pufky.data.v3(
 
         _file=paperless_ngx_cfg_file,
         _backup_dir=paperless_ngx_cfg_backup_dir | regex_replace('\\/$', ''),
@@ -29,9 +29,7 @@
           map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | list
         ),
         _nltk_data=paperless_ngx_cfg_nltk_data,
-        _live_dir=(
-          paperless_ngx___app._src_dir ~ '/' ~ paperless_ngx_srv_version
-        ),
+        _app=paperless_ngx___app._src_dir ~ '/' ~ paperless_ngx_srv_version,
         _package='paperless-ngx-' ~ paperless_ngx_srv_version ~ '.tar.xz',
         _url=(
           paperless_ngx___app._base_url ~ paperless_ngx_srv_version ~ '/' ~

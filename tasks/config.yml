@@ -3,10 +3,10 @@
 # Configure Services
 ###############################################################################
 
-- name: '{{ "Config | filesystem | set " ~ paperless_ngx___app._cfg }}'
+- name: '{{ "Config | filesystem | set " ~ paperless_ngx__cfg._cfg }}'
   ansible.builtin.template:
     src: '{{ paperless_ngx__cfg._file }}'
-    dest: '{{ paperless_ngx___app._cfg }}'
+    dest: '{{ paperless_ngx__cfg._cfg }}'
     owner: '{{ paperless_ngx__cfg._uid }}'
     group: '{{ paperless_ngx__cfg._gid }}'
     mode: '0640'

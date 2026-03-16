@@ -35,9 +35,9 @@
     '{{ paperless_ngx__cfg._uv ~ " run -- python3 manage.py migrate" }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___app._work_dir }}'
+    chdir: '{{ paperless_ngx__cfg._work_dir }}'
   environment:
-    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx___app._cfg }}'
+    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx__cfg._cfg }}'
   become: true
   become_user: '{{ paperless_ngx__srv._user }}'
   register: paperless_ngx__cmd
@@ -51,9 +51,9 @@
     }}'
   args:
     executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___app._work_dir }}'
+    chdir: '{{ paperless_ngx__cfg._work_dir }}'
   environment:
-    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx___app._cfg }}'
+    PAPERLESS_CONFIGURATION_PATH: '{{ paperless_ngx__cfg._cfg }}'
     PAPERLESS_ADMIN_USER: '{{ paperless_ngx__cfg._admin_user }}'
     PAPERLESS_ADMIN_MAIL: '{{ paperless_ngx__cfg._admin_mail }}'
     PAPERLESS_ADMIN_PASSWORD: '{{ paperless_ngx__cfg._admin_pass }}'

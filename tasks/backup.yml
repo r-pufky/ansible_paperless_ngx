@@ -18,9 +18,9 @@
     mode: '0750'
     state: directory
 
-- name: '{{ "Backup | fetch | " ~ paperless_ngx___app._cfg }}'
+- name: '{{ "Backup | fetch | " ~ paperless_ngx__cfg._cfg }}'
   ansible.builtin.fetch:
-    src: '{{ paperless_ngx___app._cfg }}'
+    src: '{{ paperless_ngx__cfg._cfg }}'
     dest: '{{
         paperless_ngx__cfg._backup_dir ~ "/" ~
         paperless_ngx__srv._start ~ "_paperless.conf"
@@ -32,7 +32,7 @@
 - name: 'Backup | awk | PAPERLESS_DATA_DIR'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
-    {{ paperless_ngx___app._cfg }}
+    {{ paperless_ngx__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
