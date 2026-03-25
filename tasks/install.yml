@@ -2,7 +2,7 @@
 ###############################################################################
 # Install Packages & Services
 ###############################################################################
-# Manually download, extract, build, and install packages accordingly to Linux
+# Manually download, extract, build, and install packages according to Linux
 # FHS standards:
 #
 # Type    | Perms               | Path
@@ -88,6 +88,8 @@
     path: '{{ item.path }}'
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
+  loop_control:
+    label: '{{ item.path }}'
 
 - name: 'Install | url | 🗘 paperless-ngx (~1 minute) 🗘'
   when: not (url_inject_enable | default(false))
@@ -171,6 +173,8 @@
     path: '{{ item.path }}'
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
+  loop_control:
+    label: '{{ item.path }}'
 
 - name: 'Install | url | 🗘 JBIG2enc (~1 minute) 🗘'
   when: not (url_inject_enable | default(false))
@@ -242,6 +246,8 @@
     path: '{{ item.path }}'
     state: 'absent'
   loop: '{{ paperless_ngx__cmd.files }}'
+  loop_control:
+    label: '{{ item.path }}'
 
 - name: 'Install | url | 🗘 Ghostscript 🗘'
   when: not (url_inject_enable | default(false))

@@ -79,7 +79,7 @@ paperless_ngx_flg_migrate: true
 # * https://github.com/paperless-ngx/paperless-ngx/releases
 paperless_ngx_srv_version: 'v2.20.10'
 
-# Github access token.
+# Github access token (paperless, jbig2enc, ghostscript).
 #
 # Unauthenticated (anonymous) API requests are heavily restricted to the sum
 # total of requests to github from a given IP. Use an access token if
