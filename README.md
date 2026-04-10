@@ -52,7 +52,7 @@ Once configured take a backup of configuration.
     name: 'r_pufky.media.paperless_ngx'
   vars:
     paperless_ngx_flg_backup: true
-    paperless_ngx_cfg_backup_dir: 'host_vars/pgnx/data'
+    paperless_ngx_cfg_backup_d: 'host_vars/pgnx/data'
 ```
 
 See [Existing Deployments](#existing-deployments) for reproducible
@@ -105,9 +105,9 @@ molecule test --all
 
 Testing variables:
 
-  Variable          | type | Description
- -------------------|------|-------------
-  url_inject_enable | bool | Disable **get_url** to inject files locally.
+  Variable            | Type | Description
+ ---------------------|------|-------------
+  molecule_flg_inject | bool | Disable **get_url** to inject files locally.
 
 ### [Releases][b]
 Focused on service deployment with templated configuration to minimize role

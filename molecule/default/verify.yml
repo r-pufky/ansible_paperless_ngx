@@ -38,18 +38,18 @@
         test_state: 'file'
         test_diff: true
 
-    - name: '{{ "Verify | test | " ~ paperless_ngx___app._policy_file }}'
+    - name: '{{ "Verify | test | " ~ paperless_ngx___app._policy_xml }}'
       ansible.builtin.include_role:
         name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
         test_name:
-          '{{ "Verify | test | " ~ paperless_ngx___app._policy_file }}'
+          '{{ "Verify | test | " ~ paperless_ngx___app._policy_xml }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/policy.xml"
           }}'
-        test_file: '{{ paperless_ngx___app._policy_file }}'
+        test_file: '{{ paperless_ngx___app._policy_xml }}'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0644'

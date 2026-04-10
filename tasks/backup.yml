@@ -9,20 +9,20 @@
 
 - name: 'Backup | filesystem | set backup location'
   when: >
-    paperless_ngx__cfg._backup_dir | length > 0 and
-    paperless_ngx__cfg._backup_dir != '/tmp'
+    paperless_ngx__cfg._backup_d | length > 0 and
+    paperless_ngx__cfg._backup_d != '/tmp'
   delegate_to: 'localhost'
   run_once: true
   ansible.builtin.file:
-    path: '{{ paperless_ngx__cfg._backup_dir }}'
+    path: '{{ paperless_ngx__cfg._backup_d }}'
     mode: '0750'
     state: directory
 
-- name: '{{ "Backup | fetch | " ~ paperless_ngx__cfg._cfg }}'
+- name: '{{ "Backup | fetch | " ~ paperless_ngx___app._cfg }}'
   ansible.builtin.fetch:
-    src: '{{ paperless_ngx__cfg._cfg }}'
+    src: '{{ paperless_ngx___app._cfg }}'
     dest: '{{
-        paperless_ngx__cfg._backup_dir ~ "/" ~
+        paperless_ngx__cfg._backup_d ~ "/" ~
         paperless_ngx__srv._start ~ "_paperless.conf"
       }}'
     fail_on_missing: false
@@ -32,7 +32,7 @@
 - name: 'Backup | awk | PAPERLESS_DATA_DIR'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
-    {{ paperless_ngx__cfg._cfg }}
+    {{ paperless_ngx___app._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -42,7 +42,7 @@
   ansible.builtin.fetch:
     src: '{{ paperless_ngx__awk_data.stdout ~ "/" ~ item }}'
     dest: '{{
-        paperless_ngx__cfg._backup_dir ~ "/" ~
+        paperless_ngx__cfg._backup_d ~ "/" ~
         paperless_ngx__srv._start ~ "_" ~ item
       }}'
     fail_on_missing: false

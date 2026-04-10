@@ -7,7 +7,7 @@
 
 - name: 'Prep | fact | record start time'
   ansible.builtin.set_fact:
-    paperless_ngx__srv: "{{ {} | r_pufky.data.v3(
+    paperless_ngx__srv: "{{ paperless_ngx___release | r_pufky.data.v3(
 
         _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
         _version=paperless_ngx_srv_version,
@@ -20,16 +20,18 @@
         _user=paperless_ngx_srv_user,
         _group=paperless_ngx_srv_group,
       ) }}"
-    paperless_ngx__cfg: "{{ paperless_ngx___app | r_pufky.data.v3(
+    paperless_ngx__cfg: "{{ {} | r_pufky.data.v3(
 
         _file=paperless_ngx_cfg_file,
-        _backup_dir=paperless_ngx_cfg_backup_dir | regex_replace('\\/$', ''),
+        _backup_d=paperless_ngx_cfg_backup_d | regex_replace('\\/$', ''),
         _ocr_languages=(
           paperless_ngx_cfg_ocr_languages | default('eng') |
           map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | list
         ),
         _nltk_data=paperless_ngx_cfg_nltk_data,
-        _app=paperless_ngx___app._src_dir ~ '/' ~ paperless_ngx_srv_version,
+        _app_d=paperless_ngx___app._src_d ~ '/' ~ paperless_ngx_srv_version,
+        _work_d='/opt/paperless/src/' ~ paperless_ngx_srv_version ~ '/src',
+        _venv_d='/opt/paperless/src/' ~ paperless_ngx_srv_version ~ '/.venv',
         _package='paperless-ngx-' ~ paperless_ngx_srv_version ~ '.tar.xz',
         _url=(
           paperless_ngx___app._base_url ~ paperless_ngx_srv_version ~ '/' ~
@@ -42,14 +44,14 @@
   ansible.builtin.assert:
     quiet: true
     that:
-      - paperless_ngx__cfg._backup_dir | length > 0
+      - paperless_ngx__cfg._backup_d | length > 0
     fail_msg: |
 
       ✘ Backup location not set.
       Backups enabled but no backup location defined.
 
       paperless_ngx_flg_backup: {{ paperless_ngx_flg_backup }}
-      paperless_ngx_cfg_backup_dir: {{ paperless_ngx__cfg._backup_dir }}
+      paperless_ngx_cfg_backup_d: {{ paperless_ngx__cfg._backup_d }}
 
 - name: 'Prep | assert | config enabled and source defined'
   when: paperless_ngx_flg_config

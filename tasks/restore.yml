@@ -19,7 +19,7 @@
 - name: 'Restore | awk | PAPERLESS_DATA_DIR'
   ansible.builtin.shell: >-
     awk -F='' '/^PAPERLESS_DATA_DIR=/ {print $2}'
-    {{ paperless_ngx__cfg._cfg }}
+    {{ paperless_ngx___app._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -28,7 +28,7 @@
 - name: 'Restore | filesystem | enumerate all backups'
   delegate_to: 'localhost'
   ansible.builtin.find:
-    paths: '{{ paperless_ngx__cfg._backup_dir }}'
+    paths: '{{ paperless_ngx__cfg._backup_d }}'
     patterns: '*.sqlite3'
     file_type: 'file'
     recurse: false
@@ -51,7 +51,7 @@
   when: paperless_ngx__dbs.files | length > 0
   delegate_to: 'localhost'
   ansible.builtin.find:
-    paths: '{{ paperless_ngx__cfg._backup_dir }}'
+    paths: '{{ paperless_ngx__cfg._backup_d }}'
     patterns: '{{ paperless_ngx__restore_base ~ ".*" }}'
     file_type: 'file'
     recurse: false

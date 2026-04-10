@@ -27,7 +27,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        url_inject_enable: true
+        molecule_flg_inject: true
 platforms:
   - name: 'paperless-ngx-default'
     image: 'ghcr.io/hifis-net/debian-systemd:13'

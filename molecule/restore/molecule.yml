@@ -25,8 +25,8 @@ provisioner:
   inventory:
     group_vars:
       all:
-        url_inject_enable: true
-        paperless_ngx_cfg_backup_dir: '/tmp/ansible_paperless_ngx_test'
+        molecule_flg_inject: true
+        paperless_ngx_cfg_backup_d: '/tmp/ansible_paperless_ngx_test'
 platforms:
   - name: 'paperless-ngx-restore'
     image: 'ghcr.io/hifis-net/debian-systemd:13'

@@ -3,10 +3,10 @@
 # Feature Flags
 ###############################################################################
 
-# 1. Backup SQLite, paperless.conf to paperless_ngx_cfg_backup_dir?
+# 1. Backup SQLite, paperless.conf to paperless_ngx_cfg_backup_d?
 #
 # Backup existing config, DB, and exit role. Only applies to SQLite databases
-# configured in PAPERLESS_DATA_DIR. paperless_ngx_cfg_backup_dir created if
+# configured in PAPERLESS_DATA_DIR. paperless_ngx_cfg_backup_d created if
 # non-existent. Services stopped, files backed up, services started.
 #
 # Default: False.
@@ -20,7 +20,7 @@ paperless_ngx_flg_backup: false
 # Configuration is applied via paperless_ngx_cfg_file.
 #
 # Database (SQLite only):
-# Restored from latest backup in paperless_ngx_cfg_backup_dir to
+# Restored from latest backup in paperless_ngx_cfg_backup_d to
 # PAPERLESS_DATA_DIR in restored configuration file. Custom PAPERLESS_DATA_DIR
 # paths are **not** created. These must be created before executing restore (as
 # with all custom user data directories).
@@ -73,11 +73,11 @@ paperless_ngx_flg_migrate: true
 #
 # Submit an issue if future versions break role deployment.
 #
-# Default: 'v2.20.10'.
+# Default: 'v2.20.13'.
 #
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
-paperless_ngx_srv_version: 'v2.20.10'
+paperless_ngx_srv_version: 'v2.20.13'
 
 # Github access token (paperless, jbig2enc, ghostscript).
 #
@@ -209,10 +209,10 @@ paperless_ngx_cfg_file: ''
 # All backup operations (SQLite, config) for a given role execution are stored
 # locally on ansible controller with the format 'YYYY-MM-DDTHHMMSS_{FILE}'.
 #
-# paperless_ngx_cfg_backup_dir: 'data/pngx'
+# paperless_ngx_cfg_backup_d: 'data/pngx'
 #
 # Default: ''
-paperless_ngx_cfg_backup_dir: ''
+paperless_ngx_cfg_backup_d: ''
 
 # List of languages used for OCR processing.
 #
