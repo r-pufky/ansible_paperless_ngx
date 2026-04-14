@@ -1,4 +1,5 @@
 ---
+
 ###############################################################################
 # Feature Flags
 ###############################################################################
@@ -169,14 +170,35 @@ paperless_ngx_srv_user: 'paperless'
 # Default: 'paperless'.
 paperless_ngx_srv_group: 'paperless'
 
+# yamllint disable rule:line-length
 ###############################################################################
 # Config
 ###############################################################################
+# Paperless uses jinja2 templating to parse paperless.conf. Templates are
+# automatically used with paperless_cfg_file.
+#
+# Use raw feature to allow jinja templating to pass through to rendered
+# template:
+#
+# ``` ini
+# PAPERLESS_FILENAME_FORMAT={% raw %}{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]{% endraw %}
+#
+# ```
+#
+# Renders paperless.conf as:
+# ``` ini
+# PAPERLESS_FILENAME_FORMAT={{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]
+# ```
+#
+# Reference:
+# * https://forgejo.org/docs/latest/admin/config-cheat-sheet/
+# * https://codeberg.org/forgejo/forgejo/src/branch/forgejo/custom/conf/app.example.ini
+# yamllint enable rule:line-length
 
 # paperless.conf to set.
 #
 # Ansible controller path to source paperless.conf (treated as a jinja2
-# template allowing for ansible variable interpretation). Overwrites existing
+# template allowing for ansible variable use). Overwrites existing
 # /etc/opt/paperless/paperless.conf.
 #
 # A minimally configured template that works with the role will be deployed if
@@ -202,6 +224,7 @@ paperless_ngx_srv_group: 'paperless'
 #
 # Reference:
 # * https://docs.paperless-ngx.com/configuration
+# yamllint enable rule:line-length
 paperless_ngx_cfg_file: ''
 
 # Role backup location.

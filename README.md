@@ -18,6 +18,23 @@ Detailed variable use documented in defaults. See usage for role operation.
 
 ## Usage
 
+### NOTE
+> Paperless uses jinja2 templating to parse paperless.conf. Templates are
+> automatically used with paperless_cfg_file.
+>
+> Use raw feature to allow jinja templating to pass through to rendered
+> template:
+
+``` ini
+PAPERLESS_FILENAME_FORMAT={% raw %}{{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]{% endraw %}
+
+```
+
+Renders paperless.conf as:
+``` ini
+PAPERLESS_FILENAME_FORMAT={{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]
+```
+
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
 
