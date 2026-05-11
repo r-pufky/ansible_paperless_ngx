@@ -15,11 +15,13 @@
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
+# TODO(ghostscript): 10.07.1 changed build dependencies resulting in build
+#     errors which require manual edits. Pin 10.06.0 until resolved upstream.
 paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-03-14',
     _debian='trixie',
-    _app='v2.20.13',
+    _app='v2.20.15',
     _jb2e='0.30',
     _gs='10.06.0',
   ) }}"
