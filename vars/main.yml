@@ -21,7 +21,7 @@ paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-03-14',
     _debian='trixie',
-    _app='v2.20.15',
+    _app='v3.0.4',
     _jb2e='0.30',
     _gs='10.06.0',
   ) }}"
@@ -89,7 +89,7 @@ paperless_ngx___redis:  # includes redis-server, redis-tools.
 ###############################################################################
 # Paperless-NGX
 ###############################################################################
-# User defined version is overlayed in prep.yml.
+# User defined version is overlaid in prep.yml.
 #
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
@@ -116,6 +116,10 @@ paperless_ngx___app: "{{ {} | r_pufky.data.v3(
     _url=(
       paperless_ngx___repo_url ~ paperless_ngx___release._app ~ '/' ~
       paperless_ngx___package
+    ),
+    _seed_key=(
+      inventory_hostname | hash('sha256') | b64encode |
+      regex_replace('[^a-zA-Z0-9-_]', '') | truncate(64, True, '')
     ),
   ) }}"
 

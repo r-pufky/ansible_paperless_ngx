@@ -35,6 +35,11 @@ Renders paperless.conf as:
 PAPERLESS_FILENAME_FORMAT={{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]
 ```
 
+### PAPERLESS_SECRET_KEY
+> Paperless 3.0+ requires this key defined for sessions and tokens. A default
+> key is generated for new installs using a deterministic value from the
+> ansible hostname. See https://docs.paperless-ngx.com/configuration.
+
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
 
@@ -92,6 +97,7 @@ host_vars/pngx.example.com/paperless.conf
 # Template:
 # https://github.com/paperless-ngx/paperless-ngx/blob/dev/paperless.conf.example
 
+PAPERLESS_SECRET_KEY={{ vault_pngx_secret_key }}  # Required 3.0+.
 PAPERLESS_CONVERT_TMPDIR=/tmp
 PAPERLESS_CONSUMPTION_DIR=/d/consume
 PAPERLESS_DATA_DIR=/d/data
@@ -130,22 +136,23 @@ Testing variables:
 Focused on service deployment with templated configuration to minimize role
 churn due to inconsistent and rapid rolling release cycle.
 
- Release | Debian | Ansible | Paperless-NGX | Notes
----------|--------|---------|---------------|-------
- 14.x.x  | 13     | 2.20    | v2.20.10      | Update to Ansible 2.20 collection dependencies.
- 13.x.x  | 13     | 2.20    | v2.20.8       | Ansible 2.20, feature flags, and semantic versioning.
- 12.x.x  | 13     | 2.18    | v2.20.1       | Last 'fully managed' config.
- 11.x.x  | 13     | 2.18    | v2.19.3       | Migrate to r_pufky.media.
- 10.x.x  | 13     | 2.18    | v2.19.2       | Redis server required for DB migrations.
- 9.x.x   | 13     | 2.18    | v2.18.4       | Data annotations V3.
- 8.x.x   | 13     | 2.18    | v2.18.4       | Breaking Paperless changes.
- 7.x.x   | 13     | 2.18    | v2.18.2       | Migrate to Debian Trixie.
- 6.x.x   | 12     | 2.18    | v2.18.1       | Breaking Paperless changes.
- 5.x.x   | 12     | 2.18    | v2.17.3       | Data annotations V2.
- 4.x.x   | 12     | 2.18    | v2.16.1       | Data annotations.
- 3.x.x   | 12     | 2.18    | v2.16.2       | Use source release for JBIG2enc.
- 2.x.x   | 12     | 2.18    | v2.14.7       | Ansible 2.18 support.
- 1.x.x   | 12     | 2.11    | v1.15.1       | Migration from private repository.
+  Release | Debian | Ansible | Paperless-NGX | Notes
+ ---------|--------|---------|---------------|-------
+  15.x.x  | 13     | 2.20    | v3.0.0        | Breaking Paperless changes.
+  14.x.x  | 13     | 2.20    | v2.20.10      | Update to Ansible 2.20 collection dependencies.
+  13.x.x  | 13     | 2.20    | v2.20.8       | Ansible 2.20, feature flags, and semantic versioning.
+  12.x.x  | 13     | 2.18    | v2.20.1       | Last 'fully managed' config.
+  11.x.x  | 13     | 2.18    | v2.19.3       | Migrate to r_pufky.media.
+  10.x.x  | 13     | 2.18    | v2.19.2       | Redis server required for DB migrations.
+  9.x.x   | 13     | 2.18    | v2.18.4       | Data annotations V3.
+  8.x.x   | 13     | 2.18    | v2.18.4       | Breaking Paperless changes.
+  7.x.x   | 13     | 2.18    | v2.18.2       | Migrate to Debian Trixie.
+  6.x.x   | 12     | 2.18    | v2.18.1       | Breaking Paperless changes.
+  5.x.x   | 12     | 2.18    | v2.17.3       | Data annotations V2.
+  4.x.x   | 12     | 2.18    | v2.16.1       | Data annotations.
+  3.x.x   | 12     | 2.18    | v2.16.2       | Use source release for JBIG2enc.
+  2.x.x   | 12     | 2.18    | v2.14.7       | Ansible 2.18 support.
+  1.x.x   | 12     | 2.11    | v1.15.1       | Migration from private repository.
 
 ## Issues
 Create a bug and provide as much information as possible.

@@ -5,6 +5,7 @@
 # Have a look at the docs for documentation.
 # https://docs.paperless-ngx.com/configuration/
 
+PAPERLESS_SECRET_KEY=NjA0NTRmZDE4MzkxZWY0NjkyYmFkNjdkNDIwZDFlNGVjMmExZDg3ODc4YTJiOGIz
 PAPERLESS_CONVERT_TMPDIR=/tmp
 PAPERLESS_CONSUMPTION_DIR=/var/opt/paperless/consume
 PAPERLESS_DATA_DIR=/var/opt/paperless/data

@@ -9,12 +9,13 @@
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
           }}'
 
-    - name: '{{ "Verify | test | " ~ paperless_ngx___app._cfg }}'
+    - name: '{{ "Verify | test | minimal " ~ paperless_ngx___app._cfg }}'
       ansible.builtin.include_role:
         name: 'r_pufky.data.test'
-        tasks_from: 'copy.yml'
+        tasks_from: 'template.yml'
       vars:
-        test_name: '{{ "Verify | test | " ~ paperless_ngx___app._cfg }}'
+        test_name:
+          '{{ "Verify | test | minimal " ~ paperless_ngx___app._cfg }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/paperless.conf.role_defaults"
@@ -24,6 +25,24 @@
         test_group: 'paperless'
         test_mode: '0640'
         test_diff: true
+        test_content: |
+          # Minimal configuration for Paperless-NGX.
+          #
+          # Precedence: config > environment.
+          #
+          # Have a look at the docs for documentation.
+          # https://docs.paperless-ngx.com/configuration/
+
+          PAPERLESS_SECRET_KEY=NjA0NTRmZDE4MzkxZWY0NjkyYmFkNjdkNDIwZDFlNGVjMmExZDg3ODc4YTJiOGIz
+          PAPERLESS_CONVERT_TMPDIR=/tmp
+          PAPERLESS_CONSUMPTION_DIR=/var/opt/paperless/consume
+          PAPERLESS_DATA_DIR=/var/opt/paperless/data
+          PAPERLESS_EMPTY_TRASH_DIR=/var/opt/paperless/trash
+          PAPERLESS_MEDIA_ROOT=/var/opt/paperless/media
+          PAPERLESS_GS_BINARY=/usr/local/bin/gs
+          PAPERLESS_ADMIN_USER=admin
+          PAPERLESS_ADMIN_MAIL=root@localhost
+          PAPERLESS_ADMIN_PASSWORD=admin
 
     - name: 'Verify | test | /var/opt/paperless/data/db.sqlite3'
       ansible.builtin.include_role:

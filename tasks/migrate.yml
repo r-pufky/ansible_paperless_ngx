@@ -18,6 +18,17 @@
 #
 # Not resolved until Paperless migrates entirely pathlib.
 #
+# Paperless-NGX 3.0+ requires PAPERLESS_SECRET_KEY to be set.
+#
+# Migrating database schema will fail with:
+#
+#   django.core.exceptions.ImproperlyConfigured: PAPERLESS_SECRET_KEY is not
+#   set or is the default 'change-me' value. A unique, secret key is required
+#   for secure operation. Generate one with:
+#   python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+#
+# User config must supply PAPERLESS_SECRET_KEY
+#
 # Reference:
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://github.com/paperless-ngx/ansible
