@@ -15,15 +15,18 @@
 # * https://docs.paperless-ngx.com/setup/#bare_metal
 # * https://github.com/paperless-ngx/paperless-ngx/blob/dev/Dockerfile
 
-# TODO(ghostscript): 10.07.1 changed build dependencies resulting in build
-#     errors which require manual edits. Pin 10.06.0 until resolved upstream.
+# TODO(ghostscript): Reverted to Debian package (10.5) to resolve jpeg
+#     corruption issues in 10.6/10.7. See commit a23a2dc/15.0.0 for manual
+#     build process.
+#
+#     Reference:
+#     * https://github.com/ocrmypdf/OCRmyPDF/issues/1656
 paperless_ngx___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-03-14',
     _debian='trixie',
-    _app='v3.0.4',
+    _app='v3.0.5',
     _jb2e='0.30',
-    _gs='10.06.0',
   ) }}"
 
 ###############################################################################
@@ -49,7 +52,7 @@ paperless_ngx___packages:
 
   # OCRmyPDF.
   - 'unpaper'
-  # - 'ghostscript'  # See security warning; use a custom build.
+  - 'ghostscript'
   - 'icc-profiles-free'
   - 'qpdf'
   - 'libleptonica6'  # Package name changed from liblept5.
@@ -144,74 +147,6 @@ paperless_ngx___jb2e: "{{ {} | r_pufky.data.v3(
     _src_d='/opt/jbig2enc/src',
     _app_d='/opt/jbig2enc/src/' ~ paperless_ngx___release._jb2e,
     _url=paperless_ngx___jb2e_repo_url ~ paperless_ngx___jb2e_package,
-  ) }}"
-
-###############################################################################
-# Ghostscript Support
-###############################################################################
-# Ghostscript release tags and versions do not match; there is not enough
-# information in the release tag to parse version from the tag. Use the release
-# version from the download link and parse the tags in prep.
-#
-# Security: CVE-2023-43115
-#   CVE:
-#   * https://nvd.nist.gov/vuln/detail/cve-2023-43115
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27835
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27832
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27831
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27836
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27830
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27833
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27837
-#   * https://nvd.nist.gov/vuln/detail/cve-2025-27834
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46951
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46952
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46953
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46954
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46955
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-46956
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33869
-#   * https://nvd.nist.gov/vuln/detail/cve-2023-52722
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33870
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-33871
-#   * https://nvd.nist.gov/vuln/detail/cve-2024-29510
-#
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27835
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27832
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27831
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27836
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27830
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27833
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27837
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-27834
-#   * https://nvd.nist.gov/vuln/detail/CVE-2025-46646
-#  Decision: do not use package - multiple vulnerabilities with PDF corruption
-#      for existing files, packages (and backports) affected.
-#  Mitigation: use source release. Default gs binary to custom binary
-#      /usr/local/bin/gs instead of /usr/bin/gs.
-#  Reference:
-#  * https://github.com/tteck/Proxmox/discussions/3265
-#  * https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
-
-paperless_ngx___gs_repo_url:
-  'https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/'
-paperless_ngx___gs_package:
-  '{{ "ghostpdl-" ~ paperless_ngx___release._gs ~ ".tar.xz" }}'
-paperless_ngx___gs_release: "{{
-    'gs' ~ paperless_ngx___release._gs | replace('.', '') | replace('-', '')
-  }}"
-
-paperless_ngx___gs: "{{ {} | r_pufky.data.v3(
-
-    _version=paperless_ngx___release._gs,
-    _package=paperless_ngx___gs_package,
-    _opt_d='/opt/ghostscript',
-    _src_d='/opt/ghostscript/src',
-    _app_d='/opt/ghostscript/src/' ~ paperless_ngx___release._gs,
-    _url=(
-      paperless_ngx___gs_repo_url ~ paperless_ngx___gs_release ~ '/' ~
-      paperless_ngx___gs_package
-    ),
   ) }}"
 
 ###############################################################################

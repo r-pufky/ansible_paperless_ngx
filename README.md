@@ -9,6 +9,18 @@ Install size: ~2GB
 
 Database backend changes are **not** supported.
 
+### Paperless 3.0+ Breaking Changes
+> Current installation must be **2.20.15** before upgrading to **3.0x**
+>
+> **PAPERLESS_SECRET_KEY** is now mandatory. Many options are deprecated or
+> changed. Manual review of configuration is **required**.
+>
+> Ghostscript rolled back to Debian 10.5 to prevent potential jpeg corruption
+> issues in both 10.6 and 10.7.
+>
+> https://github.com/paperless-ngx/paperless-ngx/blob/dev/docs/migration-v3.md
+> https://github.com/ocrmypdf/OCRmyPDF/issues/1656
+
 ## Role Variables
 Detailed variable use documented in defaults. See usage for role operation.
 
@@ -17,6 +29,7 @@ Detailed variable use documented in defaults. See usage for role operation.
 * [ports][k] - Ports are **not** managed (defined for external use).
 
 ## Usage
+
 
 ### NOTE
 > Paperless uses jinja2 templating to parse paperless.conf. Templates are
@@ -34,11 +47,6 @@ Renders paperless.conf as:
 ``` ini
 PAPERLESS_FILENAME_FORMAT={{ document_type }}/{{ correspondent }}/{{ created }}-{{ title }}-[{{ tag_list }}]
 ```
-
-### PAPERLESS_SECRET_KEY
-> Paperless 3.0+ requires this key defined for sessions and tokens. A default
-> key is generated for new installs using a deterministic value from the
-> ansible hostname. See https://docs.paperless-ngx.com/configuration.
 
 ### Feature Flags
 Tasks are gated by feature flags and executed in the following order.
@@ -103,8 +111,6 @@ PAPERLESS_CONSUMPTION_DIR=/d/consume
 PAPERLESS_DATA_DIR=/d/data
 PAPERLESS_EMPTY_TRASH_DIR=/d/trash
 PAPERLESS_MEDIA_ROOT=/d/media
-# Use role built ghostscript which addresses vulnerabilities.
-PAPERLESS_GS_BINARY=/usr/local/bin/gs
 PAPERLESS_ADMIN_USER=my_custom_admin_user
 PAPERLESS_ADMIN_MAIL=admin@example.com
 PAPERLESS_ADMIN_PASSWORD={{ vault_pgnx_admin_password }}

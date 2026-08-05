@@ -23,3 +23,14 @@
   args:
     executable: '/bin/bash'
     removes: '/usr/systemd/system/paperless-webserver.service'
+
+# 15.1.0 migrate to Debian package (ghostscript 10.5):
+# * Address 10.6/10.7 ghostscript vulnerabilities. Remove this when this is
+#   fixed upstream. See vars.
+- name: 'Maintenance | 15.1.0 | remove ghostscript build'
+  ansible.builtin.shell: >-
+    rm -rf /opt/ghostscript &&
+    rm -f /usr/local/bin/gs
+  args:
+    executable: '/bin/bash'
+    removes: '/usr/local/bin/gs'

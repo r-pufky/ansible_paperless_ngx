@@ -43,19 +43,6 @@
         test_url: '{{ paperless_ngx___jb2e._url }}'
         test_mode: '0640'
 
-    - name:
-        '{{ "Prepare | cache | Ghostscript " ~ paperless_ngx___gs._version }}'
-      ansible.builtin.include_role:
-        name: 'r_pufky.data.test'
-        tasks_from: 'cache_url.yml'
-      vars:
-        test_name: '{{
-            "Prepare | cache | Ghostscript " ~ paperless_ngx___gs._version
-          }}'
-        test_dest: '{{ paperless_ngx___gs._package }}'
-        test_url: '{{ paperless_ngx___gs._url }}'
-        test_mode: '0640'
-
 - name: 'Prepare'
   hosts: 'all'
   gather_facts: false
@@ -80,7 +67,6 @@
       loop:
         - '{{ paperless_ngx___app._package }}'
         - '{{ paperless_ngx___jb2e._package }}'
-        - '{{ paperless_ngx___gs._package }}'
 
     # Base install moving source builds to a 1-time process rather than
     # requiring 6-8 minute rebuilds on re-tests. Re-running the same process

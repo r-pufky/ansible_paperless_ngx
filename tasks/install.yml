@@ -16,7 +16,6 @@
 # * OCR packages are installed if OCR is enabled, including tesseract OCR data.
 # * JBIG2enc is used for lossless PDF/A compression (not listed in bare-metal
 #   instructions) but used in Docker configuration which is based on Bookworm.
-# * Use source ghostscript to reduce vulnerability exposure.
 # * NLTK is installed and extra data is downloaded if specified.
 # * All database libraries are installed.
 #
@@ -35,7 +34,6 @@
   loop:
     - '{{ paperless_ngx___app._src_d }}'  # src_dir includes opt_dir.
     - '{{ paperless_ngx___jb2e._src_d }}'
-    - '{{ paperless_ngx___gs._src_d }}'
     - '{{ paperless_ngx___nltk._opt_d }}'
 
 - name: 'Install | filesystem | set paperless directories'
@@ -225,79 +223,6 @@
   args:
     executable: '/bin/bash'
     chdir: '{{ paperless_ngx___jb2e._app_d }}'
-  register: paperless_ngx__cmd
-  changed_when: paperless_ngx__cmd.rc == 0
-
-###############################################################################
-# Ghostscript
-###############################################################################
-
-- name: 'Install | filesystem | find previous installations'
-  ansible.builtin.find:
-    paths: '{{ paperless_ngx___gs._src_d }}'
-    file_type: 'directory'
-    recurse: false
-    excludes:
-      - '{{ paperless_ngx___gs._version }}'
-  register: paperless_ngx__cmd
-
-- name: 'Install | filesystem | remove previous installations'
-  ansible.builtin.file:
-    path: '{{ item.path }}'
-    state: 'absent'
-  loop: '{{ paperless_ngx__cmd.files }}'
-  loop_control:
-    label: '{{ item.path }}'
-
-- name: 'Install | url | 🗘 Ghostscript 🗘'
-  when: not (molecule_flg_inject | default(false))
-  ansible.builtin.get_url:
-    url: '{{ paperless_ngx___gs._url }}'
-    dest: '{{ "/tmp/" ~ paperless_ngx___gs._package }}'
-    force: false
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
-    headers:
-      Authorization: '{{ paperless_ngx__srv._token | default(omit) }}'
-  register: paperless_ngx__cmd
-  until: paperless_ngx__cmd is succeeded
-
-- name: '{{ "Install | filesystem | set " ~ paperless_ngx___gs._app_d }}'
-  ansible.builtin.file:
-    path: '{{ paperless_ngx___gs._app_d }}'
-    owner: 'root'
-    group: 'root'
-    mode: '0755'
-    state: 'directory'
-
-- name: 'Install | filesystem | unpack Ghostscript'
-  ansible.builtin.unarchive:
-    creates: '{{ paperless_ngx___gs._app_d ~ "/base/gslib.c" }}'
-    src: '{{ "/tmp/" ~ paperless_ngx___gs._package }}'
-    remote_src: true
-    dest: '{{ paperless_ngx___gs._app_d }}'
-    owner: 'root'
-    group: 'root'
-    mode: 'a-st'
-    extra_opts: ['--strip-components=1']
-  register: paperless_ngx__cmd
-
-- name: 'Install | build | 🗘 Ghostscript (~4 minutes) 🗘'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
-  ansible.builtin.debug:
-    msg: 'Building Ghostscript (~4 minutes).'
-
-- name: '{{ "Install | build | Ghostscript " ~ paperless_ngx___gs._version }}'
-  when: paperless_ngx__cmd.changed  # noqa: no-handler immediate.
-  ansible.builtin.shell: >-
-    set -o pipefail &&
-    ./configure &&
-    make &&
-    make install
-  args:
-    executable: '/bin/bash'
-    chdir: '{{ paperless_ngx___gs._app_d }}'
   register: paperless_ngx__cmd
   changed_when: paperless_ngx__cmd.rc == 0
 

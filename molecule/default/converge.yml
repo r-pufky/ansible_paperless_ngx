@@ -43,7 +43,6 @@
           PAPERLESS_DATA_DIR=/var/opt/paperless/data
           PAPERLESS_EMPTY_TRASH_DIR=/var/opt/paperless/trash
           PAPERLESS_MEDIA_ROOT=/var/opt/paperless/media
-          PAPERLESS_GS_BINARY=/usr/local/bin/gs
           PAPERLESS_ADMIN_USER=admin
           PAPERLESS_ADMIN_MAIL=root@localhost
           PAPERLESS_ADMIN_PASSWORD=admin

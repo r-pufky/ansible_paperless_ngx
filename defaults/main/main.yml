@@ -74,13 +74,13 @@ paperless_ngx_flg_migrate: true
 #
 # Submit an issue if future versions break role deployment.
 #
-# Default: 'v3.0.4'.
+# Default: 'v3.0.5'.
 #
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
-paperless_ngx_srv_version: 'v3.0.4'
+paperless_ngx_srv_version: 'v3.0.5'
 
-# Github access token (paperless, jbig2enc, ghostscript).
+# Github access token (paperless, jbig2enc).
 #
 # Unauthenticated (anonymous) API requests are heavily restricted to the sum
 # total of requests to github from a given IP. Use an access token if
@@ -203,6 +203,7 @@ paperless_ngx_srv_group: 'paperless'
 #
 # A minimally configured template that works with the role will be deployed if
 # no config file is specified (see templates/paperless.conf.j2):
+#   PAPERLESS_SECRET_KEY={{ idempotent_key_from_ansible_host }}
 #   PAPERLESS_CONVERT_TMPDIR=/tmp
 #   PAPERLESS_CONSUMPTION_DIR=/var/opt/paperless/consume
 #   PAPERLESS_DATA_DIR=/var/opt/paperless/data
@@ -211,8 +212,6 @@ paperless_ngx_srv_group: 'paperless'
 #   PAPERLESS_ADMIN_USER=admin
 #   PAPERLESS_ADMIN_MAIL=root@localhost
 #   PAPERLESS_ADMIN_PASSWORD=admin
-#   # Use role built ghostscript which addresses vulnerabilities.
-#   PAPERLESS_GS_BINARY=/usr/local/bin/gs
 #
 # Manage additional files and directories (such as DB root certificates, custom
 # user data storage locations, etc.) outside of the role. Must be accessible to

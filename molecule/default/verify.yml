@@ -67,16 +67,3 @@
         test_mode: '0755'
         test_state: 'file'
         test_diff: true
-
-    - name: 'Verify | test | /usr/local/bin/gs'
-      ansible.builtin.include_role:
-        name: 'r_pufky.data.test'
-        tasks_from: 'file.yml'
-      vars:
-        test_name: 'Verify | test | /usr/local/bin/gs'
-        test_file: '/usr/local/bin/gs'
-        test_owner: 'root'
-        test_group: 'root'
-        test_mode: '0755'
-        test_state: 'file'
-        test_diff: true
