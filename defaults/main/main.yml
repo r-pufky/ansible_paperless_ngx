@@ -74,11 +74,11 @@ paperless_ngx_flg_migrate: true
 #
 # Submit an issue if future versions break role deployment.
 #
-# Default: 'v3.3.2'.
+# Default: 'v3.3.3'.
 #
 # Reference:
 # * https://github.com/paperless-ngx/paperless-ngx/releases
-paperless_ngx_srv_version: 'v3.3.2'
+paperless_ngx_srv_version: 'v3.3.3'
 
 # Github access token (paperless, jbig2enc).
 #
